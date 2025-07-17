@@ -1,0 +1,7 @@
+
+cloc-git.sh executable
+cowbox.sh executable
+optimize_zsh.sh executable
+profile_zsh.sh executable
+resilient_network_mount.sh executable
+starship_wizard.sh executable

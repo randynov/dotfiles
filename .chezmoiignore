@@ -1,0 +1,15 @@
+# Ignore common files
+.DS_Store
+*.zwc
+*history
+*hst
+
+# Ignore cache and temp directories
+.cache/
+.Trash/
+
+# Ignore sensitive directories and files
+.ssh/
+.gnupg/
+.aws/
+.boto

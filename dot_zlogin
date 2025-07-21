@@ -1,0 +1,25 @@
+# Only show decorative output for interactive terminal sessions
+# Skip if running in non-interactive mode, subshells, or IDE contexts
+if [[ -o interactive && -t 0 && -t 1 && $SHLVL -eq 1 && -z "$VSCODE_INJECTION" && "$TERM_PROGRAM" != "vscode" ]]; then
+    # Terminal settings - set backspace/delete key behavior
+    # Alternative erase key configurations (uncomment if needed):
+    #stty erase \^\H    # Use Ctrl+H for backspace (some old terminals)
+    #stty erase \^\?    # Use DEL character (127) for backspace
+    #stty erase \^H     # Use Ctrl+H for backspace (alternative syntax)
+    #stty erase \^?     # Use DEL character for backspace (alternative syntax)
+    stty erase '^?'     # Standard: Use DEL (127) for backspace - works with most modern terminals
+    
+    echo "--------------------------------------------------------------------------------"
+    uptime_text="$(uptime)"
+    term_width=80
+    uptime_padding=$(( (term_width - ${#uptime_text}) / 2 ))
+    printf "%*s%s\n" $uptime_padding "" "$uptime_text" | lolcat -t
+#    printf "%*s%s\n" $uptime_padding "" "$uptime_text" | lolcat -a -d 3 -s 5 -t
+#    weather_text="$(curl -s "wttr.in/Washington?format=Weather:+%l+%c+%t" 2>/dev/null || echo "Weather: N/A")"
+#    weather_padding=$(( (term_width - ${#weather_text}) / 2 ))
+#    printf "%*s%s\n" $weather_padding "" "$weather_text" | lolcat
+    echo "--------------------------------------------------------------------------------"
+    fortune | boxes -d "$(boxes -l | tail -n +4 | awk '/^[a-zA-Z0-9-]+$/{print $1}' | gshuf -n 1)" | lolcat -t
+    echo "--------------------------------------------------------------------------------"
+fi
+

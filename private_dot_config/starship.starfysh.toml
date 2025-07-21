@@ -1,0 +1,262 @@
+format = """
+[╭](fg:green)\
+$os\
+$cmd_duration\
+$username\
+$hostname\
+$nix_shell\
+$directory\
+$git_branch\
+$git_status\
+$git_commit\
+$git_state\
+$git_metrics\
+$fill\
+$nodejs\
+$dotnet\
+$python\
+$java\
+$lua\
+$golang\
+$c\
+$line_break\
+$character\
+"""
+
+right_format = """
+$time\
+$battery\
+"""
+
+palette = 'starfysh'
+add_newline = true
+
+[palettes.starfysh]
+foreground = '#e0def4'
+background = '#191724'
+current_line = '#6e6a86'
+primary = '#403d52'
+box = '#6f6a88'
+dkgrey = '#3d3836'
+grey = '#6272a4'
+blue = '#458588'
+cyan = '#9ccfd8'
+greygreen = '#56949f'
+bluegreen = '#278789'
+dkgreen = '#2a814c'
+green = '#00CC00'
+orange = '#d65d0e'
+pink = '#ebbcba'
+ltblue = '#b2beff'
+yellow = '#d79921'
+ltgrey = '#6e6a86'
+red = '#cc241d'
+color_fg0 = '#fbf1c7'
+color_bg1 = '#3c3836'
+color_bg3 = '#665c54'
+color_blue = '#458588'
+color_aqua = '#689d6a'
+color_green = '#98971a'
+
+[os]
+format = '(fg:green)[](fg:ltgrey)[$symbol](fg:bold white bg:ltgrey)[](fg:ltgrey)'
+disabled = false
+
+[os.symbols]
+Alpine = ''
+Amazon = ''
+Android = ''
+Arch = ''
+CentOS = ''
+Debian = ''
+EndeavourOS = ''
+Fedora = ''
+FreeBSD = ''
+Garuda = ''
+Gentoo = ''
+Linux = ''
+Macos = ''
+Manjaro = ''
+Mariner = ''
+Mint = ''
+NetBSD = ''
+NixOS = ''
+OpenBSD = ''
+OpenCloudOS = ''
+openEuler = ''
+openSUSE = ''
+OracleLinux = '⊂⊃'
+Pop = ''
+Raspbian = ''
+Redhat = ''
+RedHatEnterprise = ''
+Solus = ''
+SUSE = ''
+Ubuntu = ''
+Unknown = ''
+Windows = ''
+
+[nix_shell]
+disabled = false
+impure_msg = ''
+style = "bg:color_orange fg:color_fg0"
+symbol = ' Nix'
+format = '[─](fg:current_line)[](fg:yellow)[$symbol ](fg:primary bg:yellow)[](fg:yellow)'
+heuristic = false
+
+[directory]
+format = ' [](fg:yellow)[](fg:primary bg:yellow)[](fg:yellow bg:dkgreen)[ $read_only$truncation_symbol$path](fg:foreground bg:dkgreen)[](fg:dkgreen)'
+home_symbol = "󰉌 "
+truncation_symbol = ''
+truncation_length = 3
+read_only = '󱧴 '
+read_only_style = ''
+
+[directory.substitutions]
+"Documents" = "󰈙"
+"Downloads" = " "
+"Music" = "󰝚 "
+"Pictures" = " "
+"Developer" = "󰲋 "
+"dev" = "󰲋 "
+
+[git_branch]
+format = '[─](fg:current_line)[](fg:cyan)[$symbol](fg:primary bg:cyan)[](fg:cyan bg:box)[ $branch](fg:foreground bg:box)[](fg:box bg:greygreen)'
+symbol = " "
+
+[git_status]
+disabled = false
+format = '[( $all_status $ahead_behind)](fg:white bg:greygreen)[](fg:greygreen bg:box)'
+conflicted = ' '
+stashed = ' '
+deleted = ' '
+renamed = '󰑕 '
+modified = ' '
+typechanged = '󰕁 '
+staged = '$count: '
+untracked = '$count: '
+diverged = ' $ahead_count $behind_count '
+ahead = '$count: '
+behind = '$count: '
+up_to_date = ' '
+
+[git_commit]
+commit_hash_length = 5
+tag_symbol = ' '
+format = '[  $hash $tag](fg:white bg:box)[](fg:box bg:background)'
+disabled = false
+only_detached = false
+tag_disabled = false
+
+[git_state]
+disabled = false
+format = '[─](fg:current_line)[](fg:salmon bg:background)[$state ](fg:primary bg:salmon)[$progress_current/$progress_total](fg:primary bg:salmon)[](fg:salmon bg:background)'
+rebase = ''
+merge = ''
+revert = '󰕌'
+cherry_pick = ''
+bisect = ''
+am = ''
+am_or_rebase = ' or '
+
+[git_metrics]
+added_style = 'blue'
+deleted_style = 'red'
+format = ' [+$added]($added_style)/[-$deleted]($deleted_style) '
+disabled = false
+
+[nodejs]
+format = '[─](fg:current_line)[](fg:bluegreen)[$symbol](fg:primary bg:bluegreen)[](fg:bluegreen bg:dkgrey)[ $version](fg:foreground bg:dkgrey)[](fg:dkgrey)'
+symbol = '󰎙'
+
+[dotnet]
+format = '[─](fg:current_line)[](fg:purple)[$symbol](fg:primary bg:purple)[](fg:purple bg:box)[ $tfm](fg:foreground bg:box)[](fg:box)'
+symbol = ' .NET'
+
+[python]
+format = '[─](fg:current_line)[](fg:cyan)[$symbol](fg:primary bg:cyan)[](fg:cyan bg:dkgrey)[ $version](fg:foreground bg:dkgrey)[](fg:dkgrey)'
+symbol = ''
+
+[java]
+format = '[─](fg:current_line)[](fg:salmon)[$symbol](fg:primary bg:salmon)[](fg:salmon bg:box)[ $version](fg:foreground bg:box)[](fg:box)'
+symbol = ' Java'
+
+[lua]
+format = '[─](fg:current_line)[](fg:blue)[$symbol](fg:primary bg:blue)[](fg:blue bg:box)[ $version](fg:foreground bg:box)[](fg:box)'
+symbol = ' Lua'
+
+[golang]
+format = '[─](fg:current_line)[](fg:cyan)[$symbol](fg:primary bg:cyan)[](fg:cyan bg:box)[ $version](fg:foreground bg:box)[](fg:box)'
+symbol = ' Go'
+
+[c]
+format = '[─](fg:current_line)[](fg:blue)[$symbol](fg:primary bg:blue)[](fg:blue bg:box)[ $version](fg:foreground bg:box)[](fg:box)'
+symbol = ' C'
+
+[rust]
+format = '[─](fg:current_line)[](fg:salmon)[$symbol](fg:primary bg:salmon)[](fg:salmon bg:box)[ $version](fg:foreground bg:box)[](fg:box)'
+symbol = ' Rust'
+
+[zig]
+format = '[─](fg:current_line)[](fg:yellow)[$symbol](fg:primary bg:yellow)[](fg:yellow bg:box)[ $version](fg:foreground bg:box)[](fg:box)'
+symbol = ' Rust'
+
+[fill]
+symbol = '─'
+style = 'fg:current_line'
+
+[cmd_duration]
+min_time = 1
+# format = '[─](fg:current_line)[](fg:orange)[ ](fg:primary bg:orange)[](fg:orange bg:box)[ $duration ](fg:foreground bg:box)[](fg:box)'
+format = ' [$duration](italic fg:#6272a4)'
+
+# Disabled
+[shell]
+format = '[─](fg:current_line)[](fg:purple)[ ](fg:primary bg:purple)[](fg:purple bg:box)[ $indicator](fg:foreground bg:box)[](fg:box)'
+unknown_indicator = 'shell'
+powershell_indicator = 'powershell'
+fish_indicator = 'fish'
+disabled = true
+
+[time]
+format = '[ $time](fg:green)[ ](fg:box)[󱑍](fg:ltblue bg:box)[](fg:box)'
+time_format = '%H:%M:%S'
+disabled = false
+style = "bg:#1d2230"
+
+[username]
+format = ' [](fg:yellow)[](fg:primary bg:yellow)[](fg:yellow bg:orange)[ $user](fg:foreground bg:orange)[](fg:orange) '
+show_always = false
+
+[hostname]
+format = '[@$hostname ](bg:red fg:crust)'
+ssh_only = true
+disabled = true
+
+[character]
+format = """
+[╰─$symbol](fg:bold green) """
+success_symbol = '[❯](fg:bold green)'
+error_symbol = '[×](fg:bold red)'
+
+# --- 🔋 BATTERY ---
+[battery]
+disabled = false
+full_symbol = '🔋 '
+charging_symbol = "⚡️"
+discharging_symbol = "🪫"
+format = "[ $symbol $percentage]($style) "
+
+[[battery.display]]
+threshold = 30
+style = "bold red"
+
+[[battery.display]]
+threshold = 60
+style = "fg:#f1fa8c"
+
+[[battery.display]]
+threshold = 100
+style = "fg:green"
+
+# continuation_prompt = '▶▶ '

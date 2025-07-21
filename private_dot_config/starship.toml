@@ -1,0 +1,457 @@
+#  ╭─────────────────────────╮
+#  │  𓆟  𝘴𝘵𝘢𝘳𝘧𝘺𝘴𝘩  𓆟   │
+#  │  𓇼   ˚✧₊⁎  ˚✧₊⁎   𓇼   │
+#  │  ☾  ༓  acid-mode  ༓  ☽   │
+#  ╰─────────────────────────╯
+#  A hyper-minimal shell that still dreams in neon.
+
+#  A starship prompt tuned for calm, Ive-like focus.
+#  Dynamic data (folder, git state) uses the palette’s “primary” accent.
+#  Static data (language versions) fades into the background.
+
+# ---------- GLOBAL LAYOUT ----------
+add_newline = true
+format = """
+[╭](fg:green)\
+$os\
+$cmd_duration\
+$username\
+$hostname\
+$nix_shell\
+$directory\
+$git_branch\
+$git_status\
+$git_commit\
+$git_state\
+$git_metrics\
+$fill\
+$nodejs\
+$dotnet\
+$python\
+$java\
+$lua\
+$golang\
+$c\
+$line_break\
+$character\
+"""
+right_format = """
+$time\
+$battery\
+"""
+
+palette = "starfysh"
+
+# ---------- MODULE CONFIGURATION ----------
+[os]
+format = '(fg:green)[](fg:ltgrey)[$symbol](fg:bold white bg:ltgrey)[](fg:ltgrey)'
+disabled = false
+
+[os.symbols]
+Alpine = ''
+Amazon = ''
+Android = ''
+Arch = ''
+CentOS = ''
+Debian = ''
+EndeavourOS = ''
+Fedora = ''
+FreeBSD = ''
+Garuda = ''
+Gentoo = ''
+Linux = ''
+Macos = ''
+Manjaro = ''
+Mariner = ''
+Mint = ''
+NetBSD = ''
+NixOS = ''
+OpenBSD = ''
+OpenCloudOS = ''
+openEuler = ''
+openSUSE = ''
+OracleLinux = '⊂⊃'
+Pop = ''
+Raspbian = ''
+Redhat = ''
+RedHatEnterprise = ''
+Solus = ''
+SUSE = ''
+Ubuntu = ''
+Unknown = ''
+Windows = ''
+
+[nix_shell]
+disabled = false
+impure_msg = ''
+style = "bg:orange fg:foreground"
+symbol = ' Nix'
+format = '[─](fg:current_line)[](fg:yellow)[$symbol ](fg:primary bg:yellow)[](fg:yellow)'
+heuristic = false
+
+[directory]
+format = ' [](fg:orange)[](fg:primary bg:orange)[](fg:orange bg:dkgreen)[ $read_only$truncation_symbol$path](fg:foreground bg:dkgreen)[](fg:dkgreen)'
+home_symbol = "󰉌 "
+truncation_symbol = ''
+truncation_length = 3
+read_only = '󱧴 '
+read_only_style = ''
+
+[directory.substitutions]
+"Documents" = "󰈙"
+"Downloads" = " "
+"Music" = "󰝚 "
+"Pictures" = " "
+"Developer" = "󰲋 "
+"dev" = "󰲋 "
+
+[git_branch]
+format = '[─](fg:current_line)[](fg:cyan)[$symbol](fg:primary bg:cyan)[](fg:cyan bg:box)[ $branch](fg:foreground bg:box)[](fg:box bg:greygreen)'
+symbol = " "
+
+[git_status]
+disabled = false
+format = '[( $all_status $ahead_behind)](bold fg:white bg:greygreen)[](fg:greygreen bg:box)'
+conflicted = ' '
+stashed = ' '
+deleted = ' '
+renamed = '󰑕 '
+modified = ' '
+typechanged = '󰕁 '
+staged = '$count: '
+untracked = '$count: '
+diverged = ' $ahead_count $behind_count '
+ahead = '$count: '
+behind = '$count: '
+up_to_date = ' '
+
+[git_commit]
+commit_hash_length = 5
+tag_symbol = ' '
+format = '[  $hash $tag](fg:white bg:box)[](fg:box bg:background)'
+disabled = false
+only_detached = false
+tag_disabled = false
+
+[git_state]
+disabled = false
+format = '[─](fg:current_line)[](fg:salmon bg:background)[$state ](fg:primary bg:salmon)[$progress_current/$progress_total](fg:primary bg:salmon)[](fg:salmon bg:background)'
+rebase = ''
+merge = ''
+revert = '󰕌'
+cherry_pick = ''
+bisect = ''
+am = ''
+am_or_rebase = ' or '
+
+[git_metrics]
+added_style = 'blue'
+deleted_style = 'red'
+format = ' [+$added]($added_style)/[-$deleted]($deleted_style) '
+disabled = false
+
+[nodejs]
+format = '[─](fg:current_line)[](fg:bluegreen)[$symbol](fg:primary bg:bluegreen)[](fg:bluegreen bg:dkgrey)[ $version](fg:foreground bg:dkgrey)[](fg:dkgrey)'
+symbol = '󰎙'
+
+[dotnet]
+format = '[─](fg:current_line)[](fg:purple)[$symbol](fg:primary bg:purple)[](fg:purple bg:box)[ $tfm](fg:foreground bg:box)[](fg:box)'
+symbol = ' .NET'
+
+[python]
+format = '[─](fg:current_line)[](fg:cyan)[$symbol](fg:primary bg:cyan)[](fg:cyan bg:dkgrey)[ $version](fg:foreground bg:dkgrey)[](fg:dkgrey)'
+symbol = ''
+
+[java]
+format = '[─](fg:current_line)[](fg:salmon)[$symbol](fg:primary bg:salmon)[](fg:salmon bg:box)[ $version](fg:foreground bg:box)[](fg:box)'
+symbol = ' Java'
+
+[lua]
+format = '[─](fg:current_line)[](fg:blue)[$symbol](fg:primary bg:blue)[](fg:blue bg:box)[ $version](fg:foreground bg:box)[](fg:box)'
+symbol = ' Lua'
+
+[golang]
+format = '[─](fg:current_line)[](fg:cyan)[$symbol](fg:primary bg:cyan)[](fg:cyan bg:box)[ $version](fg:foreground bg:box)[](fg:box)'
+symbol = ' Go'
+
+[c]
+format = '[─](fg:current_line)[](fg:blue)[$symbol](fg:primary bg:blue)[](fg:blue bg:box)[ $version](fg:foreground bg:box)[](fg:box)'
+symbol = ' C'
+
+[rust]
+format = '[─](fg:current_line)[](fg:salmon)[$symbol](fg:primary bg:salmon)[](fg:salmon bg:box)[ $version](fg:foreground bg:box)[](fg:box)'
+symbol = ' Rust'
+
+[zig]
+format = '[─](fg:current_line)[](fg:yellow)[$symbol](fg:primary bg:yellow)[](fg:yellow bg:box)[ $version](fg:foreground bg:box)[](fg:box)'
+symbol = ' Zig'
+
+[fill]
+symbol = '─'
+style = 'fg:current_line'
+
+[cmd_duration]
+min_time = 1
+format = ' [$duration](italic fg:#6272a4)'
+
+[shell]
+disabled = true
+
+[time]
+format = '[ $time](fg:green)'
+# format = '[ $time](fg:green)[ ](fg:box)[󱑍](fg:ltblue bg:box)[](fg:box)'
+time_format = '%H:%M:%S'
+disabled = false
+style = "bg:#1d2230"
+
+[username]
+format = ' [](fg:yellow)[](fg:primary bg:yellow)[](fg:yellow bg:orange)[ $user](fg:foreground bg:orange)[](fg:orange) '
+show_always = false
+
+[hostname]
+disabled = true
+format = '[@$hostname ](bg:red fg:crust)'
+ssh_only = true
+
+[character]
+format = """
+[╰─$symbol](fg:bold green) """
+success_symbol = '[❯](fg:bold green)'
+error_symbol = '[×](fg:bold red)'
+
+[battery]
+disabled = false
+full_symbol = '🔋 '
+charging_symbol = "⚡️"
+discharging_symbol = "🪫"
+format = "[ $symbol $percentage]($style) "
+
+[[battery.display]]
+threshold = 30
+style = "bold red"
+
+[[battery.display]]
+threshold = 60
+style = "fg:#f1fa8c"
+
+[[battery.display]]
+threshold = 100
+style = "fg:green"
+
+[palettes.starfysh]
+# Core UI
+foreground   = '#e6e9f0'  # default text / icons
+background   = '#0c0e1a'  # global terminal background
+current_line = '#1e2133'  # horizontal rule (fill module)
+primary      = '#3b3e4b'  # git_branch arrow-head, os segment border
+
+# Module backgrounds
+box          = '#086488'  # git_branch bg
+dkgrey       = '#151825'  # nodejs / python / java version bg
+grey         = '#3e4251'  # dotnet / lua / golang / c / rust / zig version bg
+greygreen    = '#34727d'  # git_status bg
+
+# Accent borders
+ltgrey       = '#6e6a86'  # os symbol bg
+
+# Semantic states
+red          = '#ff6b6b'  # battery <30 %, prompt error symbol, git deleted count
+orange       = '#ffa94d'  # directory arrow-head (read-only), nix_shell bg
+yellow       = '#ffea7f'  # zig accent, nix_shell arrow-head
+green        = '#51cf66'  # battery >60 %, prompt success symbol, git added count
+cyan         = '#4ca8cc'  # git_branch arrow-tail, golang accent
+blue         = '#4c5fd7'  # c / lua accent
+bluegreen    = '#5de4c7'  # nodejs accent
+ltblue       = '#b2beff'  # time icon bg
+
+# Extra notes
+dkgreen      = '#2a814c'  # directory read-only path bg
+purple       = '#bd93f9'  # dotnet / rust accent
+pink         = '#ff79c6'  # java / rust accent
+
+
+[palettes.tron]
+# Core UI
+foreground   = '#c0f8ff'  # default text / icons
+background   = '#001a25'  # global terminal background
+current_line = '#003a4c'  # horizontal rule (fill module)
+primary      = '#00d4ff'  # git_branch arrow-head, os segment border
+
+# Module backgrounds
+box          = '#0073ad'  # git_branch bg
+dkgrey       = '#001d2d'  # nodejs / python / java version bg
+grey         = '#00405c'  # dotnet / lua / golang / c / rust / zig version bg
+greygreen    = '#006f8a'  # git_status bg
+
+# Accent borders
+ltgrey       = '#00b8ff'  # os symbol bg
+
+# Semantic states
+red          = '#ff0040'  # battery <30 %, prompt error symbol, git deleted count
+orange       = '#ff9a00'  # directory arrow-head (read-only), nix_shell bg
+yellow       = '#ffee00'  # zig accent, nix_shell arrow-head
+green        = '#00ff9d'  # battery >60 %, prompt success symbol, git added count
+cyan         = '#00d8ff'  # git_branch arrow-tail, golang accent
+blue         = '#0078ff'  # c / lua accent
+bluegreen    = '#00fff0'  # nodejs accent
+ltblue       = '#00c8ff'  # time icon bg
+
+# Extra notes
+dkgreen      = '#005a3d'  # directory read-only path bg
+purple       = '#a200ff'  # dotnet / rust accent
+pink         = '#ff00c8'  # java / rust accent
+
+[palettes.cyberpunk]
+# Core UI – High contrast with neon highlights
+foreground   = '#f0f0ff'  # bright terminal text
+background   = '#0a0a12'  # near-black base
+current_line = '#1a1a2e'  # subtle gridline
+primary      = '#ff2a6d'  # hot pink accents (arrows, borders)
+
+# Module backgrounds – Dark with neon highlights
+box          = '#1e1e3f'  # deep purple (git branch)
+dkgrey       = '#141432'  # dark slate (version bgs)
+grey         = '#2a2a4a'  # muted purple (alt version bgs)
+greygreen    = '#1a3a4a'  # teal-tinged (git status)
+
+# Accent borders – Electric highlights
+ltgrey       = '#4d4dff'  # cyber-blue (os symbol)
+
+# Semantic states – Vivid cyber hues
+red          = '#ff3864'  # error/critical
+orange       = '#ff8c42'  # warnings/directory
+yellow       = '#f9f002'  # attention (zig)
+green        = '#00ff88'  # success/git adds
+cyan         = '#00f0ff'  # info (git branch tail)
+blue         = '#5e5cff'  # c/lua
+bluegreen    = '#00ffc8'  # nodejs
+ltblue       = '#a970ff'  # time icon (purple shift)
+
+# Extra accents
+dkgreen      = '#0a3a2a'  # read-only paths
+purple       = '#c724ff'  # dotnet/rust
+pink         = '#ff6eaf'  # java
+
+[palettes.deep_ocean]
+# Core UI – Submarine dashboard
+foreground   = '#d1f1ff'  # soft blue light
+background   = '#051622'  # abyssal dark
+current_line = '#0a2a3a'  # pressure hull
+primary      = '#00c3ff'  # sonar ping blue
+
+# Module backgrounds – Layered depths
+box          = '#003d5c'  # midwater (git branch)
+dkgrey       = '#002b40'  # deep trench (versions)
+grey         = '#004a6d'  # twilight zone
+greygreen    = '#005a50'  # kelp forest (git status)
+
+# Accent borders – Glowing sea life
+ltgrey       = '#00a8cc'  # jellyfish glow
+
+# Semantic states – Reef colors
+red          = '#ff5577'  # warning coral
+orange       = '#ff9966'  # nix/directory
+yellow       = '#ffe066'  # zig (anglerfish lure)
+green        = '#00e6a0'  # healthy seagrass
+cyan         = '#00d4d4'  # git branch
+blue         = '#0088ff'  # c/lua
+bluegreen    = '#00c7b7'  # nodejs
+ltblue       = '#66b3ff'  # surface light
+
+# Extra accents
+dkgreen      = '#004d33'  # deep vents
+purple       = '#aa77ff'  # bioluminescent
+pink         = '#ff88cc'  # java (sea anemone)
+
+[palettes.obsidian]
+# Core UI – Volcanic glass
+foreground   = '#e0e0e0'  # ash text
+background   = '#0a0a0a'  # basalt
+current_line = '#1a1a1a'  # cooled lava flow
+primary      = '#ff5a00'  # magma cracks
+
+# Module backgrounds – Stratified rock
+box          = '#3a2a20'  # git branch (igneous)
+dkgrey       = '#1a1a1a'  # version bgs
+grey         = '#2a2a2a'  # alt versions
+greygreen    = '#2a3a2a'  # git status (oxidized)
+
+# Accent borders – Lava veins
+ltgrey       = '#ff8c00'  # os symbol (hot)
+
+# Semantic states – Eruption colors
+red          = '#ff3300'  # critical
+orange       = '#ff6600'  # directory/nix
+yellow       = '#ffcc00'  # zig (sulfur)
+green        = '#00aa55'  # success
+cyan         = '#00aaff'  # git branch
+blue         = '#5577ff'  # c/lua
+bluegreen    = '#00bbaa'  # nodejs
+ltblue       = '#aa88ff'  # time (geode purple)
+
+# Extra accents
+dkgreen      = '#1a3a1a'  # moss-covered
+purple       = '#aa55ff'  # dotnet/rust
+pink         = '#ff66aa'  # java
+
+[palettes.matrix]
+# Core UI - CRT terminal feel
+foreground   = '#00ff41'  # matrix green (primary text)
+background   = '#0a0a0a'  # pure black
+current_line = '#0f1a0f'  # subtle scanlines
+primary      = '#00ff66'  # brighter green (arrows/accents)
+
+# Module backgrounds - Layered darkness
+box          = '#001a00'  # git branch (deep void)
+dkgrey       = '#0a120a'  # version bgs (circuitboard)
+grey         = '#0f1a0f'  # alt versions
+greygreen    = '#002200'  # git status (active hack)
+
+# Accent borders - Glowing nodes
+ltgrey       = '#00cc44'  # os symbol (node pulse)
+
+# Semantic states - Alert colors
+red          = '#ff0033'  # critical (corrupted)
+orange       = '#ff8000'  # warnings (nix/directory)
+yellow       = '#ffff00'  # zig (golden exploit)
+green        = '#00ff41'  # success (access granted)
+cyan         = '#00ff99'  # git branch (data stream)
+blue         = '#0099ff'  # c/lua (ice protocols)
+bluegreen    = '#00ffcc'  # nodejs (neural link)
+ltblue       = '#00aaff'  # time (countdown)
+
+# Extra accents
+dkgreen      = '#001a00'  # read-only (archived)
+purple       = '#aa00ff'  # dotnet/rust (admin access)
+pink         = '#ff00aa'  # java (backdoor)
+
+[palettes.vaporwave]
+# ── ＡＥＳＴＨＥＴＩＣ　ＶＡＰＯＲＷＡＶＥ ☾◯☽ ──
+# Core UI - VHS glow
+foreground   = '#f0f0ff'          # CRT white with blue tint
+background   = '#0a0520'          # deep midnight purple
+current_line = '#2a0a4a'          # // scanline effect
+
+# Module backgrounds - Cassette tape colors
+box          = '#3a1a6a'          # git branch (purple tape)
+dkgrey       = '#1a0a3a'          # version bgs (dark reel)
+grey         = '#2a1a5a'          # alt versions
+greygreen    = '#1a3a4a'          # git status (teal static)
+
+# Accent borders - Neon gridlines
+ltgrey       = '#ff00aa'          # os symbol (hot pink)
+
+# Semantic states - Arcade cabinet
+red          = '#ff2a6d'          # error (game over)
+orange       = '#ff8000'          # directory (sunset)
+yellow       = '#ffff00'          # zig (pac-man)
+green        = '#00ff88'          # success (1UP)
+cyan         = '#00ffff'          # git branch (pool glow)
+blue         = '#0099ff'          # c/lua (ocean)
+bluegreen    = '#00ffcc'          # nodejs (palm tree)
+ltblue       = '#aa88ff'          # time (neon sign)
+
+# Extra accents
+dkgreen      = '#003a3a'          # read-only (deep wave)
+purple       = '#cc00ff'          # dotnet/rust (laser)
+pink         = '#ff66cc'          # java (bubblegum)

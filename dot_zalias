@@ -1,0 +1,110 @@
+# ================================================
+# ALIASES
+# ================================================
+
+# Directory navigation
+alias cd..='cd ..'
+alias cp='cp -p'
+
+# Modern file listing (using eza)
+alias l='/opt/homebrew/bin/eza --all --long --grid --header --classify --icons --group-directories-first --git'
+alias lt='/opt/homebrew/bin/eza --all --tree --header --classify --level=2 --icons --group-directories-first --git --git-ignore'
+alias ltt='/opt/homebrew/bin/eza --all --tree --header --classify --level=5 --icons --group-directories-first --git --git-ignore --only-dirs'
+alias ll='/opt/homebrew/bin/eza --all --grid --header --classify --icons --group-directories-first --git --git-ignore'
+
+# System utilities
+alias rsync='/opt/homebrew/bin/rsync'
+alias cls='clear'
+alias lo='logout'
+alias egrep='egrep -i'
+alias f='finger -l'
+alias w='w | sort | more'
+alias h='history 25'
+alias rm='/bin/rm -i'
+alias erase='/bin/rm'
+alias du='dust'
+alias df='duf'
+alias md="mkdir"
+alias rd="rmdir"
+
+# Modern tool replacements
+alias cat='bat'
+alias find='fd'
+alias grep='rg'
+
+# Directory navigation shortcuts
+alias ..='cd ..'
+alias ...='cd ../..'
+alias ....='cd ../../..'
+alias -- -='cd -'
+
+# File operations with confirmation
+alias cp='cp -i'
+alias mv='mv -i'
+
+# Network utilities
+alias ping='ping -c 5'
+alias ports='lsof -i'
+
+# System information
+alias myip='curl -s ipinfo.io/ip'
+
+# File operations
+alias pcp='rsync -r --progress'
+
+# Essential git aliases (from Oh-My-Zsh git plugin)
+alias gst='git status'
+alias gco='git checkout'
+alias gcb='git checkout -b'
+alias gp='git push'
+alias gpl='git pull'
+alias ga='git add'
+alias gc='git commit'
+alias gca='git commit -a'
+alias gcm='git commit -m'
+alias gcam='git commit -am'
+alias gd='git diff'
+alias gds='git diff --staged'
+alias gl='git log --oneline'
+alias glog='git log --oneline --decorate --graph'
+
+# Modern git workflow aliases
+alias gfa='git fetch --all'
+alias grb='git rebase'
+alias gstash='git stash'
+alias gstp='git stash pop'
+
+# Git utilities
+alias gcamm='git commit -am "$(curl -sk https://whatthecommit.com/index.txt)" && git push'
+
+# System maintenance
+alias brewup="brew update; brew upgrade; brew cleanup; brew doctor;"
+alias openfile="sudo opensnoop | grep -i"
+
+# File conversion
+alias renamer="ls *.m4a | awk='{print(\"mv \"\$1\" \"\$1)}' | sed='s/m4a/m4r/2' | /bin/sh"
+
+# Network utilities
+alias timeit="curl -w '\\nHTTP Code:\\t\\t%{http_code}\\nLookup time (DNS):\\t%{time_namelookup}\\nApp Connect (SSL):\\t%{time_appconnect}\\nConnect time (TCP):\\t%{time_connect}\\nPreXfer time:\\t\\t%{time_pretransfer}\\nStartXfer time:\\t\\t%{time_starttransfer}\\n\\nTotal time:\\t%{time_total}\\n\\n' -o /dev/null -s"
+alias st="wget --report-speed=bits -O /dev/null bit.ly/rjn-speedtest100"
+alias ydl="yt-dlp"
+alias wttr="curl wttr.in/Washington"
+
+# Development helpers
+alias serve='python -m http.server 8000'
+alias jsonpp='python -m json.tool'
+
+# Personal shortcuts
+alias cds="cd $HOME/Downloads/starfysh/code/curiocity"
+alias star="ssh 'starfysh@pdx1-shared-a2-13.dreamhost.com'"
+alias g="glow -w 80 -p"
+alias czup="chezmoi update"
+alias cz="chezmoi"
+
+# Python alias for Claude hooks compatibility
+alias python='python3'
+
+# Commented aliases with unique functionality (preserved)
+#alias cd='cd \\!*;sp'  # Custom cd with sp command
+#alias l.='/bin/ls -dG .*'  # Show hidden files only
+#alias syssleep="osascript -e='tell application='System Events' to sleep'"  # System sleep

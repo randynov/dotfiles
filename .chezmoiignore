@@ -29,3 +29,11 @@ yarn-error.log*
 
 # Yarn global directory (contains API keys)
 .config/yarn/
+
+# Zed editor temporary and cache files
+.config/zed/.tmp*
+.config/zed/embeddings/
+.config/zed/prompts/
+.config/zed/conversations/
+.config/zed/themes/
+.config/zed/*.zed

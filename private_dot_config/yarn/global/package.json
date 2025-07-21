@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "create-astro": "^4.11.0",
+    "create-cloudflare": "^2.38.0"
+  }
+}

@@ -1,0 +1,11 @@
+[ -f ~/.fzf.bash ] && source ~/.fzf.bash
+. "$HOME/.cargo/env"
+
+[[ -f ~/.bash-preexec.sh ]] && source ~/.bash-preexec.sh
+eval "$(atuin init bash)"
+export CREW_MAX_RPM=300
+
+# Added by LM Studio CLI (lms)
+export PATH="$PATH:/Users/randallnoval/.lmstudio/bin"
+
+[[ "$TERM_PROGRAM" == "kiro" ]] && . "$(kiro --locate-shell-integration-path bash)"

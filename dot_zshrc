@@ -42,6 +42,9 @@ export PATH
 # COMPLETIONS & ENHANCED FEATURES
 # ================================================
 
+# Add custom completions directory to fpath
+fpath=($HOME/.zsh $fpath)
+
 # Enhanced completion system
 autoload -Uz compinit
 compinit -C

@@ -16,6 +16,11 @@
     },
     "enabled_in_text_threads": false
   },
+  "languages": {
+    "Markdown": {
+      "format_on_save": "on"
+    }
+  },
   "features": {
     "edit_prediction_provider": "zed",
     "show_completions_on_input": false,

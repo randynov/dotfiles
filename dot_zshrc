@@ -4,6 +4,11 @@
 # Comment out profiling for daily use
 # zmodload zsh/zprof
 
+# Fix for Claude Code - unset zoxide cd function if CLAUDECODE is set
+if [[ -n "$CLAUDECODE" ]]; then
+    unset -f cd 2>/dev/null || true
+fi
+
 # ================================================
 # CORE CONFIGURATION
 # ================================================
@@ -20,10 +25,14 @@ export DEFAULT_USER=randallnoval
 path=(
   /usr/local/sbin
   $HOME/Library/Python/3.9/bin
+  $HOME/Library/Python/3.11/bin
+  $HOME/.lmstudio/bin
   $HOME/.codeium/windsurf/bin
   /usr/local/bin
   /opt/homebrew/bin
   $HOME/.zsh
+  /Applications/Sublime\ Text.app/Contents/SharedSupport/bin
+  /opt/homebrew/opt/postgresql@17/bin
   $path
 )
 typeset -U path
@@ -74,6 +83,10 @@ zstyle ':completion:*:*:cd:*:directory-stack' menu yes select
 zstyle ':completion:*:-tilde-:*' group-order 'named-directories' 'path-directories' 'users' 'expand'
 zstyle ':completion:*' squeeze-slashes true
 
+# FZF-tab completion styling
+zstyle ':fzf-tab:complete:cd:*' fzf-preview 'ls --color $realpath'
+zstyle ':fzf-tab:complete:__zoxide_z:*' fzf-preview 'ls --color $realpath'
+
 # Enable approximate matching
 zstyle ':completion:*' completer _complete _match _approximate
 zstyle ':completion:*:match:*' original only
@@ -97,12 +110,10 @@ hidefiles() { defaults write com.apple.finder AppleShowAllFiles -bool false && k
 # VERSION MANAGERS
 # ================================================
 
-# Lazy Load mise - Unified version manager
-function mise() {
-  unset -f mise
+# Load mise immediately for proper Node version management
+if [[ -x "$HOME/.local/bin/mise" ]]; then
   eval "$($HOME/.local/bin/mise activate zsh)"
-  mise "$@"
-}
+fi
 
 # Migration reminder aliases for replaced tools
 alias nvm='echo "🔄 Use mise instead: mise install node@version, mise use node@version, mise ls node"; false'
@@ -191,10 +202,73 @@ if [ -f ~/.fzf.zsh ]; then
   source ~/.fzf.zsh
 fi
 
-# Initialize tools with fallback loading
-(( $+commands[atuin] )) && eval "$(atuin init zsh)"
-(( $+commands[thefuck] )) && eval "$(thefuck --alias)"
-eval "$(starship init zsh)"
+# Initialize tools with fallback loading - skip for Claude Code
+if [[ -z "$CLAUDECODE" ]]; then
+    (( $+commands[atuin] )) && eval "$(atuin init zsh)"
+    (( $+commands[thefuck] )) && eval "$(thefuck --alias)"
+    (( $+commands[zoxide] )) && eval "$(zoxide init --cmd cd zsh)"
+else
+    # Ensure cd uses builtin when Claude is running commands
+    unset -f cd 2>/dev/null || true
+fi
+
+# Terminal-specific Starship configuration
+if [[ "$TERM_PROGRAM" == "Apple_Terminal" ]]; then
+    # Enhanced Terminal prompt with comprehensive info
+    autoload -Uz vcs_info
+    
+    # Function to get current time
+    get_time() {
+        echo "%F{magenta}[%D{%H:%M:%S}]%f"
+    }
+    
+    # Function to show exit code if non-zero
+    get_exit_code() {
+        echo "%(?..%F{red}[%?]%f )"
+    }
+    
+    # Function to show background jobs
+    get_jobs() {
+        echo "%(1j.%F{yellow}[jobs:%j]%f .)"
+    }
+    
+    # Function to get node/python version if in project
+    get_versions() {
+        local versions=""
+        if [[ -f package.json ]]; then
+            versions+="%F{green}node:%f$(node --version 2>/dev/null | sed 's/v//' || echo '?') "
+        fi
+        if [[ -f requirements.txt ]] || [[ -f pyproject.toml ]] || [[ -f setup.py ]]; then
+            versions+="%F{blue}py:%f$(python --version 2>/dev/null | cut -d' ' -f2 || echo '?') "
+        fi
+        echo "$versions"
+    }
+    
+    precmd() { 
+        vcs_info
+        # Update window title with current directory
+        print -Pn "\e]0;%n@%m: %~\a"
+    }
+    
+    zstyle ':vcs_info:git:*' formats '%F{green}git:%b%f%F{yellow}%u%c%f'
+    zstyle ':vcs_info:git:*' actionformats '%F{green}git:%b%f%F{red}(%a)%f%F{yellow}%u%c%f'
+    zstyle ':vcs_info:git:*' check-for-changes true
+    zstyle ':vcs_info:git:*' stagedstr '+'
+    zstyle ':vcs_info:git:*' unstagedstr 'M'
+    
+    setopt prompt_subst
+    
+    # Multi-line prompt with comprehensive info
+    PROMPT='$(get_time) $(get_exit_code)%F{blue}%n@%m%f:%F{cyan}%~%f $(get_versions)${vcs_info_msg_0_} $(get_jobs)
+%F{green}❯%f '
+elif [[ "$TERM_PROGRAM" == "iTerm.app" ]]; then
+    # Use full Unicode config for iTerm2
+    export STARSHIP_CONFIG="$HOME/.config/starship.toml"
+    eval "$(starship init zsh)"
+else
+    # Default to Starship for unknown terminals
+    eval "$(starship init zsh)"
+fi
 
 # ================================================
 # LOAD ALIASES
@@ -221,6 +295,9 @@ export VISUAL="$EDITOR"
 # Less configuration for better viewing
 export LESS="-R -M -i -j.5"
 export LESSHISTFILE="-"
+
+# Homebrew
+export HOMEBREW_NO_AUTO_UPDATE=1
 
 # ================================================
 # CUSTOM CONFIGURATIONS
@@ -294,8 +371,17 @@ zinit light-mode for \
 # Load plugins with turbo mode for faster startup
 zinit wait lucid for \
         zdharma-continuum/fast-syntax-highlighting \
-        zsh-users/zsh-autosuggestions
+        zsh-users/zsh-autosuggestions \
+        Aloxaf/fzf-tab
 
 alias claude="/Users/randallnoval/.claude/local/claude"
 
 [[ "$TERM_PROGRAM" == "kiro" ]] && . "$(kiro --locate-shell-integration-path zsh)"
+# The following lines have been added by Dbrew info postgresql@17ocker Desktop to enable Docker CLI completions.
+fpath=(/Users/randallnoval/.docker/completions $fpath)
+autoload -Uz compinit
+compinit
+# End of Docker CLI completions
+
+# Added by Antigravity
+export PATH="/Users/randallnoval/.antigravity/antigravity/bin:$PATH"

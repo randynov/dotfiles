@@ -45,7 +45,9 @@ return {
         number = true, -- sets vim.opt.number
         spell = true, -- enable spell checking like spf13
         signcolumn = "yes", -- sets vim.opt.signcolumn to yes
-        wrap = false, -- no wrap, matches spf13 nowrap
+        wrap = true, -- enable line wrapping
+        linebreak = true, -- break lines at word boundaries
+        showbreak = "↪ ", -- show wrapped line indicator
         
         -- Indentation settings (matching spf13-vim)
         shiftwidth = 4, -- 4 space indentation

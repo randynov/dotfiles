@@ -1,6 +1,6 @@
 # Only show decorative output for interactive terminal sessions
 # Skip if running in non-interactive mode, subshells, or IDE contexts
-if [[ -o interactive && -t 0 && -t 1 && $SHLVL -eq 1 && -z "$VSCODE_INJECTION" && "$TERM_PROGRAM" != "vscode" ]]; then
+if [[ -o interactive && -t 0 && -t 1 && $SHLVL -eq 1 && -z "$VSCODE_INJECTION" && "$TERM_PROGRAM" != "vscode" && "$TERM_PROGRAM" != "Apple_Terminal" ]]; then
     # Terminal settings - set backspace/delete key behavior
     # Alternative erase key configurations (uncomment if needed):
     #stty erase \^\H    # Use Ctrl+H for backspace (some old terminals)

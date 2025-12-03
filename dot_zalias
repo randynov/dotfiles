@@ -50,7 +50,7 @@ alias ports='lsof -i'
 alias myip='curl -s ipinfo.io/ip'
 
 # File operations
-alias pcp='rsync -r --progress'
+alias pcp='rsync -r --info=progress2'
 
 # Essential git aliases (from Oh-My-Zsh git plugin)
 alias gst='git status'
@@ -83,6 +83,7 @@ alias openfile="sudo opensnoop | grep -i"
 
 # File conversion
 alias renamer="ls *.m4a | awk='{print(\"mv \"\$1\" \"\$1)}' | sed='s/m4a/m4r/2' | /bin/sh"
+alias mmdc="mmdc -e png -t neutral -i"
 
 # Network utilities
 alias timeit="curl -w '\\nHTTP Code:\\t\\t%{http_code}\\nLookup time (DNS):\\t%{time_namelookup}\\nApp Connect (SSL):\\t%{time_appconnect}\\nConnect time (TCP):\\t%{time_connect}\\nPreXfer time:\\t\\t%{time_pretransfer}\\nStartXfer time:\\t\\t%{time_starttransfer}\\n\\nTotal time:\\t%{time_total}\\n\\n' -o /dev/null -s"
@@ -93,18 +94,59 @@ alias wttr="curl wttr.in/Washington"
 # Development helpers
 alias serve='python -m http.server 8000'
 alias jsonpp='python -m json.tool'
+alias docker-compose='docker compose'
 
 # Personal shortcuts
 alias cds="cd $HOME/Downloads/starfysh/code/curiocity"
 alias star="ssh 'starfysh@pdx1-shared-a2-13.dreamhost.com'"
 alias g="glow -w 80 -p"
-alias czup="chezmoi update"
+alias czup="chezmoi re-add && chezmoi git add . && chezmoi git -- commit -m 'Auto-sync dotfiles' && chezmoi git push && chezmoi update"
 alias cz="chezmoi"
 
 # Python alias for Claude hooks compatibility
 alias python='python3'
 
+# Claude Code utilities
+alias cc-log='uvx claude-code-log@latest --open-browser'
+alias cc-usage='bunx ccusage'
+alias cc-monitor='claude-monitor'
+
+# ================================================
+# FUNCTIONS
+# ================================================
+
+# Update all ollama models
+pull_ollama() {
+    echo "📋 Listing installed ollama models..."
+    ollama list
+    echo ""
+    
+    echo "🔄 Updating all models..."
+    local models=$(ollama list | tail -n +2 | awk '{print $1}' | grep -v '^$')
+    
+    if [ -z "$models" ]; then
+        echo "❌ No models found to update"
+        return 1
+    fi
+    
+    local count=0
+    local total=$(echo "$models" | wc -l | tr -d ' ')
+    
+    echo "$models" | while read -r model; do
+        if [ -n "$model" ]; then
+            count=$((count + 1))
+            echo ""
+            echo "🔄 [$count/$total] Updating: $model"
+            ollama pull "$model"
+            echo "✅ Completed: $model"
+        fi
+    done
+    
+    echo ""
+    echo "🎉 All ollama models updated successfully!"
+}
+
 # Commented aliases with unique functionality (preserved)
-#alias cd='cd \\!*;sp'  # Custom cd with sp command
-#alias l.='/bin/ls -dG .*'  # Show hidden files only
-#alias syssleep="osascript -e='tell application='System Events' to sleep'"  # System sleep
+# alias cd='cd \\!*;sp'  # Custom cd with sp command
+# alias l.='/bin/ls -dG .*'  # Show hidden files only
+# alias syssleep="osascript -e='tell application='System Events' to sleep'"  # System sleep

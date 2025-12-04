@@ -9,3 +9,8 @@ export CREW_MAX_RPM=300
 export PATH="$PATH:/Users/randallnoval/.lmstudio/bin"
 
 [[ "$TERM_PROGRAM" == "kiro" ]] && . "$(kiro --locate-shell-integration-path bash)"
+
+# Added by LM Studio CLI (lms)
+export PATH="$PATH:/Users/randynov/.lmstudio/bin"
+# End of LM Studio CLI section
+

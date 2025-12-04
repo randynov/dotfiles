@@ -23,13 +23,13 @@ export DEFAULT_USER=randallnoval
 
 # Single PATH modification with deduplication
 path=(
+  /opt/homebrew/bin
   /usr/local/sbin
   $HOME/Library/Python/3.9/bin
   $HOME/Library/Python/3.11/bin
   $HOME/.lmstudio/bin
   $HOME/.codeium/windsurf/bin
   /usr/local/bin
-  /opt/homebrew/bin
   $HOME/.zsh
   /Applications/Sublime\ Text.app/Contents/SharedSupport/bin
   /opt/homebrew/opt/postgresql@17/bin
@@ -377,8 +377,6 @@ zinit wait lucid for \
         zsh-users/zsh-autosuggestions \
         Aloxaf/fzf-tab
 
-alias claude="/Users/randallnoval/.claude/local/claude"
-
 [[ "$TERM_PROGRAM" == "kiro" ]] && . "$(kiro --locate-shell-integration-path zsh)"
 # The following lines have been added by Dbrew info postgresql@17ocker Desktop to enable Docker CLI completions.
 fpath=(/Users/randallnoval/.docker/completions $fpath)
@@ -388,3 +386,15 @@ compinit
 
 # Added by Antigravity
 export PATH="/Users/randallnoval/.antigravity/antigravity/bin:$PATH"
+
+# Added by LM Studio CLI (lms)
+export PATH="$PATH:/Users/randynov/.lmstudio/bin"
+# End of LM Studio CLI section
+
+
+# bun completions
+[ -s "/Users/randallnoval/.bun/_bun" ] && source "/Users/randallnoval/.bun/_bun"
+
+# bun
+export BUN_INSTALL="$HOME/.bun"
+export PATH="$BUN_INSTALL/bin:$PATH"

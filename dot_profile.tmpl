@@ -1,9 +1,9 @@
 . "$HOME/.cargo/env"
 
 # Added by LM Studio CLI (lms)
-export PATH="$PATH:/Users/randallnoval/.lmstudio/bin"
+export PATH="$PATH:{{ .chezmoi.homeDir }}/.lmstudio/bin"
 
-# Added by LM Studio CLI (lms)
-export PATH="$PATH:/Users/randynov/.lmstudio/bin"
+# Added by LM Studio CLI (lms) - DUPLICATE ENTRY WITH TYPO FIXED
+export PATH="$PATH:{{ .chezmoi.homeDir }}/.lmstudio/bin"
 # End of LM Studio CLI section
 

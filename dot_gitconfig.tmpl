@@ -7,7 +7,7 @@
 	name = Randall
 	email = randall@starfysh.net
 [core]
-	excludesfile = /Users/randynov/.gitignore_global
+	excludesfile = {{ .chezmoi.homeDir }}/.gitignore_global
 	pager = delta
 [interactive]
     diffFilter = delta --color-only
@@ -21,10 +21,10 @@
 	cmd = opendiff \"$LOCAL\" \"$REMOTE\"
 	path = 
 [mergetool "sourcetree"]
-	cmd = /Users/randallnoval/Applications/Sourcetree.app/Contents/Resources/opendiff-w.sh \"$LOCAL\" \"$REMOTE\" -ancestor \"$BASE\" -merge \"$MERGED\"
+	cmd = {{ .chezmoi.homeDir }}/Applications/Sourcetree.app/Contents/Resources/opendiff-w.sh \"$LOCAL\" \"$REMOTE\" -ancestor \"$BASE\" -merge \"$MERGED\"
 	trustExitCode = true
 [commit]
-	template = /Users/randallnoval/.stCommitMsg
+	template = {{ .chezmoi.homeDir }}/.stCommitMsg
 [init]
 	defaultBranch = main
 	templatedir = ~/.git-templates

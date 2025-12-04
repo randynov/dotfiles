@@ -379,13 +379,13 @@ zinit wait lucid for \
 
 [[ "$TERM_PROGRAM" == "kiro" ]] && . "$(kiro --locate-shell-integration-path zsh)"
 # The following lines have been added by Dbrew info postgresql@17ocker Desktop to enable Docker CLI completions.
-fpath=(/Users/randallnoval/.docker/completions $fpath)
+fpath=({{ .chezmoi.homeDir }}/.docker/completions $fpath)
 autoload -Uz compinit
 compinit
 # End of Docker CLI completions
 
 # Added by Antigravity
-export PATH="/Users/randallnoval/.antigravity/antigravity/bin:$PATH"
+export PATH="{{ .chezmoi.homeDir }}/.antigravity/antigravity/bin:$PATH"
 
 # Added by LM Studio CLI (lms)
 export PATH="$PATH:/Users/randynov/.lmstudio/bin"

@@ -7,7 +7,7 @@
 	name = Randall
 	email = randall@starfysh.net
 [core]
-	excludesfile = /Users/randallnoval/.gitignore_global
+	excludesfile = /Users/randynov/.gitignore_global
 	pager = delta
 [interactive]
     diffFilter = delta --color-only

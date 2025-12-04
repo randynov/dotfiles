@@ -215,8 +215,9 @@ else
     unset -f cd 2>/dev/null || true
 fi
 
-# Terminal-specific Starship configuration
-if [[ "$TERM_PROGRAM" == "Apple_Terminal" ]]; then
+# Prompt configuration: AI tools get custom prompt, everything else gets Starship
+# To add more AI tools, extend the condition (e.g., || [[ -n "$CURSOR_IDE" ]])
+if [[ -n "$CLAUDECODE" ]] || [[ -n "$GEMINI_CLI" ]]; then
     # Enhanced Terminal prompt with comprehensive info
     autoload -Uz vcs_info
     
@@ -264,12 +265,9 @@ if [[ "$TERM_PROGRAM" == "Apple_Terminal" ]]; then
     # Multi-line prompt with comprehensive info
     PROMPT='$(get_time) $(get_exit_code)%F{blue}%n@%m%f:%F{cyan}%~%f $(get_versions)${vcs_info_msg_0_} $(get_jobs)
 %F{green}❯%f '
-elif [[ "$TERM_PROGRAM" == "iTerm.app" ]]; then
-    # Use full Unicode config for iTerm2
-    export STARSHIP_CONFIG="$HOME/.config/starship.toml"
-    eval "$(starship init zsh)"
 else
-    # Default to Starship for unknown terminals
+    # Starship for all interactive sessions (Terminal, iTerm, SSH, etc.)
+    export STARSHIP_CONFIG="$HOME/.config/starship.toml"
     eval "$(starship init zsh)"
 fi
 
@@ -379,16 +377,16 @@ zinit wait lucid for \
 
 [[ "$TERM_PROGRAM" == "kiro" ]] && . "$(kiro --locate-shell-integration-path zsh)"
 # The following lines have been added by Dbrew info postgresql@17ocker Desktop to enable Docker CLI completions.
-fpath=({{ .chezmoi.homeDir }}/.docker/completions $fpath)
+fpath=(/Users/randallnoval/.docker/completions $fpath)
 autoload -Uz compinit
 compinit
 # End of Docker CLI completions
 
 # Added by Antigravity
-export PATH="{{ .chezmoi.homeDir }}/.antigravity/antigravity/bin:$PATH"
+export PATH="/Users/randallnoval/.antigravity/antigravity/bin:$PATH"
 
 # Added by LM Studio CLI (lms)
-export PATH="$PATH:{{ .chezmoi.homeDir }}/.lmstudio/bin"
+export PATH="$PATH:/Users/randallnoval/.lmstudio/bin"
 # End of LM Studio CLI section
 
 

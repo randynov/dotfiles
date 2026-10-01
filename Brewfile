@@ -392,7 +392,6 @@ brew "xcode-build-server"
 # Generate your Xcode project from a spec file and your folder structure
 brew "xcodegen"
 # JavaScript package manager
-brew "yarn"
 # Blazing fast terminal file manager written in Rust, based on async I/O
 brew "yazi"
 # Process YAML, JSON, XML, CSV and properties documents from the CLI
@@ -433,7 +432,7 @@ brew "hashicorp/tap/terraform", trusted: true
 brew "huseyinbabal/tap/taws", trusted: true
 brew "khanakia/vercelgate/vercelgate"
 # Pre-submission compliance scanner for the Apple App Store
-brew "revylai/tap/greenlight", trusted: true
+cask "revylai/tap/greenlight"
 # Terminal-friendly Markdown (.md) reader built for navigating large projects
 brew "sanford/tap/lsmd", trusted: true
 # Stripe CLI utility
@@ -599,7 +598,6 @@ npm "@playwright/cli"
 npm "@posthog/cli"
 npm "@wix/cli"
 npm "agent-browser"
-npm "agent-feed"
 npm "agent-skill-manager"
 npm "aws-cdk"
 npm "corepack"

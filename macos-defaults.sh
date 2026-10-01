@@ -1,52 +1,76 @@
 #!/bin/bash
 # Dock, Finder, keyboard, trackpad, and screenshot settings captured from the old Mac.
-# Run once by hand on a new Mac: bash ~/macos-defaults.sh
+# Preview: bash ~/macos-defaults.sh --dry-run
+# Apply:   bash ~/macos-defaults.sh
 set -euo pipefail
 
+DRY_RUN=false
+[[ "${1:-}" == "--dry-run" ]] && DRY_RUN=true
+changes=0
+
+# set_default DOMAIN KEY TYPE VALUE; booleans as true/false.
+set_default() {
+  local domain=$1 key=$2 type=$3 want=$4 have cmp
+  have=$(defaults read "$domain" "$key" 2>/dev/null || echo "<unset>")
+  cmp=$want
+  [[ $type == bool ]] && { [[ $want == true ]] && cmp=1 || cmp=0; }
+  if [[ "$have" == "$cmp" ]]; then
+    printf "  same     %-38s %-32s %s\n" "$domain" "$key" "$have"
+    return
+  fi
+  printf "  CHANGE   %-38s %-32s %s -> %s\n" "$domain" "$key" "$have" "$want"
+  changes=$((changes + 1))
+  $DRY_RUN || defaults write "$domain" "$key" "-$type" "$want"
+}
+
 # Dock
-defaults write com.apple.dock autohide -bool false
-defaults write com.apple.dock tilesize -float 31
-defaults write com.apple.dock largesize -float 122
-defaults write com.apple.dock magnification -bool true
-defaults write com.apple.dock orientation -string left
-defaults write com.apple.dock show-recents -bool true
-defaults write com.apple.dock mru-spaces -bool false
+set_default com.apple.dock autohide bool false
+set_default com.apple.dock tilesize float 31
+set_default com.apple.dock largesize float 122
+set_default com.apple.dock magnification bool true
+set_default com.apple.dock orientation string left
+set_default com.apple.dock show-recents bool true
+set_default com.apple.dock mru-spaces bool false
 # Hot corners: TL Quick Note, TR Desktop, BL Put Display to Sleep, BR Application Windows
-defaults write com.apple.dock wvous-tl-corner -int 14
-defaults write com.apple.dock wvous-tr-corner -int 4
-defaults write com.apple.dock wvous-bl-corner -int 10
-defaults write com.apple.dock wvous-br-corner -int 3
+set_default com.apple.dock wvous-tl-corner int 14
+set_default com.apple.dock wvous-tr-corner int 4
+set_default com.apple.dock wvous-bl-corner int 10
+set_default com.apple.dock wvous-br-corner int 3
 
 # Finder
-defaults write com.apple.finder ShowPathbar -bool true
-defaults write com.apple.finder ShowStatusBar -bool true
-defaults write com.apple.finder FXPreferredViewStyle -string Nlsv
-defaults write com.apple.finder FXDefaultSearchScope -string SCcf
-defaults write com.apple.finder _FXSortFoldersFirst -bool true
-defaults write com.apple.finder NewWindowTarget -string PfLo
-defaults write com.apple.finder NewWindowTargetPath -string "file://$HOME/Downloads/"
-defaults write com.apple.finder ShowExternalHardDrivesOnDesktop -bool true
-defaults write com.apple.finder ShowRemovableMediaOnDesktop -bool true
-defaults write com.apple.finder ShowHardDrivesOnDesktop -bool true
+set_default com.apple.finder ShowPathbar bool true
+set_default com.apple.finder ShowStatusBar bool true
+set_default com.apple.finder FXPreferredViewStyle string Nlsv
+set_default com.apple.finder FXDefaultSearchScope string SCcf
+set_default com.apple.finder _FXSortFoldersFirst bool true
+set_default com.apple.finder NewWindowTarget string PfLo
+set_default com.apple.finder NewWindowTargetPath string "file://$HOME/Downloads/"
+set_default com.apple.finder ShowExternalHardDrivesOnDesktop bool true
+set_default com.apple.finder ShowRemovableMediaOnDesktop bool true
+set_default com.apple.finder ShowHardDrivesOnDesktop bool true
 
 # Global
-defaults write NSGlobalDomain AppleShowAllExtensions -bool true
-defaults write NSGlobalDomain NSAutomaticCapitalizationEnabled -bool true
-defaults write NSGlobalDomain NSAutomaticPeriodSubstitutionEnabled -bool true
-defaults write NSGlobalDomain AppleInterfaceStyle -string Dark
-defaults write NSGlobalDomain AppleKeyboardUIMode -int 2
-defaults write NSGlobalDomain com.apple.swipescrolldirection -bool false
-defaults write NSGlobalDomain AppleShowScrollBars -string Always
+set_default NSGlobalDomain AppleShowAllExtensions bool true
+set_default NSGlobalDomain NSAutomaticCapitalizationEnabled bool true
+set_default NSGlobalDomain NSAutomaticPeriodSubstitutionEnabled bool true
+set_default NSGlobalDomain AppleInterfaceStyle string Dark
+set_default NSGlobalDomain AppleKeyboardUIMode int 2
+set_default NSGlobalDomain com.apple.swipescrolldirection bool false
+set_default NSGlobalDomain AppleShowScrollBars string Always
 
 # Trackpad
-defaults write com.apple.AppleMultitouchTrackpad Clicking -int 0
-defaults write com.apple.AppleMultitouchTrackpad TrackpadThreeFingerDrag -bool false
-defaults write com.apple.AppleMultitouchTrackpad TrackpadRightClick -bool true
+set_default com.apple.AppleMultitouchTrackpad Clicking int 0
+set_default com.apple.AppleMultitouchTrackpad TrackpadThreeFingerDrag bool false
+set_default com.apple.AppleMultitouchTrackpad TrackpadRightClick bool true
 
 # Screenshots
-mkdir -p "$HOME/Downloads/Screenshots"
-defaults write com.apple.screencapture location -string "$HOME/Downloads/Screenshots"
-defaults write com.apple.screencapture type -string png
+set_default com.apple.screencapture location string "$HOME/Downloads/Screenshots"
+set_default com.apple.screencapture type string png
 
+if $DRY_RUN; then
+  echo "Dry run: $changes setting(s) would change. Nothing was written."
+  exit 0
+fi
+mkdir -p "$HOME/Downloads/Screenshots"
 killall Dock Finder SystemUIServer 2>/dev/null || true
-echo "Done. Log out and back in for keyboard and trackpad settings to take full effect."
+echo "Applied $changes change(s). Log out and back in for keyboard and trackpad settings to take full effect."

@@ -1,0 +1,451 @@
+// ============================================================================
+// ZELLIJ CONFIGURATION - COMPLETE WITH PROFILES & INVISIBLE MODE
+// ============================================================================
+
+// ============================================================================
+// THEMES - CUSTOM COLOR SCHEMES
+// ============================================================================
+themes {
+    // Dracula theme (popular dark theme)
+    dracula {
+        bg 40 42 54
+        fg 248 248 242
+        black 0 0 0
+        red 255 85 85
+        green 80 250 123
+        yellow 241 250 140
+        blue 139 233 253
+        magenta 255 121 198
+        cyan 255 184 108
+        white 255 255 255
+        orange 255 184 108
+    }
+
+    // Nord theme (calm arctic colors)
+    nord {
+        bg 46 52 64
+        fg 216 222 233
+        black 59 66 82
+        red 191 97 106
+        green 163 190 140
+        yellow 235 203 139
+        blue 129 161 193
+        magenta 180 142 173
+        cyan 143 188 187
+        white 236 239 244
+        orange 208 135 112
+    }
+
+    // Catppuccin Mocha (warm dark theme)
+    catppuccin-mocha {
+        bg 30 30 46
+        fg 205 214 244
+        black 69 71 90
+        red 243 139 168
+        green 166 227 161
+        yellow 249 226 175
+        blue 137 180 250
+        magenta 203 166 247
+        cyan 148 226 213
+        white 239 241 245
+        orange 250 179 135
+    }
+
+    // Tokyo Night (deep blue-purple theme)
+    tokyo-night {
+        bg 26 27 38
+        fg 169 177 214
+        black 65 72 104
+        red 247 118 142
+        green 158 206 106
+        yellow 224 175 104
+        blue 122 162 247
+        magenta 187 154 247
+        cyan 125 207 191
+        white 187 194 226
+        orange 255 158 100
+    }
+
+    // Solarized Light (for light mode)
+    solarized-light {
+        bg 253 246 227
+        fg 101 123 131
+        black 7 54 66
+        red 220 50 47
+        green 133 153 0
+        yellow 181 137 0
+        blue 38 139 210
+        magenta 211 54 130
+        cyan 42 161 152
+        white 238 232 213
+        orange 203 75 22
+    }
+}
+
+// ============================================================================
+// UI & APPEARANCE SETTINGS - INVISIBLE MODE DEFAULT
+// ============================================================================
+pane_frames false                    // Remove borders around panes
+simplified_ui true                   // Use simpler UI elements
+default_mode "locked"                 // Start in locked mode - no visible hints
+mouse_mode true                       // Keep mouse support for dragging
+hide_session_name true                // Remove "Zellij" text from display
+copy_on_select true                   // Auto-copy on selection
+show_startup_tips false               // Disable startup tips
+show_release_notes false              // Disable release notes
+
+// Theme selection (uncomment one to enable)
+// theme "dracula"
+// theme "nord"
+// theme "catppuccin-mocha"
+// theme "tokyo-night"
+// theme "solarized-light"
+
+// ============================================================================
+// PLUGINS - ALL DISABLED FOR INVISIBLE MODE
+// ============================================================================
+plugins {
+    // All plugins commented out for invisible mode
+    // Uncomment any you want visible for themed version
+    // about location="zellij:about"
+    // compact-bar location="zellij:compact-bar"
+    // configuration location="zellij:configuration"
+    // filepicker location="zellij:strider" {
+    //     cwd "/"
+    // }
+    // plugin-manager location="zellij:plugin-manager"
+    // session-manager location="zellij:session-manager"
+    // status-bar location="zellij:status-bar"
+    // strider location="zellij:strider"
+    // tab-bar location="zellij:tab-bar"
+    // welcome-screen location="zellij:session-manager" {
+    //     welcome_screen true
+    // }
+}
+
+// No background plugins loaded
+load_plugins {
+}
+
+// ============================================================================
+// TERMINAL & BEHAVIOR SETTINGS
+// ============================================================================
+scroll_buffer_size 50000              // Scrollback buffer size
+default_shell "zsh"                   // Use zsh as default shell
+// default_cwd "/home/username"       // Uncomment to set default directory
+auto_layout false                      // Don't auto-layout panes
+stacked_resize false                   // Disable stacked resize
+advanced_mouse_actions true            // Enable mouse hover effects
+
+// Session handling
+session_serialization false            // Don't auto-save sessions
+serialize_pane_viewport false          // Don't save pane viewports
+attach_to_session false                // Don't auto-attach to existing sessions
+disable_session_metadata true          // Disable session metadata
+
+// ============================================================================
+// COPY/PASTE SETTINGS
+// ============================================================================
+// copy_command "pbcopy"               // Uncomment for macOS clipboard
+copy_clipboard "system"                // Use system clipboard
+// scrollback_editor "/usr/bin/vim"    // Uncomment to set scrollback editor
+
+// ============================================================================
+// WEB CLIENT SETTINGS (DISABLED)
+// ============================================================================
+web_server false                        // Disable web server
+web_sharing "off"                       // Disable web sharing
+
+// ============================================================================
+// KEYBINDINGS - PRESERVED FROM YOUR CONFIG
+// ============================================================================
+keybinds clear-defaults=true {
+    // LOCKED MODE - Press Ctrl+g to enter normal mode
+    locked {
+        bind "Ctrl g" { SwitchToMode "normal"; }
+    }
+
+    // PANE MODE - Navigation and pane management
+    pane {
+        // Navigation
+        bind "left" { MoveFocus "left"; }
+        bind "down" { MoveFocus "down"; }
+        bind "up" { MoveFocus "up"; }
+        bind "right" { MoveFocus "right"; }
+        bind "h" { MoveFocus "left"; }
+        bind "j" { MoveFocus "down"; }
+        bind "k" { MoveFocus "up"; }
+        bind "l" { MoveFocus "right"; }
+
+        // Pane creation
+        bind "d" { NewPane "down"; SwitchToMode "normal"; }
+        bind "r" { NewPane "right"; SwitchToMode "normal"; }
+        bind "n" { NewPane; SwitchToMode "normal"; }
+        bind "s" { NewPane "stacked"; SwitchToMode "normal"; }
+
+        // Pane management
+        bind "c" { SwitchToMode "renamepane"; PaneNameInput 0; }
+        bind "e" { TogglePaneEmbedOrFloating; SwitchToMode "normal"; }
+        bind "f" { ToggleFocusFullscreen; SwitchToMode "normal"; }
+        bind "i" { TogglePanePinned; SwitchToMode "normal"; }
+        bind "p" { SwitchFocus; }
+        bind "w" { ToggleFloatingPanes; SwitchToMode "normal"; }
+        bind "z" { TogglePaneFrames; SwitchToMode "normal"; }
+
+        // Mode switching
+        bind "Ctrl p" { SwitchToMode "normal"; }
+    }
+
+    // TAB MODE - Tab navigation and management
+    tab {
+        // Navigation
+        bind "left" { GoToPreviousTab; }
+        bind "right" { GoToNextTab; }
+        bind "down" { GoToNextTab; }
+        bind "up" { GoToPreviousTab; }
+        bind "h" { GoToPreviousTab; }
+        bind "j" { GoToNextTab; }
+        bind "k" { GoToPreviousTab; }
+        bind "l" { GoToNextTab; }
+
+        // Direct tab access
+        bind "1" { GoToTab 1; SwitchToMode "normal"; }
+        bind "2" { GoToTab 2; SwitchToMode "normal"; }
+        bind "3" { GoToTab 3; SwitchToMode "normal"; }
+        bind "4" { GoToTab 4; SwitchToMode "normal"; }
+        bind "5" { GoToTab 5; SwitchToMode "normal"; }
+        bind "6" { GoToTab 6; SwitchToMode "normal"; }
+        bind "7" { GoToTab 7; SwitchToMode "normal"; }
+        bind "8" { GoToTab 8; SwitchToMode "normal"; }
+        bind "9" { GoToTab 9; SwitchToMode "normal"; }
+
+        // Tab management
+        bind "n" { NewTab; SwitchToMode "normal"; }
+        bind "x" { CloseTab; SwitchToMode "normal"; }
+        bind "r" { SwitchToMode "renametab"; TabNameInput 0; }
+        bind "s" { ToggleActiveSyncTab; SwitchToMode "normal"; }
+        bind "b" { BreakPane; SwitchToMode "normal"; }
+        bind "[" { BreakPaneLeft; SwitchToMode "normal"; }
+        bind "]" { BreakPaneRight; SwitchToMode "normal"; }
+
+        // Mode switching
+        bind "Ctrl t" { SwitchToMode "normal"; }
+        bind "tab" { ToggleTab; }
+    }
+
+    // RESIZE MODE - Resize panes
+    resize {
+        bind "left" { Resize "Increase left"; }
+        bind "down" { Resize "Increase down"; }
+        bind "up" { Resize "Increase up"; }
+        bind "right" { Resize "Increase right"; }
+        bind "h" { Resize "Increase left"; }
+        bind "j" { Resize "Increase down"; }
+        bind "k" { Resize "Increase up"; }
+        bind "l" { Resize "Increase right"; }
+        bind "H" { Resize "Decrease left"; }
+        bind "J" { Resize "Decrease down"; }
+        bind "K" { Resize "Decrease up"; }
+        bind "L" { Resize "Decrease right"; }
+        bind "+" { Resize "Increase"; }
+        bind "-" { Resize "Decrease"; }
+        bind "=" { Resize "Increase"; }
+
+        // Mode switching
+        bind "Ctrl n" { SwitchToMode "normal"; }
+    }
+
+    // MOVE MODE - Move panes around
+    move {
+        bind "left" { MovePane "left"; }
+        bind "down" { MovePane "down"; }
+        bind "up" { MovePane "up"; }
+        bind "right" { MovePane "right"; }
+        bind "h" { MovePane "left"; }
+        bind "j" { MovePane "down"; }
+        bind "k" { MovePane "up"; }
+        bind "l" { MovePane "right"; }
+        bind "n" { MovePane; }
+        bind "p" { MovePaneBackwards; }
+        bind "tab" { MovePane; }
+
+        // Mode switching
+        bind "Ctrl h" { SwitchToMode "normal"; }
+    }
+
+    // SCROLL MODE - Scroll through pane history
+    scroll {
+        bind "e" { EditScrollback; SwitchToMode "normal"; }
+        bind "s" { SwitchToMode "entersearch"; SearchInput 0; }
+    }
+
+    // SEARCH MODE - Search in scrollback
+    search {
+        bind "c" { SearchToggleOption "CaseSensitivity"; }
+        bind "n" { Search "down"; }
+        bind "o" { SearchToggleOption "WholeWord"; }
+        bind "p" { Search "up"; }
+        bind "w" { SearchToggleOption "Wrap"; }
+    }
+
+    // SESSION MODE - Session management
+    session {
+        bind "a" {
+            LaunchOrFocusPlugin "zellij:about" {
+                floating true
+                move_to_focused_tab true
+            }
+            SwitchToMode "normal"
+        }
+        bind "c" {
+            LaunchOrFocusPlugin "configuration" {
+                floating true
+                move_to_focused_tab true
+            }
+            SwitchToMode "normal"
+        }
+        bind "p" {
+            LaunchOrFocusPlugin "plugin-manager" {
+                floating true
+                move_to_focused_tab true
+            }
+            SwitchToMode "normal"
+        }
+        bind "s" {
+            LaunchOrFocusPlugin "zellij:share" {
+                floating true
+                move_to_focused_tab true
+            }
+            SwitchToMode "normal"
+        }
+        bind "w" {
+            LaunchOrFocusPlugin "session-manager" {
+                floating true
+                move_to_focused_tab true
+            }
+            SwitchToMode "normal"
+        }
+
+        // Mode switching
+        bind "Ctrl o" { SwitchToMode "normal"; }
+    }
+
+    // TMUX MODE - Tmux-style keybindings
+    tmux {
+        bind "left" { MoveFocus "left"; SwitchToMode "normal"; }
+        bind "down" { MoveFocus "down"; SwitchToMode "normal"; }
+        bind "up" { MoveFocus "up"; SwitchToMode "normal"; }
+        bind "right" { MoveFocus "right"; SwitchToMode "normal"; }
+        bind "h" { MoveFocus "left"; SwitchToMode "normal"; }
+        bind "j" { MoveFocus "down"; SwitchToMode "normal"; }
+        bind "k" { MoveFocus "up"; SwitchToMode "normal"; }
+        bind "l" { MoveFocus "right"; SwitchToMode "normal"; }
+        bind "\"" { NewPane "down"; SwitchToMode "normal"; }
+        bind "%" { NewPane "right"; SwitchToMode "normal"; }
+        bind "c" { NewTab; SwitchToMode "normal"; }
+        bind "n" { GoToNextTab; SwitchToMode "normal"; }
+        bind "p" { GoToPreviousTab; SwitchToMode "normal"; }
+        bind "z" { ToggleFocusFullscreen; SwitchToMode "normal"; }
+        bind "o" { FocusNextPane; }
+        bind "space" { NextSwapLayout; }
+        bind "," { SwitchToMode "renametab"; }
+        bind "[" { SwitchToMode "scroll"; }
+        bind "Ctrl b" { Write 2; SwitchToMode "normal"; }
+        bind "d" { Detach; }
+    }
+
+    // SHARED KEYBINDINGS - Available in multiple modes
+    shared_except "locked" {
+        // Alt key combinations
+        bind "Alt left" { MoveFocusOrTab "left"; }
+        bind "Alt right" { MoveFocusOrTab "right"; }
+        bind "Alt down" { MoveFocus "down"; }
+        bind "Alt up" { MoveFocus "up"; }
+        bind "Alt h" { MoveFocusOrTab "left"; }
+        bind "Alt l" { MoveFocusOrTab "right"; }
+        bind "Alt j" { MoveFocus "down"; }
+        bind "Alt k" { MoveFocus "up"; }
+        bind "Alt i" { MoveTab "left"; }
+        bind "Alt o" { MoveTab "right"; }
+        bind "Alt f" { ToggleFloatingPanes; }
+        bind "Alt n" { NewPane; }
+        bind "Alt p" { TogglePaneInGroup; }
+        bind "Alt Shift p" { ToggleGroupMarking; }
+        bind "Alt +" { Resize "Increase"; }
+        bind "Alt -" { Resize "Decrease"; }
+        bind "Alt =" { Resize "Increase"; }
+        bind "Alt [" { PreviousSwapLayout; }
+        bind "Alt ]" { NextSwapLayout; }
+
+        // Ctrl key combinations
+        bind "Ctrl g" { SwitchToMode "locked"; }
+        bind "Ctrl q" { Quit; }
+        bind "Ctrl s" { SwitchToMode "scroll"; }
+        bind "Ctrl t" { SwitchToMode "tab"; }
+        bind "Ctrl p" { SwitchToMode "pane"; }
+        bind "Ctrl n" { SwitchToMode "resize"; }
+        bind "Ctrl o" { SwitchToMode "session"; }
+        bind "Ctrl b" { SwitchToMode "tmux"; }
+        bind "Ctrl h" { SwitchToMode "move"; }
+    }
+
+    // SHARED SCROLL/SEARCH BINDINGS
+    shared_among "scroll" "search" {
+        bind "PageDown" { PageScrollDown; }
+        bind "PageUp" { PageScrollUp; }
+        bind "left" { PageScrollUp; }
+        bind "down" { ScrollDown; }
+        bind "up" { ScrollUp; }
+        bind "right" { PageScrollDown; }
+        bind "h" { PageScrollUp; }
+        bind "j" { ScrollDown; }
+        bind "k" { ScrollUp; }
+        bind "l" { PageScrollDown; }
+        bind "d" { HalfPageScrollDown; }
+        bind "u" { HalfPageScrollUp; }
+        bind "Ctrl b" { PageScrollUp; }
+        bind "Ctrl f" { PageScrollDown; }
+        bind "Ctrl c" { ScrollToBottom; SwitchToMode "normal"; }
+        bind "Ctrl s" { SwitchToMode "normal"; }
+    }
+
+    // SHARED PANE/TMUX BINDINGS
+    shared_among "pane" "tmux" {
+        bind "x" { CloseFocus; SwitchToMode "normal"; }
+    }
+
+    // SHARED SESSION/TMUX BINDINGS
+    shared_among "session" "tmux" {
+        bind "d" { Detach; }
+    }
+
+    // SHARED RENAME MODE BINDINGS
+    shared_among "renametab" "renamepane" {
+        bind "Ctrl c" { SwitchToMode "normal"; }
+    }
+
+    // ENTERSEARCH MODE
+    entersearch {
+        bind "Ctrl c" { SwitchToMode "scroll"; }
+        bind "esc" { SwitchToMode "scroll"; }
+        bind "enter" { SwitchToMode "search"; }
+    }
+
+    // RENAMETAB MODE
+    renametab {
+        bind "esc" { UndoRenameTab; SwitchToMode "tab"; }
+    }
+
+    // RENAMEPANE MODE
+    renamepane {
+        bind "esc" { UndoRenamePane; SwitchToMode "pane"; }
+    }
+
+    // SHARED EXIT KEYS
+    shared_except "normal" "locked" "entersearch" {
+        bind "enter" { SwitchToMode "normal"; }
+    }
+    shared_except "normal" "locked" "entersearch" "renametab" "renamepane" {
+        bind "esc" { SwitchToMode "normal"; }
+    }
+}

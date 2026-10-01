@@ -1,0 +1,6 @@
+[settings]
+idiomatic_version_file_enable_tools = ["ruby"]
+trusted_config_paths = ["/Users/randallnoval/.orca/workspaces/gapbot-crew", "/Users/randallnoval/.orca/workspaces/gapbot-bolt-2", "/Users/randallnoval/.orca/workspaces/gapbot-bolt-2"]
+
+[tools]
+node = "24.15.0"

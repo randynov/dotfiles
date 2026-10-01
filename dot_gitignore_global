@@ -1,0 +1,8 @@
+*~
+.DS_Store
+.worktrees/
+
+**/.claude/settings.local.json
+
+# direnv per-directory env files (personal, never committed)
+.envrc

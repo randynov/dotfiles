@@ -1,0 +1,43 @@
+# Terminal-compatible Starship prompt
+# Ultra-minimal version with no special characters
+
+format = """
+$directory$git_branch$git_status$character"""
+
+[directory]
+format = '[$path](cyan) '
+truncation_length = 3
+truncation_symbol = '...'
+
+[git_branch]
+format = '[git:$branch](green) '
+
+[git_status]
+format = '[$all_status](yellow)'
+conflicted = 'C'
+ahead = '>$count'
+behind = '<$count'
+diverged = '<>$ahead_count$behind_count'
+up_to_date = ''
+untracked = '?$count'
+stashed = 'S'
+modified = 'M$count'
+staged = '+$count'
+renamed = 'R'
+deleted = 'D'
+
+[character]
+success_symbol = '[>](green)'
+error_symbol = '[X](red)'
+
+[time]
+disabled = true
+
+[battery]
+disabled = true
+
+[username]
+disabled = true
+
+[hostname]
+disabled = true

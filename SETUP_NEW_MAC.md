@@ -1,459 +1,241 @@
 # Setting Up a New Mac with Dotfiles
 
-Complete step-by-step guide to configure a new Mac with your dotfiles and development environment.
+Step-by-step guide to configure a new Mac with these dotfiles and the development environment.
+
+Apps and CLI tools are reinstalled from the `Brewfile`, not copied. User data (`~/code`, secrets, tool state) moves separately with rsync over SSH.
 
 ## Prerequisites
 
 - New or clean macOS installation
 - Admin access
-- GitHub account with SSH key or GitHub CLI auth
+- SSH access to the old Mac, or the old Mac's SSH keys available another way
 - Internet connection
-- Approximately 30-45 minutes
 
 ## Phase 1: System Preparation
 
 ### 1.1 Install Xcode Command Line Tools
 
-Required for Homebrew and development:
-
 ```bash
 xcode-select --install
-```
-
-Wait for the installation to complete (5-10 minutes).
-
-### 1.2 Verify Installation
-
-```bash
 xcode-select --version
 ```
 
 ## Phase 2: Install Homebrew
 
-### 2.1 Install Homebrew Package Manager
-
 ```bash
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-```
-
-### 2.2 Add Homebrew to PATH (Apple Silicon only)
-
-If using M1/M2/M3 Mac:
-
-```bash
-echo 'export PATH="/opt/homebrew/bin:$PATH"' >> ~/.zprofile
-source ~/.zprofile
-```
-
-### 2.3 Verify Installation
-
-```bash
+eval "$(/opt/homebrew/bin/brew shellenv)"
 brew --version
 ```
 
-## Phase 3: Clone and Setup Chezmoi
+Do not append Homebrew PATH lines to `~/.zprofile` by hand. chezmoi manages that file and will overwrite or conflict with the edit.
 
-### 3.1 Install Chezmoi via Homebrew
+## Phase 3: SSH Keys
 
-```bash
-brew install chezmoi
-```
+Copy the existing keys from the old Mac instead of generating new ones. GitHub and servers already trust them.
 
-### 3.2 Initialize from Your Dotfiles Repository
+On the new Mac:
 
 ```bash
-chezmoi init --apply https://github.com/randynov/dotfiles.git
-```
-
-This will:
-- Clone your dotfiles repo to `~/.local/share/chezmoi`
-- Apply all managed files to your home directory
-- Set up symlinks for Vim configuration
-
-### 3.3 Verify Chezmoi Setup
-
-```bash
-chezmoi status
-```
-
-Should show no differences or only expected changes.
-
-## Phase 4: Install Core Development Tools
-
-### 4.1 Install Key Brewable Tools
-
-```bash
-# Version managers
-brew install mise
-
-# Shell and terminal
-brew install zsh zoxide starship atuin
-
-# Version control
-brew install git gh
-
-# Editors
-brew install neovim
-
-# Development utilities
-brew install fzf delta htop
-```
-
-### 4.2 Install Python
-
-```bash
-brew install python@3.11
-```
-
-### 4.3 Install Node.js via mise
-
-```bash
-mise install node@latest
-mise use node@latest
-```
-
-### 4.4 Install Ruby (optional, if needed)
-
-```bash
-mise install ruby@latest
-```
-
-### 4.5 Update Homebrew
-
-```bash
-brew update && brew upgrade
-```
-
-## Phase 5: Configure Shell
-
-### 5.1 Set Zsh as Default Shell
-
-```bash
-chsh -s /bin/zsh
-```
-
-Restart terminal to confirm.
-
-### 5.2 Install Oh My Zsh (Optional)
-
-If you prefer Oh My Zsh over plain Zsh:
-
-```bash
-sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
-```
-
-### 5.3 Reload Shell Configuration
-
-```bash
-source ~/.zshrc
-```
-
-## Phase 6: Setup Git Authentication
-
-### 6.1 Generate SSH Key
-
-```bash
-ssh-keygen -t ed25519 -C "your-email@example.com"
-```
-
-Press Enter for defaults. **Do not set a passphrase for headless use.**
-
-### 6.2 Add SSH Key to GitHub
-
-```bash
-cat ~/.ssh/id_ed25519.pub
-```
-
-Copy output and add to GitHub: https://github.com/settings/keys
-
-### 6.3 Test SSH Connection
-
-```bash
+mkdir -p ~/.ssh && chmod 700 ~/.ssh
+rsync -aX -e 'ssh -4' OLD_MAC_HOSTNAME:.ssh/ ~/.ssh/
+chmod 600 ~/.ssh/* && chmod 644 ~/.ssh/*.pub
+ssh-add --apple-use-keychain ~/.ssh/id_ed25519
 ssh -T git@github.com
 ```
 
-Should respond: `Hi USERNAME! You've successfully authenticated...`
+Replace `OLD_MAC_HOSTNAME` before running. Keys with a passphrase prompt once, then the passphrase is stored in the macOS keychain.
 
-### 6.4 Configure Git User
+If generating a new key instead, set a passphrase and store it in the password manager.
+
+## Phase 4: Clone and Apply Dotfiles
+
+### 4.1 Install chezmoi and initialize without applying
 
 ```bash
-git config --global user.name "Your Name"
-git config --global user.email "your-email@example.com"
+brew install chezmoi
+chezmoi init git@github.com:randynov/dotfiles.git
 ```
 
-## Phase 7: Install Application-Specific Tools
-
-### 7.1 Terminal Multiplexer (tmux)
+### 4.2 Review before applying
 
 ```bash
-brew install tmux
-```
-
-### 7.2 Docker (if needed)
-
-```bash
-brew install docker docker-compose
-```
-
-### 7.3 Database Tools (if needed)
-
-```bash
-brew install postgresql@17 redis
-```
-
-### 7.4 Additional CLI Tools
-
-```bash
-# File processing
-brew install jq ripgrep tree
-
-# HTTP client
-brew install curl wget
-
-# System monitoring
-brew install bottom
-```
-
-## Phase 8: Install GUI Applications (Homebrew Cask)
-
-### 8.1 Install Applications
-
-```bash
-# Editors and IDEs
-brew install --cask zed visual-studio-code
-
-# Browsers
-brew install --cask arc firefox
-
-# Communication
-brew install --cask slack discord
-
-# Utilities
-brew install --cask 1password iterm2 rectangle alfred
-
-# Other development tools
-brew install --cask postman insomnia
-```
-
-Adjust based on your actual needs.
-
-## Phase 9: Apply Final Configuration
-
-### 9.1 Sync All Dotfiles
-
-After manual installations, ensure everything is in sync:
-
-```bash
-chezmoi status
 chezmoi diff
 ```
 
-Review any differences.
+If `~/.zshrc` was already copied from the old Mac, it is newer than the repo copy and contains local secrets. Apply everything except it:
 
-### 9.2 Apply Any Changes
+```bash
+chezmoi apply $(chezmoi managed --include=files --path-style=absolute | grep -v '/\.zshrc$')
+```
+
+Otherwise, apply everything:
 
 ```bash
 chezmoi apply
+chezmoi status
 ```
 
-### 9.3 Setup Chezmoi Alias
+`chezmoi apply` writes `~/Brewfile`.
 
-Already configured in your dotfiles:
+## Phase 5: Install Packages from the Brewfile
 
 ```bash
-alias czup="chezmoi re-add && chezmoi git add . && chezmoi git -- commit -m 'Auto-sync dotfiles' && chezmoi git push && chezmoi update"
-alias cz="chezmoi"
+brew bundle check --file=~/Brewfile
+brew bundle --file=~/Brewfile
 ```
 
-Test it:
+The Brewfile covers taps, formulae, casks, VS Code extensions, and npm, uv, go, and cargo tools.
+
+Not in the Brewfile; install separately:
+
+- Docker Desktop: `brew install --cask docker-desktop`, or download from docker.com
+- uv: `brew install uv` (the old Mac had a pip-installed uv)
+
+### 5.1 Keep the Brewfile current
+
+On the machine with the newest package set:
 
 ```bash
-czup
+brew bundle dump --force --file=~/.local/share/chezmoi/Brewfile
 ```
 
-## Phase 10: System Settings (Manual)
+## Phase 6: Language Toolchains
 
-These cannot be automated and must be done manually:
+Reinstall from version managers and project lockfiles. Do not copy toolchain directories (`~/.rustup`, `~/.cargo`, `~/.nvm`, `~/.rbenv`, `~/.bun`) or caches (`~/.cache`, `~/.npm`).
 
-### 10.1 Keyboard & Input
+```bash
+mise install            # tools listed in ~/.config/mise/config.toml
+```
+
+In each project, install dependencies from its lockfile (`uv sync`, `npm ci`, `pnpm install`, `bundle install`, `cargo build`).
+
+## Phase 7: Configure Shell
+
+```bash
+chsh -s /bin/zsh
+exec zsh
+```
+
+Oh My Zsh, if used:
+
+```bash
+sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --keep-zshrc
+```
+
+`--keep-zshrc` stops the installer from replacing the chezmoi-managed `~/.zshrc`.
+
+## Phase 8: Git Identity
+
+`~/.gitconfig` comes from chezmoi. Verify instead of re-setting:
+
+```bash
+git config --global user.name
+git config --global user.email
+```
+
+## Phase 9: System Settings (Manual)
+
+### 9.1 Keyboard & Input
 
 - System Settings > Keyboard > Key repeat rate
 - System Settings > Keyboard > Delay until repeat
-- System Settings > Keyboard > Shortcuts (customize as needed)
+- System Settings > Keyboard > Shortcuts
 
-### 10.2 Trackpad
+### 9.2 Trackpad
 
 - System Settings > Trackpad > Tracking speed
 - System Settings > Trackpad > Tap to click
 
-### 10.3 Finder
+### 9.3 Finder
 
 - Finder > Settings > Advanced > Show filename extensions
-- Finder > Settings > Sidebar (customize visible items)
+- Finder > Settings > Sidebar
 
-### 10.4 Dock
+### 9.4 Dock
 
 - Drag preferred applications to Dock
 - System Settings > Dock > Minimize using: Scale effect
 
-### 10.5 Terminal/iTerm2
-
-- Import color schemes if preferred
-- Set font to your preference (Menlo, Monaco, etc.)
-
-## Phase 11: Verification
-
-### 11.1 Check All Components
+## Phase 10: Verification
 
 ```bash
-# Chezmoi
-chezmoi --version
-
-# Version managers
-mise --version
-
-# Shell
+chezmoi status
+brew bundle check --file=~/Brewfile
 echo $SHELL
-zsh --version
-
-# Git
-git --version
-gh --version
-
-# Editors
-nvim --version
-
-# Tools
-node --version
-python3 --version
+git --version && gh --version && nvim --version
+node --version && python3 --version
+ssh -T git@github.com
+ls -la ~/.zshrc ~/.config/nvim/init.lua ~/.config/starship.toml
 ```
 
-### 11.2 Test Aliases
+## Secrets and This Repo
 
-```bash
-# Test your aliases
-alias | grep -E "^alias (cz|cc-|czup)"
-```
+This repo is public. Keep secrets out of every managed file.
 
-### 11.3 Verify Dotfiles Applied
+- Put tokens and API keys in 1Password and read them at shell start (`op read op://...`), or in an unmanaged file such as `~/.zshrc.local`.
+- `chezmoi re-add` warns when it finds a secret but still writes the file into the source directory. Run `git diff` before every commit.
+- The `czup` alias runs `chezmoi re-add`, commits, and pushes in one step. Do not use it while any managed file contains a secret.
 
-```bash
-# Check that key files exist
-ls -la ~/.zshrc
-ls -la ~/.config/nvim/init.lua
-ls -la ~/.config/starship.toml
-```
+## Troubleshooting
 
-## Phase 12: Troubleshooting
-
-### Problem: Chezmoi init fails with GitHub auth
-
-**Solution:** Use GitHub CLI to authenticate first:
+### chezmoi init fails with GitHub auth
 
 ```bash
 gh auth login
-# Follow prompts to authenticate
-
-# Then retry chezmoi init
-chezmoi init --apply https://github.com/randynov/dotfiles.git
+chezmoi init git@github.com:randynov/dotfiles.git
 ```
 
-### Problem: Shell not sourcing aliases
-
-**Solution:** Verify `.zshrc` is sourcing `.zalias`:
+### Shell not sourcing aliases
 
 ```bash
 grep "zalias" ~/.zshrc
-```
-
-If missing, chezmoi should have applied it. Try:
-
-```bash
 chezmoi apply
 ```
 
-### Problem: Python/Node not found after installation
-
-**Solution:** Restart your terminal or reload shell:
+### Python/Node not found after installation
 
 ```bash
 exec zsh
 ```
 
-### Problem: Git SSH connection fails
-
-**Solution:** Verify SSH key:
+### Git SSH connection fails
 
 ```bash
 ssh -vT git@github.com
-# Look for "Offering public key" messages
+ssh-add --apple-use-keychain ~/.ssh/id_ed25519
 ```
 
-If no keys offered, add to SSH agent:
-
-```bash
-ssh-add ~/.ssh/id_ed25519
-```
-
-### Problem: Chezmoi apply reports conflicts
-
-**Solution:** Review differences:
+### chezmoi apply reports conflicts
 
 ```bash
 chezmoi diff
+chezmoi re-add ~/path/to/file   # keep the local version
+chezmoi apply                   # or take the repo version
 ```
 
-If you made local changes you want to keep:
+### Shell errors mentioning `\r`
+
+A file has Windows line endings. Convert it back to LF before committing:
 
 ```bash
-chezmoi re-add   # Add your local changes to source
-chezmoi apply    # Then apply managed files
+git -C ~/.local/share/chezmoi ls-files --eol | grep crlf
 ```
 
-## Quick Reference: Essential Commands
+## Quick Reference
 
 ```bash
-# Clone and apply dotfiles
-chezmoi init --apply https://github.com/randynov/dotfiles.git
-
-# Check what would change
-chezmoi status
+chezmoi init git@github.com:randynov/dotfiles.git
 chezmoi diff
-
-# Apply all managed files
 chezmoi apply
-
-# Add local file changes back to chezmoi
-chezmoi add ~/.zshrc
-
-# Update from remote
+chezmoi re-add ~/.zshrc
 chezmoi update
-
-# Sync (pull + push with commit)
-czup
-
-# Edit a managed file
 chezmoi edit ~/.zshrc
+brew bundle --file=~/Brewfile
 ```
-
-## After Setup
-
-1. **Customize for your needs:**
-   - Edit `~/.zalias` for personal shortcuts
-   - Add project-specific configs in `~/.local/share/chezmoi`
-   - Install additional tools as needed
-
-2. **Keep dotfiles in sync:**
-   - After modifying dotfiles, run `czup` to sync
-   - Review `chezmoi diff` before applying changes
-
-3. **Backup important settings:**
-   - GitHub account recovery codes
-   - SSH key passphrases (in password manager)
-   - API keys and secrets (never in dotfiles)
 
 ## Additional Resources
 
-- Chezmoi documentation: https://www.chezmoi.io
-- Homebrew documentation: https://brew.sh
-- GitHub CLI documentation: https://cli.github.com
+- chezmoi: https://www.chezmoi.io
+- Homebrew Bundle: https://docs.brew.sh/Brew-Bundle-and-Brewfile
+- GitHub CLI: https://cli.github.com

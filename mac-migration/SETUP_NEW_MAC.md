@@ -76,13 +76,13 @@ chezmoi apply
 chezmoi status
 ```
 
-`chezmoi apply` writes `~/Brewfile`.
+`chezmoi apply` writes `~/mac-migration/Brewfile`.
 
 ## Phase 5: Install Packages from the Brewfile
 
 ```bash
-brew bundle check --file=~/Brewfile
-brew bundle --file=~/Brewfile
+brew bundle check --file=~/mac-migration/Brewfile
+brew bundle --file=~/mac-migration/Brewfile
 ```
 
 The Brewfile covers taps, formulae, casks, VS Code extensions, and npm, uv, go, and cargo tools.
@@ -97,7 +97,7 @@ Not in the Brewfile; install separately:
 On the machine with the newest package set:
 
 ```bash
-brew bundle dump --force --file=~/.local/share/chezmoi/Brewfile
+brew bundle dump --force --file=~/.local/share/chezmoi/mac-migration/Brewfile
 ```
 
 ## Phase 6: Language Toolchains
@@ -161,7 +161,7 @@ git config --global user.email
 
 ```bash
 chezmoi status
-brew bundle check --file=~/Brewfile
+brew bundle check --file=~/mac-migration/Brewfile
 echo $SHELL
 git --version && gh --version && nvim --version
 node --version && python3 --version
@@ -231,7 +231,7 @@ chezmoi apply
 chezmoi re-add ~/.zshrc
 chezmoi update
 chezmoi edit ~/.zshrc
-brew bundle --file=~/Brewfile
+brew bundle --file=~/mac-migration/Brewfile
 ```
 
 ## Additional Resources

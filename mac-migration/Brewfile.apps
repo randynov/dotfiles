@@ -1,4 +1,4 @@
-# Apps from Loma. Delete lines you do not want, then: brew bundle --file=~/Brewfile.apps
+# Apps from Loma. Delete lines you do not want, then: brew bundle --file=~/mac-migration/Brewfile.apps
 # Cloud sync apps are commented out; handled separately.
 
 # Homebrew casks

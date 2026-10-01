@@ -1,7 +1,7 @@
 #!/bin/bash
 # Dock, Finder, keyboard, trackpad, and screenshot settings captured from the old Mac.
-# Preview: bash ~/macos-defaults.sh --dry-run
-# Apply:   bash ~/macos-defaults.sh
+# Preview: bash ~/mac-migration/macos-defaults.sh --dry-run
+# Apply:   bash ~/mac-migration/macos-defaults.sh
 set -euo pipefail
 
 DRY_RUN=false

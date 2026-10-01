@@ -1,0 +1,2015 @@
+{
+  "schema": "scrumlr-codemap/1",
+  "repository": {
+    "name": "scrumlr.io",
+    "commit": "fbf673788a329ae62a1f4f1dfd4b2df73e13dd19",
+    "branch": "main",
+    "commit_time": "2024-06-22T14:01:02Z"
+  },
+  "generated_at": "2026-09-24T12:58:27Z",
+  "node_cap": 20,
+  "edge_types": [
+    "calls",
+    "imports",
+    "publishes",
+    "reads",
+    "subscribes",
+    "writes"
+  ],
+  "summary": "scrumlr.io is a collaborative retrospective board. A React 18 + Redux Toolkit single-page app in src/ talks to a Go (chi) server in server/src/ over REST for writes and over one websocket per board for reads. The server persists to PostgreSQL through bun and fans board events out over NATS (default) or Redis so that multiple server instances stay in step.",
+  "not_mapped": [
+    {
+      "path": "server/src/services/users",
+      "why": "Same shape as svc-notes: DB + realtime broker. Reached via api-http /user and /login."
+    },
+    {
+      "path": "server/src/services/reactions",
+      "why": "Note-level emoji reactions. Same shape as svc-notes."
+    },
+    {
+      "path": "server/src/services/board_reactions",
+      "why": "Ephemeral board-wide reactions. Same shape as svc-notes."
+    },
+    {
+      "path": "server/src/services/health",
+      "why": "Backs GET /health; checks database and broker."
+    },
+    {
+      "path": "server/src/services/services.go",
+      "why": "The interface contract between api-http and every service. Read this first when tracing a handler."
+    },
+    {
+      "path": "server/src/common",
+      "why": "Shared DTOs, filters, error helpers and cookie sealing."
+    },
+    {
+      "path": "server/src/logger",
+      "why": "Zap logger plus chi request-id middleware."
+    },
+    {
+      "path": "server/src/identifiers",
+      "why": "Context key constants for board/user/column/note ids."
+    },
+    {
+      "path": "src/utils",
+      "why": "Auth helpers (utils/auth.ts drives sign-in), export, timer, toast, hooks."
+    },
+    {
+      "path": "src/types",
+      "why": "TypeScript models shared by store, api and components, including the websocket event union."
+    },
+    {
+      "path": "src/constants",
+      "why": "Colors, hotkeys, storage keys."
+    },
+    {
+      "path": "cypress",
+      "why": "One end-to-end spec (landingPageToBoard). Not part of the runtime graph."
+    },
+    {
+      "path": "deployment",
+      "why": "Docker compose, SKE manifests, nginx.conf and the root Dockerfile. Not scanned for this map."
+    }
+  ],
+  "nodes": [
+    {
+      "id": "web-entry",
+      "path": "src/index.tsx",
+      "role": "Browser app bootstrap. Mounts React, wires the Redux Provider, i18n, toasts and optional Plausible analytics, then renders the router.",
+      "entrypoints": [
+        "createRoot(document.getElementById(\"root\"))",
+        "Plausible({domain: ANALYTICS_DATA_DOMAIN, apiHost: ANALYTICS_SRC})"
+      ],
+      "tests": [],
+      "constraints": [
+        "Runtime config comes from src/config.ts, which reads cookies first, then REACT_APP_* env vars, then falls back to window.location.origin + '/api'.",
+        "Analytics only initialises when both ANALYTICS_DATA_DOMAIN and ANALYTICS_SRC cookies are set."
+      ],
+      "evidence": [
+        {
+          "path": "src/index.tsx",
+          "symbol": "root",
+          "line": 49,
+          "snippet": "const root = createRoot(document.getElementById(\"root\") as HTMLDivElement);"
+        },
+        {
+          "path": "src/index.tsx",
+          "symbol": "import store",
+          "line": 6,
+          "snippet": "import store from \"store\";"
+        },
+        {
+          "path": "src/config.ts",
+          "symbol": "SERVER_HTTP_URL",
+          "line": 16,
+          "snippet": "export const SERVER_HTTP_URL = serverURL || process.env.REACT_APP_SERVER_HTTP_URL || `${window.location.origin.replace(window.location.protocol, httpProtocol)}/api`;"
+        }
+      ],
+      "external": false
+    },
+    {
+      "id": "web-routes",
+      "path": "src/routes",
+      "role": "React Router route table and route-level guards. Owns the URL surface: homepage, /new, /login, /board/:boardId (+ nested settings, voting, timer, stack).",
+      "entrypoints": [
+        "Router (src/routes/Router.tsx)",
+        "BoardGuard (src/routes/Board/BoardGuard.tsx)",
+        "RequireAuthentication (src/routes/RequireAuthentication.tsx)"
+      ],
+      "tests": [
+        "src/routes/__tests__/RequireAuthentication.test.tsx",
+        "src/routes/StackView/__tests__/StackView.test.tsx",
+        "src/routes/NotFound/NotFound.test.tsx"
+      ],
+      "constraints": [
+        "BoardGuard is the only place that dispatches joinBoard/leaveBoard; the websocket lifecycle hangs off those actions in the store middleware.",
+        "Every board route is wrapped in RequireAuthentication."
+      ],
+      "evidence": [
+        {
+          "path": "src/routes/Router.tsx",
+          "symbol": "Router",
+          "line": 23,
+          "snippet": "const Router = () => ("
+        },
+        {
+          "path": "src/routes/Router.tsx",
+          "symbol": "board route",
+          "line": 49,
+          "snippet": "path=\"/board/:boardId\""
+        },
+        {
+          "path": "src/routes/Board/BoardGuard.tsx",
+          "symbol": "joinBoard dispatch",
+          "line": 26,
+          "snippet": "store.dispatch(Actions.joinBoard(boardId!));"
+        }
+      ],
+      "external": false
+    },
+    {
+      "id": "web-components",
+      "path": "src/components",
+      "role": "All React UI. Board canvas, columns, notes, voting, timer, settings dialogs, participant list. Components read state with useSelector and write by dispatching actions.",
+      "entrypoints": [
+        "Board (src/components/Board/Board.tsx)",
+        "NoteInput (src/components/NoteInput/NoteInput.tsx)",
+        "SettingsDialog (src/components/SettingsDialog)"
+      ],
+      "tests": [
+        "src/components/Board/__tests__/Board.test.tsx",
+        "src/components/NoteInput/__tests__/NoteInput.test.tsx",
+        "src/components/Column/__tests__/Column.test.tsx",
+        "src/components/Votes/__tests__/Votes.test.tsx",
+        "src/components/SettingsDialog/__tests__/SettingsDialog.test.tsx"
+      ],
+      "constraints": [
+        "Most components dispatch actions and let the store middleware do the HTTP call, but a few call src/api directly: Timer.tsx, SettingsDialog/ExportBoard/PrintView/PrintView.tsx and SettingsDialog/Feedback/Feedback.tsx.",
+        "Largest module in the repo by file count - treat it as a directory, not a unit."
+      ],
+      "evidence": [
+        {
+          "path": "src/components/NoteInput/NoteInput.tsx",
+          "symbol": "addNote dispatch",
+          "line": 30,
+          "snippet": "dispatch(Actions.addNote(columnId!, content));"
+        },
+        {
+          "path": "src/components/NoteInput/NoteInput.tsx",
+          "symbol": "import Actions",
+          "line": 4,
+          "snippet": "import {Actions} from \"store/action\";"
+        }
+      ],
+      "external": false
+    },
+    {
+      "id": "web-store",
+      "path": "src/store",
+      "role": "Redux Toolkit store: actions, reducers, and a middleware chain. The middleware layer is the side-effect boundary - it issues REST calls and owns the board websocket.",
+      "entrypoints": [
+        "store (src/store/index.ts)",
+        "passBoardMiddleware (src/store/middleware/board.tsx) - opens/closes the board socket",
+        "passNoteMiddleware (src/store/middleware/note.tsx)"
+      ],
+      "tests": [],
+      "constraints": [
+        "One websocket per board, held in a module-level `socket` variable in middleware/board.tsx. Opened on Action.PermittedBoardAccess, closed on Action.LeaveBoard.",
+        "Incoming server events are translated into dispatches inside the socket onmessage handler; reducers never talk to the network.",
+        "parseMiddleware stamps every action with {user, board, voting, serverTimeOffset} context before the per-domain middleware run."
+      ],
+      "evidence": [
+        {
+          "path": "src/store/index.ts",
+          "symbol": "parseMiddleware",
+          "line": 30,
+          "snippet": "const parseMiddleware = (stateAPI: MiddlewareAPI<Dispatch, ApplicationState>) => (dispatch: Dispatch) => (action: ReduxAction) => {"
+        },
+        {
+          "path": "src/store/middleware/board.tsx",
+          "symbol": "socket",
+          "line": 21,
+          "snippet": "socket = new Socket(`${SERVER_WEBSOCKET_URL}/boards/${action.boardId}`, {"
+        },
+        {
+          "path": "src/store/middleware/board.tsx",
+          "symbol": "INIT handler",
+          "line": 27,
+          "snippet": "if (message.type === \"INIT\") {"
+        },
+        {
+          "path": "src/store/middleware/note.tsx",
+          "symbol": "API.addNote",
+          "line": 11,
+          "snippet": "API.addNote(action.context.board!, action.columnId, action.text).catch(() => {"
+        }
+      ],
+      "external": false
+    },
+    {
+      "id": "web-api",
+      "path": "src/api",
+      "role": "Thin REST client. One module per resource, all merged into a single `API` object. Every call is window.fetch with credentials: \"include\".",
+      "entrypoints": [
+        "API (src/api/index.ts)",
+        "BoardAPI (src/api/board.ts)",
+        "NoteAPI (src/api/note.ts)",
+        "AuthAPI (src/api/auth.ts)"
+      ],
+      "tests": [],
+      "constraints": [
+        "Base URL is SERVER_HTTP_URL from src/config.ts; it already ends in /api in the default case.",
+        "Auth is cookie-based - every fetch sets credentials: \"include\"; there is no Authorization header.",
+        "Each function throws on a non-expected status rather than returning an error value."
+      ],
+      "evidence": [
+        {
+          "path": "src/api/index.ts",
+          "symbol": "API",
+          "line": 15,
+          "snippet": "export const API = {"
+        },
+        {
+          "path": "src/api/board.ts",
+          "symbol": "createBoard",
+          "line": 17,
+          "snippet": "const response = await fetch(`${SERVER_HTTP_URL}/boards`, {"
+        },
+        {
+          "path": "src/api/note.ts",
+          "symbol": "addNote",
+          "line": 16,
+          "snippet": "const response = await fetch(`${SERVER_HTTP_URL}/boards/${boardId}/notes`, {"
+        },
+        {
+          "path": "src/api/auth.ts",
+          "symbol": "signInAnonymously",
+          "line": 29,
+          "snippet": "const response = await fetch(`${SERVER_HTTP_URL}/login/anonymous`, {"
+        }
+      ],
+      "external": false
+    },
+    {
+      "id": "server-main",
+      "path": "server/src/main.go",
+      "role": "Go process entrypoint and composition root. Parses CLI flags / env / TOML, runs migrations, picks the message broker, builds every service, and starts the HTTP server.",
+      "entrypoints": [
+        "main()",
+        "run(c *cli.Context)"
+      ],
+      "tests": [],
+      "constraints": [
+        "Migrations run before anything else; the process exits if they fail.",
+        "Redis wins over NATS: if --redis-address is set, NATS is not used at all.",
+        "Refuses to start without --key unless --insecure is passed (then a bundled dev keypair signs JWTs).",
+        "OAuth providers are only registered when client id, secret and --auth-callback-host are all set."
+      ],
+      "evidence": [
+        {
+          "path": "server/src/main.go",
+          "symbol": "run",
+          "line": 215,
+          "snippet": "func run(c *cli.Context) error {"
+        },
+        {
+          "path": "server/src/main.go",
+          "symbol": "MigrateDatabase",
+          "line": 216,
+          "snippet": "db, err := migrations.MigrateDatabase(c.String(\"database\"))"
+        },
+        {
+          "path": "server/src/main.go",
+          "symbol": "broker selection",
+          "line": 226,
+          "snippet": "if c.String(\"redis-address\") != \"\" {"
+        },
+        {
+          "path": "server/src/main.go",
+          "symbol": "ListenAndServe",
+          "line": 327,
+          "snippet": "return http.ListenAndServe(port, s)"
+        }
+      ],
+      "external": false
+    },
+    {
+      "id": "api-http",
+      "path": "server/src/api",
+      "role": "HTTP + websocket layer (go-chi). Route table, auth middleware, board role guards (participant / moderator / editable), request and response DTO handling, and the two websocket endpoints that stream board state to clients.",
+      "entrypoints": [
+        "New (server/src/api/router.go)",
+        "publicRoutes / protectedRoutes (server/src/api/router.go)",
+        "openBoardSocket (server/src/api/boards_listen_on_board.go)",
+        "listenOnBoardSessionRequest (server/src/api/board_session_requests_listen_on_request.go)"
+      ],
+      "tests": [
+        "server/src/api/event_filter_test.go",
+        "server/src/api/notes_test.go",
+        "server/src/api/votes_test.go",
+        "server/src/api/votings_test.go",
+        "server/src/api/json_parse_test.go"
+      ],
+      "constraints": [
+        "Public routes: /info, /health, /feedback, /login/*. Everything else sits behind auth.Verifier + jwtauth.Authenticator + auth.AuthContext.",
+        "Board authorisation is middleware, not handler code: BoardParticipantContext, BoardModeratorContext, BoardEditableContext.",
+        "Server holds a map of live board subscriptions keyed by board UUID; it is in-process state, so horizontal scaling relies on the broker fan-out, not shared memory.",
+        "CORS is only installed when origin checking is disabled (--disable-check-origin)."
+      ],
+      "evidence": [
+        {
+          "path": "server/src/api/router.go",
+          "symbol": "New",
+          "line": 45,
+          "snippet": "func New("
+        },
+        {
+          "path": "server/src/api/router.go",
+          "symbol": "publicRoutes",
+          "line": 126,
+          "snippet": "func (s *Server) publicRoutes(r chi.Router) chi.Router {"
+        },
+        {
+          "path": "server/src/api/router.go",
+          "symbol": "protectedRoutes",
+          "line": 143,
+          "snippet": "func (s *Server) protectedRoutes(r chi.Router) {"
+        },
+        {
+          "path": "server/src/api/boards_listen_on_board.go",
+          "symbol": "openBoardSocket",
+          "line": 41,
+          "snippet": "func (s *Server) openBoardSocket(w http.ResponseWriter, r *http.Request) {"
+        },
+        {
+          "path": "server/src/api/context.go",
+          "symbol": "BoardParticipantContext",
+          "line": 43,
+          "snippet": "func (s *Server) BoardParticipantContext(next http.Handler) http.Handler {"
+        }
+      ],
+      "external": false
+    },
+    {
+      "id": "auth",
+      "path": "server/src/auth",
+      "role": "JWT signing/verification and OAuth provider setup (goth). Turns an external identity into a scrumlr user and puts the user id into the request context.",
+      "entrypoints": [
+        "NewAuthConfiguration (server/src/auth/auth.go)",
+        "Auth interface: Sign / Verifier / Exists",
+        "AuthContext middleware (server/src/auth/auth_context.go)"
+      ],
+      "tests": [],
+      "constraints": [
+        "Supported providers are Google, GitHub, Microsoft, Azure AD and Apple - all via goth.",
+        "Two JWT keys exist: a real one and an 'unsafe' bundled dev key under auth/devkeys. Never run with the unsafe key outside local development.",
+        "Identity is carried in a cookie, which is why the browser client uses credentials: \"include\"."
+      ],
+      "evidence": [
+        {
+          "path": "server/src/auth/auth.go",
+          "symbol": "Auth",
+          "line": 32,
+          "snippet": "type Auth interface {"
+        },
+        {
+          "path": "server/src/auth/auth.go",
+          "symbol": "NewAuthConfiguration",
+          "line": 54,
+          "snippet": "func NewAuthConfiguration(providers map[string]AuthProviderConfiguration, unsafePrivateKey, privateKey string, database *database.Database) Auth {"
+        },
+        {
+          "path": "server/src/auth/auth.go",
+          "symbol": "google provider",
+          "line": 69,
+          "snippet": "p := google.New("
+        }
+      ],
+      "external": false
+    },
+    {
+      "id": "svc-boards",
+      "path": "server/src/services/boards",
+      "role": "Board and board-session domain logic: create/update/delete boards and columns, timers, join requests, participant roles, and assembling the FullBoard payload.",
+      "entrypoints": [
+        "NewBoardService",
+        "NewBoardSessionService",
+        "FullBoard"
+      ],
+      "tests": [],
+      "constraints": [
+        "Every mutation that other participants must see ends in a realtime broadcast; forgetting the broadcast is the classic bug here.",
+        "Unlike svc-notes and svc-votings, BoardService holds *database.Database directly instead of a package-local DB interface, so there is no mocking seam here."
+      ],
+      "evidence": [
+        {
+          "path": "server/src/services/boards/boards.go",
+          "symbol": "BroadcastToBoard",
+          "line": 257,
+          "snippet": "err := s.realtime.BroadcastToBoard(board.ID, realtime.BoardEvent{"
+        },
+        {
+          "path": "server/src/services/boards/boards.go",
+          "symbol": "package boards",
+          "line": 1,
+          "snippet": "package boards"
+        },
+        {
+          "path": "server/src/services/services.go",
+          "symbol": "Boards",
+          "line": 27,
+          "snippet": "type Boards interface {"
+        }
+      ],
+      "external": false
+    },
+    {
+      "id": "svc-notes",
+      "path": "server/src/services/notes",
+      "role": "Note domain logic: create, read, update (including stacking/unstacking), delete, and the NOTES_UPDATED / NOTES_SYNC broadcasts that keep every client in step.",
+      "entrypoints": [
+        "NewNoteService",
+        "Create / Update / Delete",
+        "UpdatedNotes"
+      ],
+      "tests": [
+        "server/src/services/notes/notes_test.go"
+      ],
+      "constraints": [
+        "Per-user note visibility is NOT applied here. The service broadcasts the full set and the API layer filters per socket in server/src/api/event_filter.go (filterNotes).",
+        "DB access goes through the package-local DB interface in notes.go."
+      ],
+      "evidence": [
+        {
+          "path": "server/src/services/notes/notes.go",
+          "symbol": "NewNoteService",
+          "line": 35,
+          "snippet": "func NewNoteService(db DB, rt *realtime.Broker) services.Notes {"
+        },
+        {
+          "path": "server/src/services/notes/notes.go",
+          "symbol": "DB",
+          "line": 26,
+          "snippet": "type DB interface {"
+        },
+        {
+          "path": "server/src/services/notes/notes.go",
+          "symbol": "CreateNote",
+          "line": 44,
+          "snippet": "note, err := s.database.CreateNote(database.NoteInsert{Author: body.User, Board: body.Board, Column: body.Column, Text: body.Text})"
+        },
+        {
+          "path": "server/src/services/notes/notes.go",
+          "symbol": "BroadcastToBoard",
+          "line": 138,
+          "snippet": "err := s.realtime.BroadcastToBoard(board, realtime.BoardEvent{"
+        }
+      ],
+      "external": false
+    },
+    {
+      "id": "svc-votings",
+      "path": "server/src/services/votings",
+      "role": "Voting sessions and individual votes: open/close a voting, enforce the vote limit, tally results, and broadcast VOTING_* / VOTES_UPDATED events.",
+      "entrypoints": [
+        "NewVotingService",
+        "Create / Update / AddVote / RemoveVote"
+      ],
+      "tests": [
+        "server/src/services/votings/votings_test.go"
+      ],
+      "constraints": [
+        "Vote results are re-filtered per socket in server/src/api/event_filter.go: filterVoting keeps only the results for notes that caller can see and recomputes the total from them."
+      ],
+      "evidence": [
+        {
+          "path": "server/src/services/votings/votings.go",
+          "symbol": "BroadcastToBoard",
+          "line": 129,
+          "snippet": "err = s.realtime.BroadcastToBoard(board, realtime.BoardEvent{"
+        },
+        {
+          "path": "server/src/services/services.go",
+          "symbol": "Votings",
+          "line": 84,
+          "snippet": "type Votings interface {"
+        },
+        {
+          "path": "server/src/api/event_filter.go",
+          "symbol": "filterVotingUpdated",
+          "line": 134,
+          "snippet": "func filterVotingUpdated(voting *VotingUpdated, userID uuid.UUID, boardSettings *dto.Board, columns []*dto.Column) *VotingUpdated {"
+        }
+      ],
+      "external": false
+    },
+    {
+      "id": "svc-feedback",
+      "path": "server/src/services/feedback",
+      "role": "Forwards in-app feedback to an external chat webhook. The only backend module that makes an outbound HTTP call to a third party.",
+      "entrypoints": [
+        "NewFeedbackService(webhookUrl)",
+        "Create / Enabled"
+      ],
+      "tests": [],
+      "constraints": [
+        "Disabled when --feedback-webhook-url (SCRUMLR_FEEDBACK_WEBHOOK_URL) is empty. Enabled() is surfaced to the client as feedbackEnabled on GET /info.",
+        "Posts a hard-coded Slack-style block payload with a German title string.",
+        "No retry, no timeout override - it uses http.Post with the default client."
+      ],
+      "evidence": [
+        {
+          "path": "server/src/services/feedback/feedback.go",
+          "symbol": "NewFeedbackService",
+          "line": 17,
+          "snippet": "func NewFeedbackService(webhookUrl string) services.Feedback {"
+        },
+        {
+          "path": "server/src/services/feedback/feedback.go",
+          "symbol": "http.Post",
+          "line": 45,
+          "snippet": "_, err := http.Post(s.webhookUrl, \"application/json\", bytes.NewBuffer(jsonData))"
+        },
+        {
+          "path": "server/src/services/feedback/feedback.go",
+          "symbol": "Enabled",
+          "line": 49,
+          "snippet": "func (s *FeedbackService) Enabled() bool {"
+        }
+      ],
+      "external": false
+    },
+    {
+      "id": "database",
+      "path": "server/src/database",
+      "role": "Persistence layer over PostgreSQL using bun. One file per aggregate (boards, columns, notes, reactions, sessions, votes, votings, users) plus shared enum types.",
+      "entrypoints": [
+        "New(db *sql.DB, verbose bool)",
+        "Database.Get - loads a whole board in one call",
+        "CreateNote / UpdateNote / DeleteNote"
+      ],
+      "tests": [
+        "server/src/database/database_test.go",
+        "server/src/database/boards_test.go",
+        "server/src/database/notes_test.go",
+        "server/src/database/votings_test.go",
+        "server/src/database/votes_test.go",
+        "server/src/database/users_test.go",
+        "server/src/database/columns_test.go",
+        "server/src/database/reactions_test.go",
+        "server/src/database/board_sessions_test.go",
+        "server/src/database/board_session_requests_test.go"
+      ],
+      "constraints": [
+        "Connection pool is sized 4 * GOMAXPROCS for both max-open and max-idle.",
+        "Multi-table writes are single SQL statements: CreateBoard composes the board insert, the column inserts and the owner session insert into one CTE query. Read the SQL before changing the service layer.",
+        "DB tests run against a real PostgreSQL instance with fixtures under database/testdata."
+      ],
+      "evidence": [
+        {
+          "path": "server/src/database/database.go",
+          "symbol": "New",
+          "line": 19,
+          "snippet": "func New(db *sql.DB, verbose bool) *Database {"
+        },
+        {
+          "path": "server/src/database/database.go",
+          "symbol": "pool sizing",
+          "line": 24,
+          "snippet": "maxOpenConnections := 4 * runtime.GOMAXPROCS(0)"
+        },
+        {
+          "path": "server/src/database/database.go",
+          "symbol": "pgdialect",
+          "line": 21,
+          "snippet": "d.db = bun.NewDB(db, pgdialect.New())"
+        },
+        {
+          "path": "server/src/database/notes.go",
+          "symbol": "CreateNote",
+          "line": 49,
+          "snippet": "func (d *Database) CreateNote(insert NoteInsert) (Note, error) {"
+        }
+      ],
+      "external": false
+    },
+    {
+      "id": "migrations",
+      "path": "server/src/database/migrations",
+      "role": "Embedded SQL schema migrations, applied automatically at process start via golang-migrate.",
+      "entrypoints": [
+        "MigrateDatabase(databaseUrl string)"
+      ],
+      "tests": [],
+      "constraints": [
+        "Migration SQL is embedded into the binary with //go:embed sql - adding a file without rebuilding the binary does nothing.",
+        "Runs on every boot, so a bad migration takes the whole service down rather than degrading it."
+      ],
+      "evidence": [
+        {
+          "path": "server/src/database/migrations/migrations.go",
+          "symbol": "MigrateDatabase",
+          "line": 16,
+          "snippet": "func MigrateDatabase(databaseUrl string) (*sql.DB, error) {"
+        },
+        {
+          "path": "server/src/database/migrations/migrations.go",
+          "symbol": "go:embed",
+          "line": 13,
+          "snippet": "//go:embed sql"
+        },
+        {
+          "path": "server/src/database/migrations/migrations.go",
+          "symbol": "sql.Open",
+          "line": 17,
+          "snippet": "db, err := sql.Open(\"postgres\", databaseUrl)"
+        }
+      ],
+      "external": false
+    },
+    {
+      "id": "realtime",
+      "path": "server/src/realtime",
+      "role": "Pub/sub abstraction for board events. One Client interface with two implementations (NATS and Redis); the Broker adds board-scoped topics and the BoardEvent vocabulary.",
+      "entrypoints": [
+        "NewNats(url) / NewRedis(server)",
+        "Broker.BroadcastToBoard",
+        "Broker.GetBoardChannel"
+      ],
+      "tests": [
+        "server/src/realtime/nats_test.go",
+        "server/src/realtime/redis_test.go",
+        "server/src/realtime/boards_test.go",
+        "server/src/realtime/board_sessions_requests_test.go",
+        "server/src/realtime/health_test.go"
+      ],
+      "constraints": [
+        "Topic naming is 'board.<uuid>' - see boardsSubject in realtime/boards.go.",
+        "BoardEventType is the full event vocabulary the browser switches on; adding an event means touching this file and src/store/middleware/board.tsx together.",
+        "GetBoardChannel swallows subscribe errors and only logs them (there is a TODO about it), so a broker outage looks like a silent board."
+      ],
+      "evidence": [
+        {
+          "path": "server/src/realtime/broker.go",
+          "symbol": "Client",
+          "line": 5,
+          "snippet": "type Client interface {"
+        },
+        {
+          "path": "server/src/realtime/boards.go",
+          "symbol": "BroadcastToBoard",
+          "line": 42,
+          "snippet": "func (b *Broker) BroadcastToBoard(boardID uuid.UUID, msg BoardEvent) error {"
+        },
+        {
+          "path": "server/src/realtime/boards.go",
+          "symbol": "boardsSubject",
+          "line": 56,
+          "snippet": "func boardsSubject(boardID uuid.UUID) string {"
+        },
+        {
+          "path": "server/src/realtime/boards.go",
+          "symbol": "BoardEventType",
+          "line": 11,
+          "snippet": "type BoardEventType string"
+        }
+      ],
+      "external": false
+    },
+    {
+      "id": "ext-postgres",
+      "path": "external://postgresql",
+      "role": "EXTERNAL. PostgreSQL - the system of record for boards, columns, notes, reactions, sessions, votes and users.",
+      "entrypoints": [
+        "postgres://<host>:5432/scrumlr (--database flag / SCRUMLR_SERVER_DATABASE_URL)"
+      ],
+      "tests": [],
+      "constraints": [
+        "Only server/src/database and server/src/database/migrations talk to it.",
+        "Local dev instance is started by deployment/docker or server/docker-compose.dev.yml."
+      ],
+      "evidence": [
+        {
+          "path": "server/src/database/migrations/migrations.go",
+          "symbol": "postgres driver",
+          "line": 17,
+          "snippet": "db, err := sql.Open(\"postgres\", databaseUrl)"
+        },
+        {
+          "path": "server/src/database/database.go",
+          "symbol": "pgdialect",
+          "line": 9,
+          "snippet": "\"github.com/uptrace/bun/dialect/pgdialect\""
+        }
+      ],
+      "external": true
+    },
+    {
+      "id": "ext-nats",
+      "path": "external://nats",
+      "role": "EXTERNAL. NATS - the default message broker for fanning board events out across server instances.",
+      "entrypoints": [
+        "nats://localhost:4222 (--nats flag / SCRUMLR_SERVER_NATS_URL)"
+      ],
+      "tests": [],
+      "constraints": [
+        "Used only when --redis-address is empty."
+      ],
+      "evidence": [
+        {
+          "path": "server/src/realtime/nats.go",
+          "symbol": "NewNats",
+          "line": 39,
+          "snippet": "func NewNats(url string) (*Broker, error) {"
+        },
+        {
+          "path": "server/src/realtime/nats.go",
+          "symbol": "nats.Connect",
+          "line": 42,
+          "snippet": "nc, err := nats.Connect(url)"
+        }
+      ],
+      "external": true
+    },
+    {
+      "id": "ext-redis",
+      "path": "external://redis",
+      "role": "EXTERNAL. Redis pub/sub - the alternative message broker. Selected by setting --redis-address.",
+      "entrypoints": [
+        "--redis-address / SCRUMLR_SERVER_REDIS_HOST"
+      ],
+      "tests": [],
+      "constraints": [
+        "Takes precedence over NATS when set.",
+        "Events are JSON-encoded by hand (encodeEvent/decodeEvent) rather than by the client library."
+      ],
+      "evidence": [
+        {
+          "path": "server/src/realtime/redis.go",
+          "symbol": "NewRedis",
+          "line": 12,
+          "snippet": "func NewRedis(server RedisServer) (*Broker, error) {"
+        },
+        {
+          "path": "server/src/realtime/redis.go",
+          "symbol": "redis.NewClient",
+          "line": 27,
+          "snippet": "rdb := redis.NewClient(&redis.Options{"
+        }
+      ],
+      "external": true
+    },
+    {
+      "id": "ext-oauth",
+      "path": "external://oauth-providers",
+      "role": "EXTERNAL. Google, GitHub, Microsoft, Azure AD and Apple OAuth endpoints, reached through goth.",
+      "entrypoints": [
+        "GET /login/{provider}",
+        "GET /login/{provider}/callback"
+      ],
+      "tests": [],
+      "constraints": [
+        "A provider is only wired up when its client id, client secret and --auth-callback-host are all set.",
+        "Redirect URI is derived as <callback-host><base-path>/login/<provider>/callback."
+      ],
+      "evidence": [
+        {
+          "path": "server/src/auth/auth.go",
+          "symbol": "goth providers",
+          "line": 18,
+          "snippet": "\"github.com/markbates/goth/providers/google\""
+        },
+        {
+          "path": "server/src/api/router.go",
+          "symbol": "provider callback route",
+          "line": 137,
+          "snippet": "r.Get(\"/callback\", s.verifyAuthProviderCallback)"
+        }
+      ],
+      "external": true
+    },
+    {
+      "id": "ext-feedback-webhook",
+      "path": "external://feedback-webhook",
+      "role": "EXTERNAL. Slack-compatible incoming webhook that receives user feedback submitted from the app.",
+      "entrypoints": [
+        "--feedback-webhook-url / SCRUMLR_FEEDBACK_WEBHOOK_URL"
+      ],
+      "tests": [],
+      "constraints": [
+        "Optional. When unset, the feedback service reports Enabled() == false and the UI hides the form."
+      ],
+      "evidence": [
+        {
+          "path": "server/src/services/feedback/feedback.go",
+          "symbol": "http.Post",
+          "line": 45,
+          "snippet": "_, err := http.Post(s.webhookUrl, \"application/json\", bytes.NewBuffer(jsonData))"
+        },
+        {
+          "path": "server/src/services/feedback/feedback.go",
+          "symbol": "webhookUrl",
+          "line": 14,
+          "snippet": "webhookUrl string"
+        }
+      ],
+      "external": true
+    }
+  ],
+  "edges": [
+    {
+      "from": "web-entry",
+      "to": "web-store",
+      "type": "imports",
+      "evidence": [
+        {
+          "path": "src/index.tsx",
+          "symbol": "import store",
+          "line": 6,
+          "snippet": "import store from \"store\";"
+        }
+      ],
+      "evidence_status": "verified"
+    },
+    {
+      "from": "web-entry",
+      "to": "web-routes",
+      "type": "imports",
+      "evidence": [
+        {
+          "path": "src/index.tsx",
+          "symbol": "import Router",
+          "line": 7,
+          "snippet": "import Router from \"routes/Router\";"
+        }
+      ],
+      "evidence_status": "verified"
+    },
+    {
+      "from": "web-routes",
+      "to": "web-components",
+      "type": "imports",
+      "evidence": [
+        {
+          "path": "src/routes/Router.tsx",
+          "symbol": "import SettingsDialog",
+          "line": 8,
+          "snippet": "import {SettingsDialog} from \"components/SettingsDialog\";"
+        }
+      ],
+      "evidence_status": "verified"
+    },
+    {
+      "from": "web-routes",
+      "to": "web-store",
+      "type": "calls",
+      "evidence": [
+        {
+          "path": "src/routes/Board/BoardGuard.tsx",
+          "symbol": "joinBoard dispatch",
+          "line": 26,
+          "snippet": "store.dispatch(Actions.joinBoard(boardId!));"
+        }
+      ],
+      "evidence_status": "verified"
+    },
+    {
+      "from": "web-components",
+      "to": "web-store",
+      "type": "calls",
+      "evidence": [
+        {
+          "path": "src/components/NoteInput/NoteInput.tsx",
+          "symbol": "addNote dispatch",
+          "line": 30,
+          "snippet": "dispatch(Actions.addNote(columnId!, content));"
+        }
+      ],
+      "evidence_status": "verified"
+    },
+    {
+      "from": "web-store",
+      "to": "web-api",
+      "type": "calls",
+      "evidence": [
+        {
+          "path": "src/store/middleware/note.tsx",
+          "symbol": "API.addNote",
+          "line": 11,
+          "snippet": "API.addNote(action.context.board!, action.columnId, action.text).catch(() => {"
+        },
+        {
+          "path": "src/store/middleware/board.tsx",
+          "symbol": "import API",
+          "line": 7,
+          "snippet": "import {API} from \"api\";"
+        }
+      ],
+      "evidence_status": "verified"
+    },
+    {
+      "from": "web-api",
+      "to": "api-http",
+      "type": "calls",
+      "evidence": [
+        {
+          "path": "src/api/board.ts",
+          "symbol": "POST /boards",
+          "line": 17,
+          "snippet": "const response = await fetch(`${SERVER_HTTP_URL}/boards`, {"
+        },
+        {
+          "path": "server/src/api/router.go",
+          "symbol": "POST /boards route",
+          "line": 148,
+          "snippet": "r.Post(\"/boards\", s.createBoard)"
+        }
+      ],
+      "evidence_status": "verified"
+    },
+    {
+      "from": "web-store",
+      "to": "api-http",
+      "type": "subscribes",
+      "evidence": [
+        {
+          "path": "src/store/middleware/board.tsx",
+          "symbol": "board socket",
+          "line": 21,
+          "snippet": "socket = new Socket(`${SERVER_WEBSOCKET_URL}/boards/${action.boardId}`, {"
+        },
+        {
+          "path": "server/src/api/boards_listen_on_board.go",
+          "symbol": "openBoardSocket",
+          "line": 41,
+          "snippet": "func (s *Server) openBoardSocket(w http.ResponseWriter, r *http.Request) {"
+        }
+      ],
+      "evidence_status": "verified"
+    },
+    {
+      "from": "server-main",
+      "to": "migrations",
+      "type": "calls",
+      "evidence": [
+        {
+          "path": "server/src/main.go",
+          "symbol": "MigrateDatabase",
+          "line": 216,
+          "snippet": "db, err := migrations.MigrateDatabase(c.String(\"database\"))"
+        }
+      ],
+      "evidence_status": "verified"
+    },
+    {
+      "from": "server-main",
+      "to": "database",
+      "type": "calls",
+      "evidence": [
+        {
+          "path": "server/src/main.go",
+          "symbol": "database.New",
+          "line": 292,
+          "snippet": "dbConnection := database.New(db, c.Bool(\"verbose\"))"
+        }
+      ],
+      "evidence_status": "verified"
+    },
+    {
+      "from": "server-main",
+      "to": "realtime",
+      "type": "calls",
+      "evidence": [
+        {
+          "path": "server/src/main.go",
+          "symbol": "realtime.NewNats",
+          "line": 236,
+          "snippet": "rt, err = realtime.NewNats(c.String(\"nats\"))"
+        },
+        {
+          "path": "server/src/main.go",
+          "symbol": "realtime.NewRedis",
+          "line": 227,
+          "snippet": "rt, err = realtime.NewRedis(realtime.RedisServer{"
+        }
+      ],
+      "evidence_status": "verified"
+    },
+    {
+      "from": "server-main",
+      "to": "auth",
+      "type": "calls",
+      "evidence": [
+        {
+          "path": "server/src/main.go",
+          "symbol": "NewAuthConfiguration",
+          "line": 296,
+          "snippet": "authConfig := auth.NewAuthConfiguration(providersMap, unsafeKeyWithNewlines, keyWithNewlines, dbConnection)"
+        }
+      ],
+      "evidence_status": "verified"
+    },
+    {
+      "from": "server-main",
+      "to": "svc-boards",
+      "type": "calls",
+      "evidence": [
+        {
+          "path": "server/src/main.go",
+          "symbol": "NewBoardService",
+          "line": 298,
+          "snippet": "boardService := boards.NewBoardService(dbConnection, rt)"
+        }
+      ],
+      "evidence_status": "verified"
+    },
+    {
+      "from": "server-main",
+      "to": "svc-notes",
+      "type": "calls",
+      "evidence": [
+        {
+          "path": "server/src/main.go",
+          "symbol": "NewNoteService",
+          "line": 302,
+          "snippet": "noteService := notes.NewNoteService(dbConnection, rt)"
+        }
+      ],
+      "evidence_status": "verified"
+    },
+    {
+      "from": "server-main",
+      "to": "svc-votings",
+      "type": "calls",
+      "evidence": [
+        {
+          "path": "server/src/main.go",
+          "symbol": "NewVotingService",
+          "line": 300,
+          "snippet": "votingService := votings.NewVotingService(dbConnection, rt)"
+        }
+      ],
+      "evidence_status": "verified"
+    },
+    {
+      "from": "server-main",
+      "to": "svc-feedback",
+      "type": "calls",
+      "evidence": [
+        {
+          "path": "server/src/main.go",
+          "symbol": "NewFeedbackService",
+          "line": 304,
+          "snippet": "feedbackService := feedback.NewFeedbackService(c.String(\"feedback-webhook-url\"))"
+        }
+      ],
+      "evidence_status": "verified"
+    },
+    {
+      "from": "server-main",
+      "to": "api-http",
+      "type": "calls",
+      "evidence": [
+        {
+          "path": "server/src/main.go",
+          "symbol": "api.New",
+          "line": 308,
+          "snippet": "s := api.New("
+        },
+        {
+          "path": "server/src/main.go",
+          "symbol": "ListenAndServe",
+          "line": 327,
+          "snippet": "return http.ListenAndServe(port, s)"
+        }
+      ],
+      "evidence_status": "verified"
+    },
+    {
+      "from": "api-http",
+      "to": "auth",
+      "type": "calls",
+      "evidence": [
+        {
+          "path": "server/src/api/router.go",
+          "symbol": "auth.Verifier",
+          "line": 145,
+          "snippet": "r.Use(s.auth.Verifier())"
+        },
+        {
+          "path": "server/src/api/router.go",
+          "symbol": "AuthContext",
+          "line": 147,
+          "snippet": "r.Use(auth.AuthContext)"
+        }
+      ],
+      "evidence_status": "verified"
+    },
+    {
+      "from": "api-http",
+      "to": "svc-boards",
+      "type": "calls",
+      "evidence": [
+        {
+          "path": "server/src/api/boards.go",
+          "symbol": "boards.Create",
+          "line": 34,
+          "snippet": "b, err := s.boards.Create(r.Context(), body)"
+        },
+        {
+          "path": "server/src/api/boards_listen_on_board.go",
+          "symbol": "boards.FullBoard",
+          "line": 54,
+          "snippet": "board, requests, sessions, columns, notes, reactions, votings, votes, err := s.boards.FullBoard(r.Context(), id)"
+        }
+      ],
+      "evidence_status": "verified"
+    },
+    {
+      "from": "api-http",
+      "to": "svc-notes",
+      "type": "calls",
+      "evidence": [
+        {
+          "path": "server/src/api/notes.go",
+          "symbol": "notes.Create",
+          "line": 28,
+          "snippet": "note, err := s.notes.Create(r.Context(), body)"
+        },
+        {
+          "path": "server/src/api/notes.go",
+          "symbol": "notes.Delete",
+          "line": 102,
+          "snippet": "if err := s.notes.Delete(r.Context(), body, note); err != nil {"
+        },
+        {
+          "path": "server/src/api/router.go",
+          "symbol": "initNoteResources",
+          "line": 259,
+          "snippet": "func (s *Server) initNoteResources(r chi.Router) {"
+        }
+      ],
+      "evidence_status": "verified"
+    },
+    {
+      "from": "api-http",
+      "to": "svc-votings",
+      "type": "calls",
+      "evidence": [
+        {
+          "path": "server/src/api/votings.go",
+          "symbol": "votings.Create",
+          "line": 25,
+          "snippet": "voting, err := s.votings.Create(r.Context(), body)"
+        },
+        {
+          "path": "server/src/api/votings.go",
+          "symbol": "votings.Update",
+          "line": 54,
+          "snippet": "voting, err := s.votings.Update(r.Context(), body)"
+        },
+        {
+          "path": "server/src/api/router.go",
+          "symbol": "initVotingResources",
+          "line": 190,
+          "snippet": "func (s *Server) initVotingResources(r chi.Router) {"
+        }
+      ],
+      "evidence_status": "verified"
+    },
+    {
+      "from": "api-http",
+      "to": "svc-feedback",
+      "type": "calls",
+      "evidence": [
+        {
+          "path": "server/src/api/feedback.go",
+          "symbol": "feedback.Create",
+          "line": 60,
+          "snippet": "err := s.feedback.Create(r.Context(), string(body.Type), *body.Contact, *body.Text)"
+        },
+        {
+          "path": "server/src/api/router.go",
+          "symbol": "POST /feedback",
+          "line": 130,
+          "snippet": "r.Post(\"/feedback\", s.createFeedback)"
+        }
+      ],
+      "evidence_status": "verified"
+    },
+    {
+      "from": "api-http",
+      "to": "realtime",
+      "type": "subscribes",
+      "evidence": [
+        {
+          "path": "server/src/api/boards_listen_on_board.go",
+          "symbol": "GetBoardChannel",
+          "line": 127,
+          "snippet": "b.subscription = s.realtime.GetBoardChannel(boardID)"
+        }
+      ],
+      "evidence_status": "verified"
+    },
+    {
+      "from": "svc-notes",
+      "to": "database",
+      "type": "writes",
+      "evidence": [
+        {
+          "path": "server/src/services/notes/notes.go",
+          "symbol": "CreateNote",
+          "line": 44,
+          "snippet": "note, err := s.database.CreateNote(database.NoteInsert{Author: body.User, Board: body.Board, Column: body.Column, Text: body.Text})"
+        }
+      ],
+      "evidence_status": "verified"
+    },
+    {
+      "from": "svc-notes",
+      "to": "database",
+      "type": "reads",
+      "evidence": [
+        {
+          "path": "server/src/services/notes/notes.go",
+          "symbol": "GetNotes",
+          "line": 68,
+          "snippet": "notes, err := s.database.GetNotes(boardID)"
+        }
+      ],
+      "evidence_status": "verified"
+    },
+    {
+      "from": "svc-notes",
+      "to": "realtime",
+      "type": "publishes",
+      "evidence": [
+        {
+          "path": "server/src/services/notes/notes.go",
+          "symbol": "BroadcastToBoard",
+          "line": 138,
+          "snippet": "err := s.realtime.BroadcastToBoard(board, realtime.BoardEvent{"
+        }
+      ],
+      "evidence_status": "verified"
+    },
+    {
+      "from": "svc-boards",
+      "to": "database",
+      "type": "writes",
+      "evidence": [
+        {
+          "path": "server/src/services/boards/boards.go",
+          "symbol": "CreateBoard",
+          "line": 86,
+          "snippet": "b, err := s.database.CreateBoard(body.Owner, board, columns)"
+        }
+      ],
+      "evidence_status": "verified"
+    },
+    {
+      "from": "svc-boards",
+      "to": "realtime",
+      "type": "publishes",
+      "evidence": [
+        {
+          "path": "server/src/services/boards/boards.go",
+          "symbol": "BroadcastToBoard",
+          "line": 257,
+          "snippet": "err := s.realtime.BroadcastToBoard(board.ID, realtime.BoardEvent{"
+        }
+      ],
+      "evidence_status": "verified"
+    },
+    {
+      "from": "svc-votings",
+      "to": "realtime",
+      "type": "publishes",
+      "evidence": [
+        {
+          "path": "server/src/services/votings/votings.go",
+          "symbol": "BroadcastToBoard",
+          "line": 129,
+          "snippet": "err = s.realtime.BroadcastToBoard(board, realtime.BoardEvent{"
+        }
+      ],
+      "evidence_status": "verified"
+    },
+    {
+      "from": "svc-votings",
+      "to": "database",
+      "type": "writes",
+      "evidence": [
+        {
+          "path": "server/src/services/votings/votings.go",
+          "symbol": "CreateVoting",
+          "line": 47,
+          "snippet": "voting, err := s.database.CreateVoting(database.VotingInsert{"
+        }
+      ],
+      "evidence_status": "verified"
+    },
+    {
+      "from": "svc-feedback",
+      "to": "ext-feedback-webhook",
+      "type": "calls",
+      "evidence": [
+        {
+          "path": "server/src/services/feedback/feedback.go",
+          "symbol": "http.Post",
+          "line": 45,
+          "snippet": "_, err := http.Post(s.webhookUrl, \"application/json\", bytes.NewBuffer(jsonData))"
+        }
+      ],
+      "evidence_status": "verified"
+    },
+    {
+      "from": "database",
+      "to": "ext-postgres",
+      "type": "reads",
+      "evidence": [
+        {
+          "path": "server/src/database/boards.go",
+          "symbol": "GetBoard",
+          "line": 183,
+          "snippet": "func (d *Database) GetBoard(id uuid.UUID) (Board, error) {"
+        },
+        {
+          "path": "server/src/database/database.go",
+          "symbol": "pgdialect",
+          "line": 21,
+          "snippet": "d.db = bun.NewDB(db, pgdialect.New())"
+        }
+      ],
+      "evidence_status": "verified"
+    },
+    {
+      "from": "database",
+      "to": "ext-postgres",
+      "type": "writes",
+      "evidence": [
+        {
+          "path": "server/src/database/notes.go",
+          "symbol": "CreateNote",
+          "line": 49,
+          "snippet": "func (d *Database) CreateNote(insert NoteInsert) (Note, error) {"
+        }
+      ],
+      "evidence_status": "verified"
+    },
+    {
+      "from": "migrations",
+      "to": "ext-postgres",
+      "type": "writes",
+      "evidence": [
+        {
+          "path": "server/src/database/migrations/migrations.go",
+          "symbol": "sql.Open",
+          "line": 17,
+          "snippet": "db, err := sql.Open(\"postgres\", databaseUrl)"
+        }
+      ],
+      "evidence_status": "verified"
+    },
+    {
+      "from": "realtime",
+      "to": "ext-nats",
+      "type": "publishes",
+      "evidence": [
+        {
+          "path": "server/src/realtime/nats.go",
+          "symbol": "natsClient.Publish",
+          "line": 15,
+          "snippet": "return n.con.Publish(subject, event)"
+        }
+      ],
+      "evidence_status": "verified"
+    },
+    {
+      "from": "realtime",
+      "to": "ext-nats",
+      "type": "subscribes",
+      "evidence": [
+        {
+          "path": "server/src/realtime/nats.go",
+          "symbol": "SubscribeToBoardEvents",
+          "line": 29,
+          "snippet": "func (n *natsClient) SubscribeToBoardEvents(subject string) (chan *BoardEvent, error) {"
+        }
+      ],
+      "evidence_status": "verified"
+    },
+    {
+      "from": "realtime",
+      "to": "ext-redis",
+      "type": "publishes",
+      "evidence": [
+        {
+          "path": "server/src/realtime/redis.go",
+          "symbol": "redisClient.Publish",
+          "line": 58,
+          "snippet": "_, err = r.con.Publish(context.Background(), subject, payload).Result()"
+        }
+      ],
+      "evidence_status": "verified"
+    },
+    {
+      "from": "realtime",
+      "to": "ext-redis",
+      "type": "subscribes",
+      "evidence": [
+        {
+          "path": "server/src/realtime/redis.go",
+          "symbol": "SubscribeToBoardEvents",
+          "line": 102,
+          "snippet": "func (r *redisClient) SubscribeToBoardEvents(subject string) (chan *BoardEvent, error) {"
+        }
+      ],
+      "evidence_status": "verified"
+    },
+    {
+      "from": "auth",
+      "to": "ext-oauth",
+      "type": "calls",
+      "evidence": [
+        {
+          "path": "server/src/auth/auth.go",
+          "symbol": "google.New",
+          "line": 69,
+          "snippet": "p := google.New("
+        },
+        {
+          "path": "server/src/api/router.go",
+          "symbol": "provider begin route",
+          "line": 136,
+          "snippet": "r.Get(\"/\", s.beginAuthProviderVerification)"
+        }
+      ],
+      "evidence_status": "verified"
+    },
+    {
+      "from": "auth",
+      "to": "database",
+      "type": "reads",
+      "evidence": [
+        {
+          "path": "server/src/auth/auth.go",
+          "symbol": "IsUserAvailableForKeyMigration",
+          "line": 167,
+          "snippet": "if ok, err = a.database.IsUserAvailableForKeyMigration(user); ok {"
+        }
+      ],
+      "evidence_status": "verified"
+    },
+    {
+      "from": "web-components",
+      "to": "web-api",
+      "type": "calls",
+      "evidence": [
+        {
+          "path": "src/components/SettingsDialog/Feedback/Feedback.tsx",
+          "symbol": "FeedbackAPI.sendFeedback",
+          "line": 54,
+          "snippet": "FeedbackAPI.sendFeedback(feedbackType.value, feedback.value.trim(), contact.value.trim());"
+        },
+        {
+          "path": "src/components/Timer/Timer.tsx",
+          "symbol": "import API",
+          "line": 9,
+          "snippet": "import {API} from \"api\";"
+        }
+      ],
+      "evidence_status": "verified"
+    },
+    {
+      "from": "web-routes",
+      "to": "web-api",
+      "type": "calls",
+      "evidence": [
+        {
+          "path": "src/routes/NewBoard/NewBoard.tsx",
+          "symbol": "API.createBoard",
+          "line": 32,
+          "snippet": "const boardId = await API.createBoard("
+        },
+        {
+          "path": "src/utils/auth.ts",
+          "symbol": "API.signInAnonymously",
+          "line": 17,
+          "snippet": "const user = await API.signInAnonymously(displayName);"
+        }
+      ],
+      "evidence_status": "verified"
+    }
+  ],
+  "flows": [
+    {
+      "id": "flow-anonymous-login",
+      "name": "Anonymous sign-in",
+      "trigger": "A visitor enters a display name on the landing page and continues without an account.",
+      "steps": [
+        {
+          "node": "web-routes",
+          "detail": "LoginBoard calls Auth.signInAnonymously (src/utils/auth.ts) - no store middleware is involved."
+        },
+        {
+          "node": "web-api",
+          "detail": "AuthAPI.signInAnonymously POSTs to /login/anonymous with credentials: \"include\"."
+        },
+        {
+          "node": "api-http",
+          "detail": "The public route /login/anonymous hits Server.signInAnonymously."
+        },
+        {
+          "node": "database",
+          "detail": "users.LoginAnonymous persists an anonymous user; this happens BEFORE the token is signed."
+        },
+        {
+          "node": "ext-postgres",
+          "detail": "The user record lands in PostgreSQL."
+        },
+        {
+          "node": "auth",
+          "detail": "auth.Sign issues a JWT for the new user id; the handler sets it as the HttpOnly 'jwt' cookie."
+        },
+        {
+          "node": "web-store",
+          "detail": "utils/auth.ts dispatches Actions.signIn with the returned user."
+        }
+      ],
+      "outcome": "The browser holds a session cookie and every later request is authenticated by it. Protected routes now pass auth.Verifier and jwtauth.Authenticator.",
+      "evidence": [
+        {
+          "path": "src/routes/LoginBoard/LoginBoard.tsx",
+          "symbol": "Auth.signInAnonymously",
+          "line": 41,
+          "snippet": "await Auth.signInAnonymously(displayName);"
+        },
+        {
+          "path": "src/utils/auth.ts",
+          "symbol": "API.signInAnonymously",
+          "line": 17,
+          "snippet": "const user = await API.signInAnonymously(displayName);"
+        },
+        {
+          "path": "src/api/auth.ts",
+          "symbol": "signInAnonymously",
+          "line": 29,
+          "snippet": "const response = await fetch(`${SERVER_HTTP_URL}/login/anonymous`, {"
+        },
+        {
+          "path": "server/src/api/router.go",
+          "symbol": "anonymous route",
+          "line": 133,
+          "snippet": "r.Post(\"/anonymous\", s.signInAnonymously)"
+        },
+        {
+          "path": "server/src/api/login.go",
+          "symbol": "users.LoginAnonymous",
+          "line": 35,
+          "snippet": "user, err := s.users.LoginAnonymous(r.Context(), body.Name)"
+        },
+        {
+          "path": "server/src/api/login.go",
+          "symbol": "auth.Sign",
+          "line": 42,
+          "snippet": "tokenString, err := s.auth.Sign(map[string]interface{}{\"id\": user.ID})"
+        },
+        {
+          "path": "server/src/api/login.go",
+          "symbol": "jwt cookie",
+          "line": 49,
+          "snippet": "cookie := http.Cookie{Name: \"jwt\", Value: tokenString, Path: \"/\", HttpOnly: true, MaxAge: math.MaxInt32}"
+        }
+      ]
+    },
+    {
+      "id": "flow-join-board",
+      "name": "Open a board and receive the initial state",
+      "trigger": "An authenticated user navigates to /board/:boardId.",
+      "steps": [
+        {
+          "node": "web-routes",
+          "detail": "BoardGuard dispatches joinBoard(boardId)."
+        },
+        {
+          "node": "web-store",
+          "detail": "On PermittedBoardAccess the board middleware opens a sockette connection to SERVER_WEBSOCKET_URL/boards/<id>."
+        },
+        {
+          "node": "api-http",
+          "detail": "GET /boards/{id} upgrades to a websocket in openBoardSocket, guarded by BoardParticipantContext."
+        },
+        {
+          "node": "svc-boards",
+          "detail": "FullBoard assembles board, columns, notes, reactions, votings, votes, sessions and requests."
+        },
+        {
+          "node": "database",
+          "detail": "Database.Get loads every aggregate for the board."
+        },
+        {
+          "node": "ext-postgres",
+          "detail": "The rows come out of PostgreSQL."
+        },
+        {
+          "node": "api-http",
+          "detail": "eventInitFilter strips data the caller may not see, then the INIT event is written to the socket."
+        },
+        {
+          "node": "web-store",
+          "detail": "The onmessage handler dispatches Actions.initializeBoard with the INIT payload."
+        },
+        {
+          "node": "web-components",
+          "detail": "Board, columns and notes render from the hydrated store."
+        }
+      ],
+      "outcome": "The client has the full board state and a live subscription for every later change.",
+      "evidence": [
+        {
+          "path": "src/routes/Board/BoardGuard.tsx",
+          "symbol": "joinBoard",
+          "line": 26,
+          "snippet": "store.dispatch(Actions.joinBoard(boardId!));"
+        },
+        {
+          "path": "src/store/middleware/board.tsx",
+          "symbol": "socket open",
+          "line": 21,
+          "snippet": "socket = new Socket(`${SERVER_WEBSOCKET_URL}/boards/${action.boardId}`, {"
+        },
+        {
+          "path": "server/src/api/boards_listen_on_board.go",
+          "symbol": "FullBoard",
+          "line": 54,
+          "snippet": "board, requests, sessions, columns, notes, reactions, votings, votes, err := s.boards.FullBoard(r.Context(), id)"
+        },
+        {
+          "path": "server/src/api/boards_listen_on_board.go",
+          "symbol": "eventInitFilter",
+          "line": 77,
+          "snippet": "initEvent = eventInitFilter(initEvent, userID)"
+        },
+        {
+          "path": "src/store/middleware/board.tsx",
+          "symbol": "INIT dispatch",
+          "line": 29,
+          "snippet": "store.dispatch(Actions.initializeBoard(board, participants, requests || [], columns, notes || [], reactions || [], votes || [], votings || []));"
+        }
+      ]
+    },
+    {
+      "id": "flow-add-note",
+      "name": "Add a note and fan it out to every participant",
+      "trigger": "A participant types into a column and submits a note.",
+      "steps": [
+        {
+          "node": "web-components",
+          "detail": "NoteInput dispatches Actions.addNote(columnId, content)."
+        },
+        {
+          "node": "web-store",
+          "detail": "passNoteMiddleware calls API.addNote with the board id from the action context."
+        },
+        {
+          "node": "web-api",
+          "detail": "NoteAPI.addNote POSTs to /boards/{boardId}/notes."
+        },
+        {
+          "node": "api-http",
+          "detail": "The note routes run BoardParticipantContext, then Server.createNote."
+        },
+        {
+          "node": "svc-notes",
+          "detail": "NoteService.Create writes the note, then calls UpdatedNotes."
+        },
+        {
+          "node": "database",
+          "detail": "Database.CreateNote inserts the row."
+        },
+        {
+          "node": "ext-postgres",
+          "detail": "The note is persisted."
+        },
+        {
+          "node": "svc-notes",
+          "detail": "UpdatedNotes broadcasts a NOTES_UPDATED BoardEvent."
+        },
+        {
+          "node": "realtime",
+          "detail": "Broker.BroadcastToBoard publishes on topic board.<uuid>."
+        },
+        {
+          "node": "ext-nats",
+          "detail": "NATS (or Redis when configured) fans the event out to every server instance."
+        },
+        {
+          "node": "api-http",
+          "detail": "Each instance's board subscription receives the event and writes it to its websockets."
+        },
+        {
+          "node": "web-store",
+          "detail": "The onmessage handler dispatches Actions.updatedNotes."
+        },
+        {
+          "node": "web-components",
+          "detail": "Every participant's board re-renders with the new note."
+        }
+      ],
+      "outcome": "The note is durable in PostgreSQL and visible to every connected participant without a refresh.",
+      "evidence": [
+        {
+          "path": "src/components/NoteInput/NoteInput.tsx",
+          "symbol": "addNote",
+          "line": 30,
+          "snippet": "dispatch(Actions.addNote(columnId!, content));"
+        },
+        {
+          "path": "src/store/middleware/note.tsx",
+          "symbol": "API.addNote",
+          "line": 11,
+          "snippet": "API.addNote(action.context.board!, action.columnId, action.text).catch(() => {"
+        },
+        {
+          "path": "src/api/note.ts",
+          "symbol": "POST notes",
+          "line": 16,
+          "snippet": "const response = await fetch(`${SERVER_HTTP_URL}/boards/${boardId}/notes`, {"
+        },
+        {
+          "path": "server/src/api/notes.go",
+          "symbol": "createNote",
+          "line": 15,
+          "snippet": "func (s *Server) createNote(w http.ResponseWriter, r *http.Request) {"
+        },
+        {
+          "path": "server/src/services/notes/notes.go",
+          "symbol": "CreateNote",
+          "line": 44,
+          "snippet": "note, err := s.database.CreateNote(database.NoteInsert{Author: body.User, Board: body.Board, Column: body.Column, Text: body.Text})"
+        },
+        {
+          "path": "server/src/services/notes/notes.go",
+          "symbol": "broadcast",
+          "line": 138,
+          "snippet": "err := s.realtime.BroadcastToBoard(board, realtime.BoardEvent{"
+        },
+        {
+          "path": "server/src/realtime/boards.go",
+          "symbol": "BroadcastToBoard",
+          "line": 42,
+          "snippet": "func (b *Broker) BroadcastToBoard(boardID uuid.UUID, msg BoardEvent) error {"
+        },
+        {
+          "path": "src/store/middleware/board.tsx",
+          "symbol": "NOTES_UPDATED",
+          "line": 55,
+          "snippet": "if (message.type === \"NOTES_UPDATED\") {"
+        }
+      ]
+    },
+    {
+      "id": "flow-create-board",
+      "name": "Create a new board",
+      "trigger": "A user configures columns and an access policy on /new and submits.",
+      "steps": [
+        {
+          "node": "web-routes",
+          "detail": "The /new route renders NewBoard behind RequireAuthentication."
+        },
+        {
+          "node": "web-components",
+          "detail": "The template picker and AccessPolicySelection collect name, policy and columns."
+        },
+        {
+          "node": "web-api",
+          "detail": "NewBoard.tsx calls API.createBoard directly (no store middleware); it POSTs to /boards and returns the new board id."
+        },
+        {
+          "node": "api-http",
+          "detail": "Server.createBoard runs behind the JWT middleware stack."
+        },
+        {
+          "node": "svc-boards",
+          "detail": "BoardService.Create persists the board plus its columns and the creator's owner session."
+        },
+        {
+          "node": "database",
+          "detail": "Database.CreateBoard composes the board, column and owner-session inserts into a single CTE query."
+        },
+        {
+          "node": "ext-postgres",
+          "detail": "The board is stored."
+        },
+        {
+          "node": "web-routes",
+          "detail": "The browser navigates to /board/<new id>, which starts the join-board flow."
+        }
+      ],
+      "outcome": "A board exists with its columns, the creator is its owner, and the user lands on the live board.",
+      "evidence": [
+        {
+          "path": "src/routes/NewBoard/NewBoard.tsx",
+          "symbol": "API.createBoard",
+          "line": 32,
+          "snippet": "const boardId = await API.createBoard("
+        },
+        {
+          "path": "src/api/board.ts",
+          "symbol": "createBoard",
+          "line": 15,
+          "snippet": "createBoard: async (name: string | undefined, accessPolicy: {type: string; passphrase?: string}, columns: {name: string; hidden: boolean; color: Color}[]) => {"
+        },
+        {
+          "path": "server/src/api/router.go",
+          "symbol": "POST /boards",
+          "line": 148,
+          "snippet": "r.Post(\"/boards\", s.createBoard)"
+        },
+        {
+          "path": "server/src/api/boards.go",
+          "symbol": "createBoard",
+          "line": 34,
+          "snippet": "b, err := s.boards.Create(r.Context(), body)"
+        },
+        {
+          "path": "server/src/database/boards.go",
+          "symbol": "CreateBoard",
+          "line": 70,
+          "snippet": "func (d *Database) CreateBoard(creator uuid.UUID, board BoardInsert, columns []ColumnInsert) (Board, error) {"
+        }
+      ]
+    },
+    {
+      "id": "flow-voting",
+      "name": "Run a voting session",
+      "trigger": "A moderator opens a voting from the voting dialog.",
+      "steps": [
+        {
+          "node": "web-components",
+          "detail": "VotingDialog dispatches the create-voting action."
+        },
+        {
+          "node": "web-store",
+          "detail": "passVotingMiddleware calls the votings REST client."
+        },
+        {
+          "node": "web-api",
+          "detail": "VotingAPI posts to /boards/{id}/votings."
+        },
+        {
+          "node": "api-http",
+          "detail": "initVotingResources guards create/update with BoardModeratorContext."
+        },
+        {
+          "node": "svc-votings",
+          "detail": "VotingService creates the voting and broadcasts VOTING_CREATED."
+        },
+        {
+          "node": "database",
+          "detail": "The voting row is written; votes are later counted in SQL."
+        },
+        {
+          "node": "ext-postgres",
+          "detail": "Voting and vote rows are persisted."
+        },
+        {
+          "node": "realtime",
+          "detail": "The voting events are published on the board topic."
+        },
+        {
+          "node": "api-http",
+          "detail": "eventFilter hides vote counts from participants while the voting is open."
+        },
+        {
+          "node": "web-store",
+          "detail": "Clients dispatch the voting updates into the votings reducer."
+        },
+        {
+          "node": "web-components",
+          "detail": "Vote buttons appear; results render once the voting closes."
+        }
+      ],
+      "outcome": "Participants cast votes under the configured limit, and totals become visible only after the moderator closes the voting.",
+      "evidence": [
+        {
+          "path": "server/src/api/router.go",
+          "symbol": "initVotingResources",
+          "line": 190,
+          "snippet": "func (s *Server) initVotingResources(r chi.Router) {"
+        },
+        {
+          "path": "server/src/api/router.go",
+          "symbol": "moderator guard",
+          "line": 193,
+          "snippet": "r.With(s.BoardModeratorContext).Post(\"/\", s.createVoting)"
+        },
+        {
+          "path": "server/src/services/votings/votings.go",
+          "symbol": "broadcast",
+          "line": 129,
+          "snippet": "err = s.realtime.BroadcastToBoard(board, realtime.BoardEvent{"
+        },
+        {
+          "path": "server/src/api/event_filter.go",
+          "symbol": "filterVotingUpdated",
+          "line": 134,
+          "snippet": "func filterVotingUpdated(voting *VotingUpdated, userID uuid.UUID, boardSettings *dto.Board, columns []*dto.Column) *VotingUpdated {"
+        },
+        {
+          "path": "src/store/middleware/board.tsx",
+          "symbol": "VOTING_UPDATED",
+          "line": 93,
+          "snippet": "if (message.type === \"VOTING_UPDATED\") {"
+        }
+      ]
+    },
+    {
+      "id": "flow-feedback",
+      "name": "Submit feedback to the external webhook",
+      "trigger": "A user fills in the feedback form in the settings dialog.",
+      "steps": [
+        {
+          "node": "web-components",
+          "detail": "The Feedback settings panel posts the form."
+        },
+        {
+          "node": "web-api",
+          "detail": "Feedback.tsx imports FeedbackAPI from api/feedback directly and posts to the public /feedback endpoint. Note api/feedback is NOT merged into the shared API object in api/index.ts."
+        },
+        {
+          "node": "api-http",
+          "detail": "Server.createFeedback handles it - no authentication required."
+        },
+        {
+          "node": "svc-feedback",
+          "detail": "FeedbackService.Create builds a Slack block payload and posts it."
+        },
+        {
+          "node": "ext-feedback-webhook",
+          "detail": "The external webhook receives the message."
+        }
+      ],
+      "outcome": "Feedback reaches the team's chat channel. If --feedback-webhook-url is unset the feature is disabled and the form is hidden.",
+      "evidence": [
+        {
+          "path": "src/components/SettingsDialog/Feedback/Feedback.tsx",
+          "symbol": "FeedbackAPI.sendFeedback",
+          "line": 54,
+          "snippet": "FeedbackAPI.sendFeedback(feedbackType.value, feedback.value.trim(), contact.value.trim());"
+        },
+        {
+          "path": "server/src/api/router.go",
+          "symbol": "POST /feedback",
+          "line": 130,
+          "snippet": "r.Post(\"/feedback\", s.createFeedback)"
+        },
+        {
+          "path": "server/src/api/feedback.go",
+          "symbol": "feedback.Create",
+          "line": 60,
+          "snippet": "err := s.feedback.Create(r.Context(), string(body.Type), *body.Contact, *body.Text)"
+        },
+        {
+          "path": "server/src/api/info.go",
+          "symbol": "feedbackEnabled",
+          "line": 38,
+          "snippet": "if s.feedback.Enabled() {"
+        },
+        {
+          "path": "server/src/services/feedback/feedback.go",
+          "symbol": "http.Post",
+          "line": 45,
+          "snippet": "_, err := http.Post(s.webhookUrl, \"application/json\", bytes.NewBuffer(jsonData))"
+        },
+        {
+          "path": "src/components/SettingsDialog/Feedback/__tests__/Feedback.test.tsx",
+          "symbol": "describe(Feedback)",
+          "line": 12,
+          "snippet": "describe(\"Feedback\", () => {"
+        }
+      ]
+    }
+  ]
+}

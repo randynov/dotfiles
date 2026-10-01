@@ -1,0 +1,176 @@
+{
+  "commit": "fbf673788a329ae62a1f4f1dfd4b2df73e13dd19",
+  "branch": "main",
+  "dirty": true,
+  "dirty_excludes": [
+    "../../.claude/skills/codemap-workspace/iteration-1/eval-0-cold-start/with_skill/outputs/codemap/"
+  ],
+  "generated_at": "2026-09-24T12:53:33+00:00",
+  "scope": [
+    "src/",
+    "server/src/",
+    "docs/",
+    "cypress/",
+    "deployment/",
+    "k8s/",
+    ".github/",
+    "Dockerfile",
+    "nginx.conf"
+  ],
+  "excluded_dirs": [
+    "node_modules/",
+    "docs/node_modules/",
+    "build/",
+    "public/",
+    "server/src/database/testdata/",
+    "src/assets/",
+    "server/api.postman_collection.json"
+  ],
+  "fingerprint_algorithm": "sha256 over newline-joined '<tracked path>:<sha256 of file bytes>' entries, paths sorted ascending, module scope = include prefixes minus exclude prefixes",
+  "modules": {
+    "web-ui": {
+      "include": [
+        "src/components/",
+        "src/routes/"
+      ],
+      "exclude": [],
+      "file_count": 379,
+      "fingerprint": "4d5c82f1bfc09eb22847dd128decc884f6fee560933e1b140f0c35cfe8f1c8fb"
+    },
+    "web-store": {
+      "include": [
+        "src/store/"
+      ],
+      "exclude": [
+        "src/store/middleware/"
+      ],
+      "file_count": 26,
+      "fingerprint": "28a073a5cd0e5de6b59d1094afd07528865d1cb344d86aec3543fd5ce6ae23cc"
+    },
+    "web-middleware": {
+      "include": [
+        "src/store/middleware/"
+      ],
+      "exclude": [],
+      "file_count": 12,
+      "fingerprint": "3727f4a2d91345aa46f53d6cbfac00f77e236e698108026f16af06d0fca5197f"
+    },
+    "web-api": {
+      "include": [
+        "src/api/"
+      ],
+      "exclude": [],
+      "file_count": 14,
+      "fingerprint": "1b8dcdc1f8a16693cc681a6af13909faa4636aae6618dff42e83e27fddfbc4c3"
+    },
+    "web-platform": {
+      "include": [
+        "src/utils/",
+        "src/types/",
+        "src/constants/",
+        "src/i18n/",
+        "src/config.ts",
+        "src/index.tsx",
+        "src/index.scss",
+        "src/setupTests.ts",
+        "src/testUtils.tsx",
+        "src/__tests__/"
+      ],
+      "exclude": [],
+      "file_count": 61,
+      "fingerprint": "c7984e44df21b0a6bc21b6bd3ff2bcd0cffc12b7e78c8b6aaadff90a5d9dc569"
+    },
+    "server-bootstrap": {
+      "include": [
+        "server/src/main.go",
+        "server/src/go.mod",
+        "server/src/go.sum",
+        "server/src/Dockerfile"
+      ],
+      "exclude": [],
+      "file_count": 4,
+      "fingerprint": "e4f929a0545c283de255e83f2eb6b92f9bef26afb0d430f8705de468ecf436de"
+    },
+    "api-http": {
+      "include": [
+        "server/src/api/"
+      ],
+      "exclude": [],
+      "file_count": 25,
+      "fingerprint": "f60a4f9b558b8171b0fcaa42ff9cf09ec8fb52609d19a3113539c01730f2f167"
+    },
+    "server-auth": {
+      "include": [
+        "server/src/auth/"
+      ],
+      "exclude": [],
+      "file_count": 5,
+      "fingerprint": "5f658c08e7ec9d23a2fc151824d359351a900efa3ce5d3c381721d3df85b8084"
+    },
+    "server-services": {
+      "include": [
+        "server/src/services/"
+      ],
+      "exclude": [],
+      "file_count": 14,
+      "fingerprint": "31be7b49de06b812a62c7887cdfb2be3cfbb27434eb4d93ce9d448d7a883cf8d"
+    },
+    "server-data": {
+      "include": [
+        "server/src/database/"
+      ],
+      "exclude": [
+        "server/src/database/testdata/"
+      ],
+      "file_count": 76,
+      "fingerprint": "af2e3e1745115c712e71c93c3d33817ec1f25931363fd893a24e891943486961"
+    },
+    "server-realtime": {
+      "include": [
+        "server/src/realtime/"
+      ],
+      "exclude": [],
+      "file_count": 11,
+      "fingerprint": "b6e14faeb61e3d328c1e0e65620ae1ebba89f62c94c69af24a2d6f711fdd52a4"
+    },
+    "server-common": {
+      "include": [
+        "server/src/common/",
+        "server/src/logger/",
+        "server/src/identifiers/"
+      ],
+      "exclude": [],
+      "file_count": 19,
+      "fingerprint": "7a5a57867a51acd4dbc045d9387a81b843678fb5a077f39cb8f7e3f979f3cf92"
+    },
+    "ops-deploy": {
+      "include": [
+        "Dockerfile",
+        "nginx.conf",
+        "deployment/",
+        "k8s/",
+        ".github/",
+        "package.json",
+        "yarn.lock",
+        "tsconfig.json",
+        "cypress.config.ts",
+        "scripts/",
+        "server/Makefile",
+        "server/docker-compose.yml",
+        "server/docker-compose.dev.yml",
+        "server/config_example.toml"
+      ],
+      "exclude": [],
+      "file_count": 41,
+      "fingerprint": "6c61743e33c709f2ec802bd1985943a29b985e1577ba115f77461bb922a7566f"
+    },
+    "docs-site": {
+      "include": [
+        "docs/"
+      ],
+      "exclude": [],
+      "file_count": 20,
+      "fingerprint": "fb730ccb7cd4dd55f2ad898702f0ba1dd865ba2a9b3d108f70fe8d531cb3efc4"
+    }
+  }
+}

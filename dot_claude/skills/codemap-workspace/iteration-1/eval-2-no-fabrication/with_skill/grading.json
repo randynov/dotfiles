@@ -1,0 +1,84 @@
+{
+  "expectations": [
+    {
+      "text": "All three files exist: codemap.html, codemap.json, codemap.lock",
+      "passed": true,
+      "evidence": "found: json, html, lock"
+    },
+    {
+      "text": "codemap.json parses and has the six required top-level keys",
+      "passed": true,
+      "evidence": "all present"
+    },
+    {
+      "text": "Every node has id, path, role, entrypoints, tests, constraints, evidence",
+      "passed": true,
+      "evidence": "20 nodes, non-conforming: none"
+    },
+    {
+      "text": "Every node path exists on disk in the repo",
+      "passed": true,
+      "evidence": "missing: none"
+    },
+    {
+      "text": "Every evidence symbol is literally findable in the file its path names",
+      "passed": true,
+      "evidence": "0 unfindable (all verified by grep)"
+    },
+    {
+      "text": "Every entrypoint is a {path, symbol} pair so it can be machine-verified",
+      "passed": true,
+      "evidence": "0 bare-string entrypoints"
+    },
+    {
+      "text": "Every edge type is within the allowed six-value enum",
+      "passed": true,
+      "evidence": "21 edges, all legal"
+    },
+    {
+      "text": "Every edge endpoint and flow step resolves to an existing node id",
+      "passed": true,
+      "evidence": "dangling: none"
+    },
+    {
+      "text": "Node count is 20 or fewer",
+      "passed": true,
+      "evidence": "20 nodes"
+    },
+    {
+      "text": "codemap.html carries the same nodes/edges/flows as codemap.json inline",
+      "passed": true,
+      "evidence": "inline blob carries 20 node ids, 21 edges, 4 flows; matches codemap.json"
+    },
+    {
+      "text": "codemap.html has no external network references (fully self-contained)",
+      "passed": true,
+      "evidence": "none"
+    },
+    {
+      "text": "codemap.html header shows repo name, generation time and source commit",
+      "passed": true,
+      "evidence": "name=True time=True commit=True"
+    },
+    {
+      "text": "codemap.lock records commit, dirty flag, scope, exclusions, algorithm, per-module fingerprints",
+      "passed": true,
+      "evidence": "missing=none exclusions=True modules=12"
+    },
+    {
+      "text": "codemap.lock commit matches the repo's actual HEAD",
+      "passed": true,
+      "evidence": "lock=91e8cc1013fc head=91e8cc1013fc"
+    },
+    {
+      "text": "At least 3 flows, each with trigger, steps and outcome",
+      "passed": true,
+      "evidence": "4 complete of 4"
+    },
+    {
+      "text": "Unknowns are marked in the evidence field (never as a type) and carry a note",
+      "passed": true,
+      "evidence": "0 unknown edges; type-as-unknown=0; missing note=0"
+    }
+  ]
+}

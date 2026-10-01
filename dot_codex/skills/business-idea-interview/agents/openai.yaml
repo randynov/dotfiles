@@ -1,0 +1,4 @@
+interface:
+  display_name: "Business Idea Interview"
+  short_description: "Turn a business idea into a validated PRD"
+  default_prompt: "Use $business-idea-interview to interview me about my idea and write a validated PRD."

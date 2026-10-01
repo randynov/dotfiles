@@ -37,3 +37,10 @@ yarn-error.log*
 .config/zed/conversations/
 .config/zed/themes/
 .config/zed/*.zed
+
+# Claude/Codex runtime pieces inside managed dirs
+.claude/hooks/.venv
+.claude/hooks/.venv/**
+**/.DS_Store
+.claude/skills/synced
+.claude/skills/synced/**

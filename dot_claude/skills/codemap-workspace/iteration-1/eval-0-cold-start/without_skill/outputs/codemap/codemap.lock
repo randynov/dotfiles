@@ -1,0 +1,153 @@
+{
+  "schema": "scrumlr-codemap-lock/1",
+  "commit": "fbf673788a329ae62a1f4f1dfd4b2df73e13dd19",
+  "commit_time": "2024-06-22T14:01:02Z",
+  "branch": "main",
+  "dirty": true,
+  "dirty_paths": [
+    " M deployment/docker/docker-compose.yml",
+    "?? deployment/docker/.env",
+    "?? deployment/docker/jwt.key"
+  ],
+  "generated_at": "2026-09-24T12:58:27Z",
+  "generator": "generate.py (data in codemap_data.py, page shell in template.html)",
+  "notes": [
+    "The working tree was dirty at generation time; dirty_paths lists exactly what differed.",
+    "None of the dirty paths sit inside a fingerprinted module, so every module fingerprint here equals the one the clean commit would produce.",
+    "Fingerprints cover tracked files only. Untracked files (including deployment/docker/.env and deployment/docker/jwt.key) were never read.",
+    "The `database` fingerprint covers server/src/database recursively, so it includes the 29 files also counted under `migrations`.",
+    "Every evidence item is mechanically resolved to a line in the tracked working tree and generation aborts on any item that does not resolve. That guarantee covers the evidence anchors only. Node roles, constraints and flow step descriptions are curated prose written from reading those files; they were reviewed against source but are not machine-checked.",
+    "Relationships that could not be backed by a source line are recorded with evidence_status 'unknown' in codemap.json. In this run there are none; modules left off the map entirely are listed under `not_mapped` in codemap.json."
+  ],
+  "scanned_scope": [
+    "src",
+    "server/src"
+  ],
+  "excluded_dirs": [
+    "node_modules",
+    ".git",
+    "build",
+    "dist",
+    "src/assets",
+    "public",
+    "docs",
+    "k8s",
+    "scripts",
+    ".github"
+  ],
+  "fingerprint_algorithm": "sha256-tracked-tree-v1: run `git ls-files -z -- <node.path>`, sort the paths bytewise, then sha256 over the concatenation of <path-bytes> + 0x00 + hex(sha256(file-bytes)) + 0x0a for each path. Content is read from the working tree, not from the index, so uncommitted edits change the fingerprint. A node whose path is not tracked (external systems) gets a null fingerprint.",
+  "module_fingerprints": {
+    "web-entry": {
+      "path": "src/index.tsx",
+      "fingerprint": "2546cfbd9b424df4bd95152b22175ab0ff2452ed2c658c71884cb45f38ea5314",
+      "tracked_files": 1
+    },
+    "web-routes": {
+      "path": "src/routes",
+      "fingerprint": "9f96ebfdce3b92c75b4ce2efa217da9f185a6a9484855559630ff25f29a7f353",
+      "tracked_files": 33
+    },
+    "web-components": {
+      "path": "src/components",
+      "fingerprint": "ab53b0b29273d07c283c710d2d3671286ffd191706e7672248bcaaf5131d16f6",
+      "tracked_files": 346
+    },
+    "web-store": {
+      "path": "src/store",
+      "fingerprint": "55b95303c6a7c8c94d1006ecf390b4cedc6df548d0515c9040e544799b898ec1",
+      "tracked_files": 38
+    },
+    "web-api": {
+      "path": "src/api",
+      "fingerprint": "7f21321286856a6f89dd716e8e0462de45bace0d5fd3756e50c32edb094cffcf",
+      "tracked_files": 14
+    },
+    "server-main": {
+      "path": "server/src/main.go",
+      "fingerprint": "3d4335ce978fa2c258d1ecc38691ddf878665f67834a802dc00a01e245019928",
+      "tracked_files": 1
+    },
+    "api-http": {
+      "path": "server/src/api",
+      "fingerprint": "d138fde95e0bcdf58d801d546508226bd6c36496d70fb5071f970b3ba4b1a8f7",
+      "tracked_files": 25
+    },
+    "auth": {
+      "path": "server/src/auth",
+      "fingerprint": "d914da77940d9105af2ffd4c5590069c037b61cd8d375b913c04db3db1e03ec7",
+      "tracked_files": 5
+    },
+    "svc-boards": {
+      "path": "server/src/services/boards",
+      "fingerprint": "6855d8bde5d9d19b5b5bb0f0a247f7d78cb9693f4f62ca416140f6a8f9e22d4e",
+      "tracked_files": 3
+    },
+    "svc-notes": {
+      "path": "server/src/services/notes",
+      "fingerprint": "834009fa23ac8bca8742b662f71296b27299d91801e0c4ea308bb92b1a78c32b",
+      "tracked_files": 2
+    },
+    "svc-votings": {
+      "path": "server/src/services/votings",
+      "fingerprint": "862fc8ef44d6cd6d1856f8b8e2f08f2fe96eaa221e690e38f00c05aae4d711b9",
+      "tracked_files": 3
+    },
+    "svc-feedback": {
+      "path": "server/src/services/feedback",
+      "fingerprint": "7a716d07b7bcbe614209e6383dd152d099bde6027e5f8903b0cd32d0f755db35",
+      "tracked_files": 1
+    },
+    "database": {
+      "path": "server/src/database",
+      "fingerprint": "a5aec8d85002550cca8bb1bf193889d704532f31df2c53dd42c740ec3a053ed4",
+      "tracked_files": 77
+    },
+    "migrations": {
+      "path": "server/src/database/migrations",
+      "fingerprint": "5f75e6356a2827b5b42755266ae54c31660ab7513bc1571e7b9f95e97c8b0604",
+      "tracked_files": 29
+    },
+    "realtime": {
+      "path": "server/src/realtime",
+      "fingerprint": "91135eaaa0d3b249150164634945412c73bbf39aca14b54f7224280d9a5e8709",
+      "tracked_files": 11
+    },
+    "ext-postgres": {
+      "path": "external://postgresql",
+      "fingerprint": null,
+      "tracked_files": 0,
+      "reason": "external system - no tracked source in this repository"
+    },
+    "ext-nats": {
+      "path": "external://nats",
+      "fingerprint": null,
+      "tracked_files": 0,
+      "reason": "external system - no tracked source in this repository"
+    },
+    "ext-redis": {
+      "path": "external://redis",
+      "fingerprint": null,
+      "tracked_files": 0,
+      "reason": "external system - no tracked source in this repository"
+    },
+    "ext-oauth": {
+      "path": "external://oauth-providers",
+      "fingerprint": null,
+      "tracked_files": 0,
+      "reason": "external system - no tracked source in this repository"
+    },
+    "ext-feedback-webhook": {
+      "path": "external://feedback-webhook",
+      "fingerprint": null,
+      "tracked_files": 0,
+      "reason": "external system - no tracked source in this repository"
+    }
+  },
+  "counts": {
+    "nodes": 20,
+    "edges": 42,
+    "edges_unknown": 0,
+    "flows": 6,
+    "evidence_items": 156
+  }
+}

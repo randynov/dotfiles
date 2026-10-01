@@ -1,0 +1,186 @@
+{
+  "scenarios": [
+    {
+      "id": "01",
+      "diagram_type": "context",
+      "prompt": "Create a context diagram for an online banking system. Users can access it via web browser. The system integrates with an external payment processor (Visa) and an external notification service (Twilio). An internal fraud detection system also interacts with the banking system.",
+      "expected_elements": [
+        { "type": "Person", "name_contains": "user" },
+        { "type": "System", "name_contains": "banking" },
+        { "type": "System_Ext", "name_contains": "payment" },
+        { "type": "System_Ext", "name_contains": "notification" },
+        { "type": "System", "name_contains": "fraud" }
+      ],
+      "expected_relationships": [
+        { "from_contains": "user", "to_contains": "banking" },
+        { "from_contains": "banking", "to_contains": "payment" },
+        { "from_contains": "banking", "to_contains": "notification" }
+      ],
+      "valid_element_types": ["Person", "Person_Ext", "System", "System_Ext"]
+    },
+    {
+      "id": "02",
+      "diagram_type": "context",
+      "prompt": "Create a context diagram for a hospital patient portal. Patients log in to view records and schedule appointments. The portal connects to an external insurance verification service and sends emails via SendGrid. Hospital staff use an admin panel to manage patient data.",
+      "expected_elements": [
+        { "type": "Person", "name_contains": "patient" },
+        { "type": "Person", "name_contains": "staff" },
+        { "type": "System", "name_contains": "portal" },
+        { "type": "System_Ext", "name_contains": "insurance" },
+        { "type": "System_Ext", "name_contains": "email" }
+      ],
+      "expected_relationships": [
+        { "from_contains": "patient", "to_contains": "portal" },
+        { "from_contains": "staff", "to_contains": "portal" },
+        { "from_contains": "portal", "to_contains": "insurance" }
+      ],
+      "valid_element_types": ["Person", "Person_Ext", "System", "System_Ext"]
+    },
+    {
+      "id": "03",
+      "diagram_type": "context",
+      "prompt": "Create a context diagram for a ride-sharing platform. Riders request rides and drivers accept them. The platform integrates with Google Maps for routing, Stripe for payments, and Firebase for push notifications. A support agent system handles disputes.",
+      "expected_elements": [
+        { "type": "Person", "name_contains": "rider" },
+        { "type": "Person", "name_contains": "driver" },
+        { "type": "System", "name_contains": "ride" },
+        { "type": "System_Ext", "name_contains": "maps" },
+        { "type": "System_Ext", "name_contains": "payment" }
+      ],
+      "expected_relationships": [
+        { "from_contains": "rider", "to_contains": "ride" },
+        { "from_contains": "driver", "to_contains": "ride" },
+        { "from_contains": "ride", "to_contains": "maps" }
+      ],
+      "valid_element_types": ["Person", "Person_Ext", "System", "System_Ext"]
+    },
+    {
+      "id": "04",
+      "diagram_type": "container",
+      "prompt": "Create a container diagram for an e-commerce system. It has a React web application and a React Native mobile app. The backend is a Node.js REST API. Data is stored in PostgreSQL. Product search uses Elasticsearch. Sessions are cached in Redis. An image CDN serves product photos.",
+      "expected_elements": [
+        { "type": "Container", "name_contains": "web" },
+        { "type": "Container", "name_contains": "mobile" },
+        { "type": "Container", "name_contains": "api" },
+        { "type": "ContainerDb", "name_contains": "postgre" },
+        { "type": "ContainerDb", "name_contains": "elastic" },
+        { "type": "ContainerDb", "name_contains": "redis" }
+      ],
+      "expected_relationships": [
+        { "from_contains": "web", "to_contains": "api" },
+        { "from_contains": "mobile", "to_contains": "api" },
+        { "from_contains": "api", "to_contains": "postgre" }
+      ],
+      "valid_element_types": ["Person", "Person_Ext", "Container", "ContainerDb", "ContainerQueue", "Container_Ext", "ContainerDb_Ext", "System_Ext"]
+    },
+    {
+      "id": "05",
+      "diagram_type": "container",
+      "prompt": "Create a container diagram for a real-time chat application. There is an Angular SPA frontend, a Go WebSocket server, a message broker using RabbitMQ, a Python message processor service, and a Cassandra database for message history. Users are authenticated via an OAuth2 service.",
+      "expected_elements": [
+        { "type": "Container", "name_contains": "angular" },
+        { "type": "Container", "name_contains": "websocket" },
+        { "type": "ContainerQueue", "name_contains": "rabbit" },
+        { "type": "Container", "name_contains": "processor" },
+        { "type": "ContainerDb", "name_contains": "cassandra" }
+      ],
+      "expected_relationships": [
+        { "from_contains": "angular", "to_contains": "websocket" },
+        { "from_contains": "websocket", "to_contains": "rabbit" },
+        { "from_contains": "processor", "to_contains": "cassandra" }
+      ],
+      "valid_element_types": ["Person", "Person_Ext", "Container", "ContainerDb", "ContainerQueue", "Container_Ext", "ContainerDb_Ext", "System_Ext"]
+    },
+    {
+      "id": "06",
+      "diagram_type": "container",
+      "prompt": "Create a container diagram for a CI/CD pipeline platform. A Vue.js dashboard lets developers trigger builds. A Python build orchestrator manages jobs. Build agents run in Docker containers. Artifacts are stored in S3. A PostgreSQL database tracks build history. Slack notifications are sent via webhook.",
+      "expected_elements": [
+        { "type": "Container", "name_contains": "dashboard" },
+        { "type": "Container", "name_contains": "orchestrat" },
+        { "type": "Container", "name_contains": "agent" },
+        { "type": "ContainerDb", "name_contains": "s3" },
+        { "type": "ContainerDb", "name_contains": "postgre" }
+      ],
+      "expected_relationships": [
+        { "from_contains": "dashboard", "to_contains": "orchestrat" },
+        { "from_contains": "orchestrat", "to_contains": "agent" },
+        { "from_contains": "agent", "to_contains": "s3" }
+      ],
+      "valid_element_types": ["Person", "Person_Ext", "Container", "ContainerDb", "ContainerQueue", "Container_Ext", "ContainerDb_Ext", "System_Ext"]
+    },
+    {
+      "id": "07",
+      "diagram_type": "component",
+      "prompt": "Create a component diagram for the API server container of an e-commerce platform. It contains an AuthController handling login/logout, a ProductController for product CRUD, an OrderController for order management, an AuthService for token validation, a ProductRepository backed by PostgreSQL, and an OrderRepository also backed by PostgreSQL.",
+      "expected_elements": [
+        { "type": "Component", "name_contains": "auth" },
+        { "type": "Component", "name_contains": "product" },
+        { "type": "Component", "name_contains": "order" },
+        { "type": "Component", "name_contains": "service" },
+        { "type": "ComponentDb", "name_contains": "repository" }
+      ],
+      "expected_relationships": [
+        { "from_contains": "auth", "to_contains": "service" },
+        { "from_contains": "product", "to_contains": "repository" },
+        { "from_contains": "order", "to_contains": "repository" }
+      ],
+      "valid_element_types": ["Component", "ComponentDb", "ComponentQueue", "Component_Ext", "Person", "Person_Ext", "Container_Ext", "ContainerDb_Ext", "System_Ext"]
+    },
+    {
+      "id": "08",
+      "diagram_type": "component",
+      "prompt": "Create a component diagram for the notification service container. It has an EmailNotifier using SendGrid, an SMSNotifier using Twilio, a PushNotifier using Firebase, a NotificationRouter that dispatches to the right notifier, a TemplateEngine for rendering messages, and a NotificationLog repository backed by MongoDB.",
+      "expected_elements": [
+        { "type": "Component", "name_contains": "email" },
+        { "type": "Component", "name_contains": "sms" },
+        { "type": "Component", "name_contains": "push" },
+        { "type": "Component", "name_contains": "router" },
+        { "type": "Component", "name_contains": "template" },
+        { "type": "ComponentDb", "name_contains": "log" }
+      ],
+      "expected_relationships": [
+        { "from_contains": "router", "to_contains": "email" },
+        { "from_contains": "router", "to_contains": "sms" },
+        { "from_contains": "router", "to_contains": "push" }
+      ],
+      "valid_element_types": ["Component", "ComponentDb", "ComponentQueue", "Component_Ext", "Person", "Person_Ext", "Container_Ext", "ContainerDb_Ext", "System_Ext"]
+    },
+    {
+      "id": "09",
+      "diagram_type": "sequence",
+      "prompt": "Create a sequence diagram for user login flow. The user submits credentials from the web app. The web app calls the API server to authenticate. The API server queries the database to verify the password hash. The API server generates a JWT and returns it. The web app stores the token and redirects to the dashboard.",
+      "expected_elements": [
+        { "type": "Person", "name_contains": "user" },
+        { "type": "Container", "name_contains": "web" },
+        { "type": "Container", "name_contains": "api" },
+        { "type": "ContainerDb", "name_contains": "database" }
+      ],
+      "expected_relationships": [
+        { "from_contains": "user", "to_contains": "web" },
+        { "from_contains": "web", "to_contains": "api" },
+        { "from_contains": "api", "to_contains": "database" }
+      ],
+      "valid_element_types": ["Person", "Container", "ContainerDb", "ContainerQueue", "Component", "ComponentDb"]
+    },
+    {
+      "id": "10",
+      "diagram_type": "sequence",
+      "prompt": "Create a sequence diagram for placing an order in an e-commerce system. The customer submits an order from the web app. The API validates the cart and calls the inventory service to check stock. The inventory service queries the database. If available, the API calls the payment service to charge the card. On success, the API publishes an order event to the message queue. The fulfillment service consumes the event and updates the order status.",
+      "expected_elements": [
+        { "type": "Person", "name_contains": "customer" },
+        { "type": "Container", "name_contains": "api" },
+        { "type": "Container", "name_contains": "inventory" },
+        { "type": "Container", "name_contains": "payment" },
+        { "type": "ContainerQueue", "name_contains": "queue" },
+        { "type": "Container", "name_contains": "fulfillment" }
+      ],
+      "expected_relationships": [
+        { "from_contains": "customer", "to_contains": "api" },
+        { "from_contains": "api", "to_contains": "inventory" },
+        { "from_contains": "api", "to_contains": "payment" }
+      ],
+      "valid_element_types": ["Person", "Container", "ContainerDb", "ContainerQueue", "Component", "ComponentDb"]
+    }
+  ]
+}

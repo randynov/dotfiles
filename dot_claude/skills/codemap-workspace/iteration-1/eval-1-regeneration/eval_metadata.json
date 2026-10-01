@@ -1,0 +1,27 @@
+{
+  "eval_id": 1,
+  "eval_name": "regeneration-drift-report",
+  "prompt": "We already have a codemap in docs/codemap/ but it's from a while back. Regenerate it against what's on main now, and tell me which modules actually changed since the last one \u2014 I don't want to re-read the whole diagram, I just want to know what moved.",
+  "assertions": [
+    {
+      "id": "b1",
+      "text": "All three files are regenerated together \u2014 none is left at its old content while the others move"
+    },
+    {
+      "id": "b2",
+      "text": "The response explicitly names which modules changed, added, or removed relative to the previous codemap.lock (or states plainly that none changed)"
+    },
+    {
+      "id": "b3",
+      "text": "The new codemap.lock commit matches current HEAD"
+    },
+    {
+      "id": "b4",
+      "text": "Module fingerprints in the new lock are recomputed from current file contents, not copied from the old lock"
+    },
+    {
+      "id": "b5",
+      "text": "Validation is run and its actual output is reported, not just asserted as passing"
+    }
+  ]
+}

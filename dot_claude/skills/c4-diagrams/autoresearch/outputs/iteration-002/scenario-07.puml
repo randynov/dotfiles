@@ -1,0 +1,21 @@
+@startuml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
+HIDE_STEREOTYPE()
+
+title E-Commerce API Server - Component Diagram
+
+Container_Boundary(api_server, "API Server") {
+  Component(auth_controller, "AuthController", "Spring MVC", "Handles login and logout requests")
+  Component(product_controller, "ProductController", "Spring MVC", "Handles product CRUD operations")
+  Component(order_controller, "OrderController", "Spring MVC", "Handles order management operations")
+  Component(auth_service, "AuthService", "Spring Service", "Validates tokens and manages authentication")
+  ComponentDb(product_repository, "ProductRepository", "JPA/PostgreSQL", "Data access layer for products")
+  ComponentDb(order_repository, "OrderRepository", "JPA/PostgreSQL", "Data access layer for orders")
+}
+
+Rel(auth_controller, auth_service, "Validates credentials", "Method call")
+Rel(product_controller, product_repository, "Reads/writes products", "JPA")
+Rel(order_controller, order_repository, "Reads/writes orders", "JPA")
+Rel(order_controller, auth_service, "Verifies authorization", "Method call")
+
+@enduml

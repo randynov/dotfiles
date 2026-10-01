@@ -1,0 +1,81 @@
+{
+  "skill_name": "codemap",
+  "iteration": 1,
+  "configurations": {
+    "with_skill": {
+      "pass_rate": {
+        "mean": 1.0,
+        "stddev": 0.0
+      },
+      "n_evals": 3
+    },
+    "without_skill": {
+      "pass_rate": {
+        "mean": 0.75,
+        "stddev": 0.184
+      },
+      "n_evals": 3
+    }
+  },
+  "delta": {
+    "pass_rate": 0.25
+  },
+  "clean_evals_only": {
+    "with_skill": {
+      "mean": 1.0,
+      "stddev": 0.0
+    },
+    "without_skill": {
+      "mean": 0.625,
+      "stddev": 0.0625
+    }
+  },
+  "per_eval": [
+    {
+      "eval_name": "eval-0-cold-start",
+      "configurations": {
+        "with_skill": {
+          "pass_rate": 1.0,
+          "passed": 16,
+          "total": 16
+        },
+        "without_skill": {
+          "pass_rate": 0.6875,
+          "passed": 11,
+          "total": 16
+        }
+      }
+    },
+    {
+      "eval_name": "eval-1-regeneration",
+      "configurations": {
+        "with_skill": {
+          "pass_rate": 1.0,
+          "passed": 16,
+          "total": 16
+        },
+        "without_skill": {
+          "pass_rate": 1.0,
+          "passed": 16,
+          "total": 16
+        }
+      }
+    },
+    {
+      "eval_name": "eval-2-no-fabrication",
+      "configurations": {
+        "with_skill": {
+          "pass_rate": 1.0,
+          "passed": 16,
+          "total": 16
+        },
+        "without_skill": {
+          "pass_rate": 0.5625,
+          "passed": 9,
+          "total": 16
+        }
+      }
+    }
+  ],
+  "notes": "eval-1-regeneration is contaminated: its target repo vendors the same generator the skill bundles, so the baseline inherited the skill's main artifact. clean_evals_only excludes it. Two grader assertions were corrected mid-grading for overfitting to this generator's implementation (embedding mechanism, vendor URLs quoted as evidence). See OBSERVATIONS.md."
+}

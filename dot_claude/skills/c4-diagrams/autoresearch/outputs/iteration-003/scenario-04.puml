@@ -1,0 +1,29 @@
+@startuml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+HIDE_STEREOTYPE()
+
+title E-Commerce System - Container
+
+Person(customer, "Customer", "Shops online via web or mobile")
+
+System_Boundary(ecommerce, "E-Commerce System") {
+  Container(web_app, "Web Application", "React", "Browser-based shopping interface")
+  Container(mobile_app, "Mobile App", "React Native", "iOS and Android shopping app")
+  Container(api_server, "API Server", "Node.js", "REST API handling business logic")
+  ContainerDb(postgresql_db, "PostgreSQL Database", "PostgreSQL", "Stores orders, users, and product data")
+  ContainerDb(elasticsearch_index, "Elasticsearch Index", "Elasticsearch", "Powers product search")
+  ContainerDb(redis_cache, "Redis Cache", "Redis", "Caches sessions and frequently accessed data")
+  Container(image_cdn, "Image CDN", "CDN", "Serves product photos and media assets")
+}
+
+Rel(customer, web_app, "Shops via", "HTTPS")
+Rel(customer, mobile_app, "Shops via", "HTTPS")
+Rel(web_app, api_server, "Makes API calls", "REST/JSON")
+Rel(mobile_app, api_server, "Makes API calls", "REST/JSON")
+Rel(api_server, postgresql_db, "Reads/writes", "SQL")
+Rel(api_server, elasticsearch_index, "Searches products", "REST")
+Rel(api_server, redis_cache, "Caches/retrieves", "Redis Protocol")
+Rel(web_app, image_cdn, "Loads images", "HTTPS")
+Rel(mobile_app, image_cdn, "Loads images", "HTTPS")
+
+@enduml

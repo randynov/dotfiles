@@ -1,0 +1,131 @@
+{
+  "commit": "91e8cc1013fc2c8bbcb0b856418260c0a14876b9",
+  "branch": "main",
+  "dirty": false,
+  "dirty_excludes": [
+    "../../.claude/skills/codemap-workspace/iteration-1/eval-2-no-fabrication/with_skill/outputs/codemap/"
+  ],
+  "generated_at": "2026-09-24T12:38:20+00:00",
+  "scope": [
+    "scanner/",
+    "site/",
+    ".github/workflows/"
+  ],
+  "excluded_dirs": [
+    "scanner/vendor/",
+    "site/examples/",
+    "scanner/scripts/",
+    "scanner/.github/workflows/release.yml"
+  ],
+  "fingerprint_algorithm": "sha256 over newline-joined '<tracked path>:<sha256 of file bytes>' entries, paths sorted ascending, module scope = include prefixes minus exclude prefixes",
+  "modules": {
+    "cli-auditkit": {
+      "include": [
+        "scanner/cmd/auditkit/"
+      ],
+      "exclude": [],
+      "file_count": 1,
+      "fingerprint": "efa72bd3e82e60192a1ed060677400d2b2db05662543f970e5f2813533b83c63"
+    },
+    "site-marketing": {
+      "include": [
+        "site/",
+        ".github/workflows/pages.yml"
+      ],
+      "exclude": [
+        "site/examples/"
+      ],
+      "file_count": 59,
+      "fingerprint": "4fe9509df43ff6854113f988c19ed8abfb130f2f0ca564739edf56da16aa7880"
+    },
+    "provider-abstraction": {
+      "include": [
+        "scanner/pkg/core/",
+        "scanner/pkg/providers/",
+        "scanner/cmd/"
+      ],
+      "exclude": [
+        "scanner/cmd/auditkit/"
+      ],
+      "file_count": 8,
+      "fingerprint": "0c2bbd1acfddc116a0988a97f49a3389e04fcd0306a15bd512b00a6b0b86cdba"
+    },
+    "scan-aws": {
+      "include": [
+        "scanner/pkg/aws/"
+      ],
+      "exclude": [],
+      "file_count": 43,
+      "fingerprint": "d55c0512134aa730fc28de3e5ff4f6663dadea82cd351edf71659475369fb909"
+    },
+    "scan-azure": {
+      "include": [
+        "scanner/pkg/azure/"
+      ],
+      "exclude": [],
+      "file_count": 18,
+      "fingerprint": "58cf24801a56e31f662ddc8421a35bba3aa5d20b10c1126d3262bfd9dff9894b"
+    },
+    "scan-gcp": {
+      "include": [
+        "scanner/pkg/gcp/"
+      ],
+      "exclude": [],
+      "file_count": 17,
+      "fingerprint": "c46234c98fda799b7c840be31f209b8a3b055a20ffea80e8b6a97f33c1f553ac"
+    },
+    "integrations": {
+      "include": [
+        "scanner/pkg/integrations/"
+      ],
+      "exclude": [],
+      "file_count": 3,
+      "fingerprint": "9155983fe8ae1e66a8f956220e4826f3eec8c8d40e8f739349b0e317f2c8b11c"
+    },
+    "mappings-crosswalk": {
+      "include": [
+        "scanner/pkg/mappings/",
+        "scanner/mappings/"
+      ],
+      "exclude": [],
+      "file_count": 10,
+      "fingerprint": "1dddce624f789092199b88cebe3a37efed5075c5cba455ddd9432072dd80cc1a"
+    },
+    "reporting": {
+      "include": [
+        "scanner/pkg/report/"
+      ],
+      "exclude": [],
+      "file_count": 2,
+      "fingerprint": "5ca13f32f55b481d493b4412adfd1eb94d8afd2ab96e4df07aa4cc9658ea2775"
+    },
+    "tracker-evidence": {
+      "include": [
+        "scanner/pkg/tracker/",
+        "scanner/pkg/evidence/"
+      ],
+      "exclude": [],
+      "file_count": 3,
+      "fingerprint": "cde0cadbe113b7f33dbe6a398ac39f68f9d087bbdbbb2691e640078f32aab2b0"
+    },
+    "offline-cache": {
+      "include": [
+        "scanner/pkg/offline/",
+        "scanner/pkg/cache/"
+      ],
+      "exclude": [],
+      "file_count": 2,
+      "fingerprint": "286f4016beb76d42a90992e8b85460e141669d019a640f7a40c93c3c5b31a2d6"
+    },
+    "platform-support": {
+      "include": [
+        "scanner/pkg/cli/",
+        "scanner/pkg/remediation/",
+        "scanner/pkg/updater/"
+      ],
+      "exclude": [],
+      "file_count": 5,
+      "fingerprint": "40194c932dd54f338d243a762f2df3b29e8b33aea08a3bf99c839d9d6c9d3ad2"
+    }
+  }
+}

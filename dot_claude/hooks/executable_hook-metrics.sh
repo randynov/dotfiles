@@ -1,0 +1,104 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# shellcheck source=db-init.sh
+source "$(dirname "$0")/db-init.sh"
+_init_hooks_db
+
+RAW="$1"; shift
+if [[ "$RAW" == *:* ]]; then
+  HOOK_EVENT="${RAW%%:*}"; HOOK_NAME="${RAW#*:}"
+else
+  HOOK_EVENT="PostToolUse"; HOOK_NAME="$RAW"
+fi
+
+# Git repo root — captured early for path resolution, reused for DB insert
+repo=$(git rev-parse --show-toplevel 2>/dev/null | tr -d '`$\n\r' || echo "")
+
+# Resolve relative script path against git repo root
+_script="$1"
+if [[ "$_script" != /* ]]; then
+  if [[ -n "$repo" ]] && [[ -x "$repo/$_script" ]]; then
+    shift
+    set -- "$repo/$_script" "$@"
+  elif [[ "$_script" == */* ]]; then
+    echo "warn: hook-metrics: relative path '$_script' not resolved against '$repo', running as-is" >&2
+  fi
+fi
+
+# Reconstruct command string for logging AFTER resolution so cmd column logs resolved path
+CMD_ARGS="$*"
+
+# Capture stdin to temp file for passthrough
+input_file=$(mktemp)
+cat > "$input_file"
+
+# Temp file for timing data
+time_file=$(mktemp)
+
+# Temp file for stderr capture
+stderr_file=$(mktemp)
+
+# Clean up temp files on exit (handles errors and normal exit)
+trap 'rm -f "$input_file" "$time_file" "$stderr_file"' EXIT
+
+# Run command with timing (-p for parseable output: "real X.XX\nuser X.XX\nsys X.XX")
+# Disable set -e so non-zero exit codes don't abort the script before we log them
+set +e
+/usr/bin/time -p -o "$time_file" "$@" < "$input_file" 2> >(tee "$stderr_file" >&2)
+exit_code=$?
+wait  # drain tee subshell before reading $stderr_file
+set -e
+
+# Capture stderr snippet only on failure (empty string on success = no overhead)
+stderr_snippet=""
+if [ "$exit_code" -ne 0 ]; then
+  stderr_snippet=$(head -c 200 "$stderr_file" | tr '\n\r\t' '   ' | tr -d '`$')
+fi
+
+# Parse timing data
+real=$(grep "^real" "$time_file" | awk '{print $2}')
+user=$(grep "^user" "$time_file" | awk '{print $2}')
+sys=$(grep "^sys" "$time_file" | awk '{print $2}')
+
+# Compute duration_ms from real seconds
+duration_ms=$(awk "BEGIN{printf \"%.0f\", $real * 1000}")
+
+# Session ID — prefer env var set by Claude Code (v2.1.9+), fall back to stdin JSON
+SESSION_ID=$(printf '%s' "${CLAUDE_SESSION_ID:-}" | tr -d '`$\n\r')
+if [ -z "$SESSION_ID" ]; then
+  SESSION_ID=$(jq -r '.session_id // ""' "$input_file" 2>/dev/null | tr -d '`$\n\r' || echo "")
+fi
+
+# Git context — strip shell-injectable chars before heredoc interpolation
+branch=$(git rev-parse --abbrev-ref HEAD 2>/dev/null | tr -d '`$\n\r' || echo "")
+sha=$(git rev-parse --short HEAD 2>/dev/null | tr -d '`$\n\r' || echo "")
+host=$(hostname 2>/dev/null | tr -d '`$\n\r' || echo "")
+
+ts=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+
+sqlite3 "$HOOKS_DB" >/dev/null <<SQL || echo "warn: hook-metrics: sqlite3 insert failed" >&2
+PRAGMA busy_timeout=1000;
+INSERT INTO hook_metrics (ts, hook, step, cmd, exit_code, duration_ms, real_s, user_s, sys_s, branch, sha, host, repo, session, stderr_snippet)
+VALUES (
+  '$(_sql_escape "$ts")',
+  '$(_sql_escape "$HOOK_EVENT")',
+  '$(_sql_escape "$HOOK_NAME")',
+  '$(_sql_escape "$CMD_ARGS")',
+  $exit_code,
+  $duration_ms,
+  $real,
+  $user,
+  $sys,
+  '$(_sql_escape "$branch")',
+  '$(_sql_escape "$sha")',
+  '$(_sql_escape "$host")',
+  '$(_sql_escape "$repo")',
+  '$(_sql_escape "$SESSION_ID")',
+  '$(_sql_escape "$stderr_snippet")'
+);
+SQL
+
+_maybe_prune_hooks_db
+
+exit $exit_code

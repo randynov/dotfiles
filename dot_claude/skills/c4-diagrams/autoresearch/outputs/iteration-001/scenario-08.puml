@@ -1,0 +1,22 @@
+@startuml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
+HIDE_STEREOTYPE()
+
+title Notification Service - Component Diagram
+
+Container_Boundary(notification_service, "Notification Service") {
+  Component(email_notifier, "EmailNotifier", "SendGrid SDK", "Sends email notifications via SendGrid")
+  Component(sms_notifier, "SMSNotifier", "Twilio SDK", "Sends SMS notifications via Twilio")
+  Component(push_notifier, "PushNotifier", "Firebase SDK", "Sends push notifications via Firebase")
+  Component(notification_router, "NotificationRouter", "Spring Service", "Dispatches notifications to the appropriate notifier")
+  Component(template_engine, "TemplateEngine", "Thymeleaf", "Renders notification message templates")
+  ComponentDb(notification_log, "NotificationLog", "MongoDB Repository", "Stores notification history and delivery status")
+}
+
+Rel(notification_router, email_notifier, "Routes email notifications", "Method call")
+Rel(notification_router, sms_notifier, "Routes SMS notifications", "Method call")
+Rel(notification_router, push_notifier, "Routes push notifications", "Method call")
+Rel(notification_router, template_engine, "Renders message templates", "Method call")
+Rel(notification_router, notification_log, "Logs notification events", "Method call")
+
+@enduml

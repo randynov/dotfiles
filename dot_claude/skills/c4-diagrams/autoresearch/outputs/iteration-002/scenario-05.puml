@@ -1,0 +1,25 @@
+@startuml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+HIDE_STEREOTYPE()
+
+title Real-Time Chat Application - Container Diagram
+
+Person(user, "User", "Sends and receives messages via the chat application")
+
+System_Boundary(chat_app, "Real-Time Chat Application") {
+  Container(angular_spa, "Angular SPA", "Angular", "Frontend web application for chat")
+  Container(websocket_server, "WebSocket Server", "Go", "Manages real-time WebSocket connections")
+  ContainerQueue(rabbitmq_broker, "RabbitMQ Message Broker", "RabbitMQ", "Queues messages for asynchronous processing")
+  Container(message_processor, "Message Processor Service", "Python", "Processes and routes chat messages")
+  ContainerDb(cassandra_history, "Cassandra Message History", "Cassandra", "Stores chat message history")
+  Container(oauth_service, "OAuth2 Service", "OAuth2", "Handles user authentication and authorization")
+}
+
+Rel(user, angular_spa, "Sends and receives messages", "HTTPS/WSS")
+Rel(angular_spa, websocket_server, "Connects and sends messages", "WebSocket")
+Rel(angular_spa, oauth_service, "Authenticates", "OAuth2/HTTPS")
+Rel(websocket_server, rabbitmq_broker, "Publishes messages", "AMQP")
+Rel(message_processor, rabbitmq_broker, "Consumes messages", "AMQP")
+Rel(message_processor, cassandra_history, "Stores messages", "CQL")
+
+@enduml

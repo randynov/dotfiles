@@ -1,0 +1,502 @@
+{
+  "cleanupPeriodDays": 180,
+  "env": {
+    "ENABLE_LSP_TOOL": "1",
+    "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1",
+    "USE_BUILTIN_RIPGREP": "0",
+    "ENABLE_PROMPT_CACHING_1H": "1",
+    "CLAUDE_CODE_FORK_SUBAGENT": "1",
+    "PONYTAIL_DEFAULT_MODE": "off"
+  },
+  "attribution": {
+    "commit": "disabled",
+    "pr": "disabled"
+  },
+  "permissions": {
+    "allow": [
+      "Bash(/tmp/)",
+      "Bash(ast-grep:*)",
+      "Bash(bd:*)",
+      "Bash(claude mcp:*)",
+      "Bash(docker:*)",
+      "Bash(fd:*)",
+      "Bash(gh:*)",
+      "Bash(git *)",
+      "Bash(grep:*)",
+      "Bash(ls:*)",
+      "Bash(lsof:*)",
+      "Bash(mise *)",
+      "Bash(npm *)",
+      "Bash(pip show:*)",
+      "Bash(pyright:*)",
+      "Bash(pytest:*)",
+      "Bash(sort:*)",
+      "Bash(uv:*)",
+      "Bash(wc:*)",
+      "mcp__context7",
+      "mcp__sequential-thinking",
+      "Skill(commitcraft-push)",
+      "Skill(vr)",
+      "Skill(wireframe)",
+      "WebFetch(domain:alirezarezvani.medium.com)",
+      "WebFetch(domain:app.switchbird.com)",
+      "WebFetch(domain:blog.date-fns.org)",
+      "WebFetch(domain:claude-plugins.dev)",
+      "WebFetch(domain:claudefa.st)",
+      "WebFetch(domain:context7.com)",
+      "WebFetch(domain:date-fns.org)",
+      "WebFetch(domain:deepwiki.com)",
+      "WebFetch(domain:django-import-export.readthedocs.io)",
+      "WebFetch(domain:docs.github.com)",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:mikhail.io)",
+      "WebFetch(domain:pages.nist.gov)",
+      "WebFetch(domain:pmnd.rs)",
+      "WebFetch(domain:prettier.io)",
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "WebFetch(domain:security.snyk.io)",
+      "WebFetch(domain:socket.dev)",
+      "WebFetch(domain:typescript-eslint.io)",
+      "WebFetch(domain:vitest.dev)",
+      "WebFetch(domain:www.eesel.ai)",
+      "WebFetch(domain:www.npmjs.com)",
+      "WebSearch",
+      "Read(~/.claude/plans/**)"
+    ],
+    "ask": [
+      "Bash(rm *)",
+      "Bash(/bin/rm *)",
+      "Bash(rmdir *)",
+      "Bash(/bin/rmdir *)",
+      "Bash(wrangler deploy*)",
+      "Bash(wrangler publish*)",
+      "Bash(wrangler delete*)",
+      "Bash(wrangler rollback*)",
+      "Bash(wrangler versions deploy*)",
+      "Bash(wrangler versions upload*)",
+      "Bash(wrangler triggers*)",
+      "Bash(wrangler secret put*)",
+      "Bash(wrangler secret delete*)",
+      "Bash(wrangler secret bulk*)",
+      "Bash(wrangler kv key put*)",
+      "Bash(wrangler kv key delete*)",
+      "Bash(wrangler kv bulk*)",
+      "Bash(wrangler kv namespace create*)",
+      "Bash(wrangler kv namespace delete*)",
+      "Bash(wrangler d1 execute*)",
+      "Bash(wrangler d1 create*)",
+      "Bash(wrangler d1 delete*)",
+      "Bash(wrangler d1 migrations apply*)",
+      "Bash(wrangler r2 object put*)",
+      "Bash(wrangler r2 object delete*)",
+      "Bash(wrangler r2 bucket create*)",
+      "Bash(wrangler r2 bucket delete*)",
+      "Bash(wrangler pages deploy*)",
+      "Bash(wrangler pages project delete*)"
+    ],
+    "defaultMode": "auto"
+  },
+  "model": "opus[1m]",
+  "hooks": {
+    "PreToolUse": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "$HOME/.claude/hooks/hook-metrics.sh PreToolUse:guard-security python3 $HOME/.claude/hooks/guardrails/guard-security.py",
+            "timeout": 5
+          }
+        ]
+      },
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "if [ -f '/Users/randallnoval/.orca/agent-hooks/claude-hook.sh' ] && [ -r '/Users/randallnoval/.orca/agent-hooks/claude-hook.sh' ] && [ -x '/Users/randallnoval/.orca/agent-hooks/claude-hook.sh' ]; then /bin/sh '/Users/randallnoval/.orca/agent-hooks/claude-hook.sh'; else cat >/dev/null 2>&1 || :; fi",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "PermissionRequest": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "$HOME/.claude/hooks/hook-metrics.sh PermissionRequest:guard-auto-allow python3 $HOME/.claude/hooks/guardrails/guard-auto-allow.py",
+            "timeout": 5
+          }
+        ]
+      },
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "if [ -f '/Users/randallnoval/.orca/agent-hooks/claude-hook.sh' ] && [ -r '/Users/randallnoval/.orca/agent-hooks/claude-hook.sh' ] && [ -x '/Users/randallnoval/.orca/agent-hooks/claude-hook.sh' ]; then /bin/sh '/Users/randallnoval/.orca/agent-hooks/claude-hook.sh'; else cat >/dev/null 2>&1 || :; fi",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Bash|Edit|Write|Read|Glob|Grep|WebFetch|WebSearch",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "[ -x $HOME/.claude/hooks/hook-metrics.sh ] && $HOME/.claude/hooks/hook-metrics.sh PostToolUse:audit-logger ~/.claude/hooks/audit-logger.sh || ~/.claude/hooks/audit-logger.sh",
+            "timeout": 2
+          }
+        ]
+      },
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/hook-metrics.sh PostToolUse:mermaid-lint ~/.claude/hooks/mermaid-lint.sh",
+            "timeout": 35
+          }
+        ]
+      },
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "$HOME/.claude/hooks/hook-metrics.sh PostToolUse:guard-python-lint python3 $HOME/.claude/hooks/guardrails/guard-python-lint.py",
+            "timeout": 30
+          }
+        ]
+      },
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "$HOME/.claude/hooks/hook-metrics.sh PostToolUse:guard-python-typecheck python3 $HOME/.claude/hooks/guardrails/guard-python-typecheck.py",
+            "timeout": 30
+          }
+        ]
+      },
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "$HOME/.claude/hooks/hook-metrics.sh PostToolUse:guard-ts-typecheck python3 $HOME/.claude/hooks/guardrails/guard-ts-typecheck.py",
+            "timeout": 30
+          }
+        ]
+      },
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "if [ -f '/Users/randallnoval/.orca/agent-hooks/claude-hook.sh' ] && [ -r '/Users/randallnoval/.orca/agent-hooks/claude-hook.sh' ] && [ -x '/Users/randallnoval/.orca/agent-hooks/claude-hook.sh' ]; then /bin/sh '/Users/randallnoval/.orca/agent-hooks/claude-hook.sh'; else cat >/dev/null 2>&1 || :; fi",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "if [ -f '/Users/randallnoval/.orca/agent-hooks/claude-hook.sh' ] && [ -r '/Users/randallnoval/.orca/agent-hooks/claude-hook.sh' ] && [ -x '/Users/randallnoval/.orca/agent-hooks/claude-hook.sh' ]; then /bin/sh '/Users/randallnoval/.orca/agent-hooks/claude-hook.sh'; else cat >/dev/null 2>&1 || :; fi",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "PostToolUseFailure": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "$HOME/.claude/hooks/hook-metrics.sh PostToolUseFailure:audit-logger $HOME/.claude/hooks/audit-logger.sh PostToolUseFailure"
+          }
+        ]
+      },
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "if [ -f '/Users/randallnoval/.orca/agent-hooks/claude-hook.sh' ] && [ -r '/Users/randallnoval/.orca/agent-hooks/claude-hook.sh' ] && [ -x '/Users/randallnoval/.orca/agent-hooks/claude-hook.sh' ]; then /bin/sh '/Users/randallnoval/.orca/agent-hooks/claude-hook.sh'; else cat >/dev/null 2>&1 || :; fi",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "SubagentStart": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "$HOME/.claude/hooks/hook-metrics.sh SubagentStart:audit-logger $HOME/.claude/hooks/audit-logger.sh SubagentStart"
+          }
+        ]
+      },
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "if [ -f '/Users/randallnoval/.orca/agent-hooks/claude-hook.sh' ] && [ -r '/Users/randallnoval/.orca/agent-hooks/claude-hook.sh' ] && [ -x '/Users/randallnoval/.orca/agent-hooks/claude-hook.sh' ]; then /bin/sh '/Users/randallnoval/.orca/agent-hooks/claude-hook.sh'; else cat >/dev/null 2>&1 || :; fi",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "SubagentStop": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "$HOME/.claude/hooks/hook-metrics.sh SubagentStop:audit-logger $HOME/.claude/hooks/audit-logger.sh SubagentStop"
+          }
+        ]
+      },
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "if [ -f '/Users/randallnoval/.orca/agent-hooks/claude-hook.sh' ] && [ -r '/Users/randallnoval/.orca/agent-hooks/claude-hook.sh' ] && [ -x '/Users/randallnoval/.orca/agent-hooks/claude-hook.sh' ]; then /bin/sh '/Users/randallnoval/.orca/agent-hooks/claude-hook.sh'; else cat >/dev/null 2>&1 || :; fi",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "SessionEnd": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "$HOME/.claude/hooks/hook-metrics.sh SessionEnd:audit-logger $HOME/.claude/hooks/audit-logger.sh SessionEnd"
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "$HOME/.claude/hooks/hook-metrics.sh UserPromptSubmit:audit-logger $HOME/.claude/hooks/audit-logger.sh UserPromptSubmit"
+          }
+        ]
+      },
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "if [ -f '/Users/randallnoval/.orca/agent-hooks/claude-hook.sh' ] && [ -r '/Users/randallnoval/.orca/agent-hooks/claude-hook.sh' ] && [ -x '/Users/randallnoval/.orca/agent-hooks/claude-hook.sh' ]; then /bin/sh '/Users/randallnoval/.orca/agent-hooks/claude-hook.sh'; else cat >/dev/null 2>&1 || :; fi",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "PermissionDenied": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "$HOME/.claude/hooks/hook-metrics.sh PermissionDenied:audit-logger $HOME/.claude/hooks/audit-logger.sh PermissionDenied",
+            "timeout": 5
+          }
+        ]
+      }
+    ],
+    "StopFailure": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "if [ -f '/Users/randallnoval/.orca/agent-hooks/claude-hook.sh' ] && [ -r '/Users/randallnoval/.orca/agent-hooks/claude-hook.sh' ] && [ -x '/Users/randallnoval/.orca/agent-hooks/claude-hook.sh' ]; then /bin/sh '/Users/randallnoval/.orca/agent-hooks/claude-hook.sh'; else cat >/dev/null 2>&1 || :; fi",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "TeammateIdle": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "if [ -f '/Users/randallnoval/.orca/agent-hooks/claude-hook.sh' ] && [ -r '/Users/randallnoval/.orca/agent-hooks/claude-hook.sh' ] && [ -x '/Users/randallnoval/.orca/agent-hooks/claude-hook.sh' ]; then /bin/sh '/Users/randallnoval/.orca/agent-hooks/claude-hook.sh'; else cat >/dev/null 2>&1 || :; fi",
+            "timeout": 10
+          }
+        ]
+      }
+    ]
+  },
+  "statusLine": {
+    "type": "command",
+    "command": "bunx -y ccstatusline@latest",
+    "padding": 0
+  },
+  "enabledPlugins": {
+    "pyright-lsp@claude-plugins-official": true,
+    "pr-review-toolkit@claude-plugins-official": true,
+    "claude-code-setup@claude-plugins-official": false,
+    "claude-md-management@claude-plugins-official": false,
+    "feature-dev@claude-plugins-official": false,
+    "swift-lsp@claude-plugins-official": false,
+    "ui-ux-pro-max@ui-ux-pro-max-skill": false,
+    "game-sounds@citedy": true,
+    "skill-creator@claude-plugins-official": true,
+    "codex@openai-codex": true,
+    "vercel@claude-plugins-official": false,
+    "dep-review@nautilai": true,
+    "commitcraft@nautilai": true,
+    "pr-review-deep@nautilai": true,
+    "review-plan@nautilai": true,
+    "wireframe@nautilai": true,
+    "cc-adoption-audit@nautilai": false,
+    "cc-skill-audit@nautilai": true,
+    "cc-validate-hooks@nautilai": false,
+    "frontend-review@nautilai": true,
+    "github-issue-auditor@nautilai": true,
+    "pr-comment-review@nautilai": true,
+    "phi-scan@nautilai": true,
+    "rbac-django@nautilai": true,
+    "relay@nautilai": true,
+    "figma@claude-plugins-official": false,
+    "ponytail@ponytail": true,
+    "sentry@claude-plugins-official": true,
+    "security-guidance@claude-plugins-official": true,
+    "caveman@caveman": true,
+    "sentry-cli@claude-plugins-official": true,
+    "mattpocock-skills@claude-plugins-official": true,
+    "sentry-hygiene@nautilai": true,
+    "action-first@nautilai": true,
+    "typesafe@typesafe-ai": true
+  },
+  "extraKnownMarketplaces": {
+    "citedy": {
+      "source": {
+        "source": "github",
+        "repo": "citedy/claude-plugins"
+      }
+    },
+    "impeccable": {
+      "source": {
+        "source": "github",
+        "repo": "pbakaus/impeccable"
+      }
+    },
+    "knowledge-work-plugins": {
+      "source": {
+        "source": "github",
+        "repo": "anthropics/knowledge-work-plugins"
+      }
+    },
+    "claude-code-plugins-plus": {
+      "source": {
+        "source": "github",
+        "repo": "jeremylongshore/claude-code-plugins-plus"
+      }
+    },
+    "claude-plugins-official": {
+      "source": {
+        "source": "github",
+        "repo": "anthropics/claude-plugins-official"
+      }
+    },
+    "openai-codex": {
+      "source": {
+        "source": "github",
+        "repo": "openai/codex-plugin-cc"
+      }
+    },
+    "minimalist-entrepreneur": {
+      "source": {
+        "source": "github",
+        "repo": "slavingia/skills"
+      }
+    },
+    "ponytail": {
+      "source": {
+        "source": "github",
+        "repo": "DietrichGebert/ponytail"
+      }
+    },
+    "caveman": {
+      "source": {
+        "source": "github",
+        "repo": "JuliusBrussee/caveman"
+      }
+    },
+    "typesafe-ai": {
+      "source": {
+        "source": "github",
+        "repo": "typesafe-ai/skills"
+      }
+    }
+  },
+  "outputStyle": "ELI5",
+  "effortLevel": "medium",
+  "advisorModel": "opus",
+  "tui": "fullscreen",
+  "autoMemoryEnabled": true,
+  "autoDreamEnabled": true,
+  "skipDangerousModePermissionPrompt": true,
+  "skipWorkflowUsageWarning": true,
+  "preferredNotifChannel": "auto",
+  "inputNeededNotifEnabled": true,
+  "agentPushNotifEnabled": true,
+  "skipAutoPermissionPrompt": true,
+  "autoMode": {
+    "allow": [
+      "$defaults",
+      "Bash(supabase db dump:*) in /Users/randallnoval/Code/gapbot-crew",
+      "Bash(ruff check:*) in /Users/randallnoval/Code/gapbot-crew",
+      "Bash(supabase db query --linked:*) in /Users/randallnoval/Code/gapbot-crew"
+    ],
+    "soft_deny": [
+      "$defaults",
+      "Bash(supabase db push:*) — repo docs explicitly forbid this from gapbot-crew (schema owned by gapbot-bolt-2)",
+      "Bash(fly deploy:*) — repo docs explicitly forbid manual deploy; CI-only",
+      "Bash(fly ssh:*) against gapbot-crew — prod container access, requires per-invocation re-auth per CLAUDE.md"
+    ],
+    "environment": [
+      "### Org-wide",
+      "**Organization**: None configured",
+      "**Cloud provider(s)**: Supabase (project `gapbot-bolt`, us-east-2); Fly.io (app `gapbot-crew`, and `gapbot-log-shipper`)",
+      "**Repository visibility**: private (randynov/gapbot-crew, confirmed via gh)",
+      "**Internal sharing / snippet hosting**: None configured — treat public paste/gist services as outside the trust boundary",
+      "**Secrets management**: Fly secrets (`fly secrets list`); CI secrets referenced: ANTHROPIC_API_KEY, FLY_API_TOKEN, LLAMA_CLOUD_API_KEY; local `.env` (gitignored)",
+      "**Default / protected branches**: main (default); no classic branch protection listed, rulesets not queryable here — do not treat as unprotected on that basis alone",
+      "**CI/CD deploy targets**: GitHub Actions → Fly.io (auto-deploy on push to main); manual `fly deploy` explicitly disallowed by repo docs",
+      "**Network posture**: None configured",
+      "**Source control**: github.com/randynov/gapbot-crew (origin) — this repo and its remote only",
+      "**Trusted internal domains**: gapbot-crew.fly.dev; langtrace.starfysh.net (self-hosted Langtrace, since 2026-07-27)",
+      "**Trusted cloud buckets**: None configured",
+      "**Key internal services**: Better Stack / Logtail (log retention 3-day, table `t524135_gapchecker_logs`); Langtrace (self-hosted at langtrace.starfysh.net); Sentry (errors)",
+      "**Internal package registry**: None configured",
+      "**Sensitive data locations & audiences**: client-uploaded documents (PDF/DOCX/XLSX) and derived findings in Supabase storage/tables — tenant-isolated, never log document content or expose it in HTTP error responses; `scratch/prod_log_snapshot_20260705.jsonl` (prod log snapshot, gitignored scratch)",
+      "**Data retention / declassification**: Better Stack logs retained 3 days; no other retention policy configured",
+      "**Sensitive remote targets**: any host/namespace containing `prod`/`production` as a whole segment; Fly production app `gapbot-crew` and prod DB/API access (`fly ssh`, prod API/DB) require per-invocation re-auth per repo docs",
+      "**Protected deployment namespaces / environments**: production Fly app (`gapbot-crew`) and its Supabase project (`gapbot-bolt`, us-east-2) — no `fly deploy`/`supabase db push` from this repo; deploys are CI-only",
+      "**Protected IaC scopes**: IAM, RBAC, networking, quota, and node-pool resources; anything whose name or tag carries `prod` or `production` as a whole word or name segment",
+      "### User-specific",
+      "**Primary use of Claude Code**: software development (ISO 9001 conformance analysis service — CrewAI + FastAPI)",
+      "**Trusted repo**: /Users/randallnoval/Code/gapbot-crew (working directory) and its remote github.com/randynov/gapbot-crew (private) — confidential material (client documents, findings) may be committed here but is not cleared for any public repo",
+      "**Org-specific CLIs**: supabase, fly (both scoped to this repo's linked project/app); code-review-graph (knowledge-graph MCP-adjacent CLI used routinely)",
+      "routine under /Users/randallnoval/Code/gapbot-crew/ prefix: supabase, fly, uv, ruff, black, pytest commands per CLAUDE.md"
+    ]
+  },
+  "releaseChannel": "latest",
+  "feedbackSurveyState": {
+    "lastShownTime": 1753999641513
+  }
+}

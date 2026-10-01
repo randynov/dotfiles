@@ -1,0 +1,56 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# shellcheck source=db-init.sh
+source "$(dirname "$0")/db-init.sh"
+_init_hooks_db
+
+# Optional event type prefix (e.g. PostToolUseFailure). Blank for PostToolUse.
+EVENT_TYPE="${1:-}"
+
+# Tee stdin to temp file — full-fidelity passthrough, bounded store
+TMPFILE=$(mktemp)
+trap 'rm -f "$TMPFILE"' EXIT
+cat > "$TMPFILE"
+
+# jq guard — exit 0 so missing jq never blocks Claude Code
+command -v jq >/dev/null 2>&1 || { echo "warn: audit-logger: jq not found, audit data not collected" >&2; cat "$TMPFILE"; exit 0; }
+
+ts=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+
+# Fallback chain covers PostToolUse (.tool_name), SubagentStart/Stop (.agent_type),
+# SessionEnd/UserPromptSubmit (.hook_event_name)
+tool=$(head -c 65536 "$TMPFILE" | jq -r '.tool_name // .agent_type // .hook_event_name // "unknown"') || tool="unknown"
+session=$(head -c 65536 "$TMPFILE" | jq -r '.session_id // "unknown"') || session="unknown"
+
+# Strip shell-injectable chars before heredoc interpolation
+tool=$(printf '%s' "$tool" | tr -d '`$\n\r')
+session=$(printf '%s' "$session" | tr -d '`$\n\r')
+
+# Prepend event type for non-PostToolUse events (e.g. "PostToolUseFailure:Write")
+[ -n "$EVENT_TYPE" ] && tool="${EVENT_TYPE}:${tool}"
+
+# Full JSON payload — valuable for analysis; bounded to 64KB for shell safety
+full_payload=$(head -c 65536 "$TMPFILE")
+full_payload=$(printf '%s' "$full_payload" | tr -d '`$')
+
+if [[ "${HOOKS_AUDIT_CHAIN:-0}" = "1" ]]; then
+  # Atomic chained insert (OWASP ASI10). Helper opens single sqlite3 connection
+  # with BEGIN IMMEDIATE so concurrent writers serialize, then hashes the
+  # persisted column values for verifier determinism.
+  CLAUDE_HOOKS_DB="$HOOKS_DB" PYTHONPATH="$(dirname "$0")" python3 -m hooks_report.audit_chain \
+    --insert "$ts" "$session" "$tool" "$full_payload" \
+    || echo "warn: audit-logger: chained insert failed" >&2
+else
+  sqlite3 "$HOOKS_DB" >/dev/null <<SQL || echo "warn: audit-logger: sqlite3 insert failed" >&2
+PRAGMA busy_timeout=1000;
+INSERT INTO audit_events (ts, session, tool, input)
+VALUES ('$(_sql_escape "$ts")', '$(_sql_escape "$session")', '$(_sql_escape "$tool")', '$(_sql_escape "$full_payload")');
+SQL
+fi
+
+_maybe_prune_hooks_db
+
+# Full-fidelity passthrough — echo original, not potentially truncated variable
+cat "$TMPFILE"
+exit 0

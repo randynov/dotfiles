@@ -1,0 +1,18 @@
+@startuml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Context.puml
+HIDE_STEREOTYPE()
+
+title Hospital Patient Portal - Context Diagram
+
+Person(patient, "Patient", "Logs in to view records and schedule appointments")
+Person(staff, "Hospital Staff", "Uses admin panel to manage patient data")
+System(portal, "Patient Portal", "Allows patients to view health records and schedule appointments")
+System_Ext(insurance_service, "Insurance Verification Service", "External service for verifying patient insurance coverage")
+System_Ext(email_service, "Email Service (SendGrid)", "Sends email notifications to patients and staff")
+
+Rel(patient, portal, "Views records, schedules appointments", "HTTPS")
+Rel(staff, portal, "Manages patient data", "HTTPS")
+Rel(portal, insurance_service, "Verifies insurance coverage", "API/HTTPS")
+Rel(portal, email_service, "Sends email notifications", "API/HTTPS")
+
+@enduml

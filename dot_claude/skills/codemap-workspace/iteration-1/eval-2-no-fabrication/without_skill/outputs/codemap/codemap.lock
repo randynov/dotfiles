@@ -1,0 +1,980 @@
+{
+  "schema": "auditkit-codemap-lock/1",
+  "generated_at": "2026-09-24T12:52:49Z",
+  "commit": "91e8cc1013fc2c8bbcb0b856418260c0a14876b9",
+  "branch": "main",
+  "dirty": false,
+  "dirty_entries": [],
+  "scanned_scope": {
+    "roots": [
+      "scanner/",
+      "site/",
+      ".github/"
+    ],
+    "file_selection": "git ls-files (tracked files only); untracked and ignored files are not scanned",
+    "languages_parsed": [
+      "Go",
+      "JavaScript",
+      "HTML",
+      "YAML"
+    ],
+    "tracked_file_count": 207
+  },
+  "excluded_directories": [
+    ".git",
+    "site/examples/reports",
+    "site/examples/screenshots"
+  ],
+  "fingerprint_algorithm": "sha256-v1: for each tracked file in the module, in byte-lexicographic order of its repo-relative path, feed \"<path>\\0<sha256(file bytes as they exist in the working tree)>\\n\" into a sha256 stream; the module fingerprint is the hex digest. Generation time is excluded, so the fingerprint changes only when tracked paths or file contents change.",
+  "notes": [
+    "Modules may overlap: site/cookie-consent.js is fingerprinted both on its own and as part of the site-static prefix site/. A change to it moves both fingerprints.",
+    "pkg-integrations includes scanner/mappings/scubagear/ because ScubaGearIntegration.LoadMappings reads those JSON files at runtime.",
+    "Modules cover only the primary and secondary nodes that own tracked source. Documentation-only paths (site/docs/*.md, README.md, CHANGELOG.md) fall inside the site-static prefix; no module covers scanner/go.sum or scanner/scripts/."
+  ],
+  "modules": {
+    "cmd-auditkit": {
+      "paths": [
+        "scanner/cmd/auditkit/"
+      ],
+      "file_count": 1,
+      "files": [
+        {
+          "path": "scanner/cmd/auditkit/main.go",
+          "sha256": "0ae0f9c8f0f5e6dbb6d49fd1fbd596e5639d041e047b348759fc78fd67f1efcd"
+        }
+      ],
+      "fingerprint": "6dddc76b8885feabd3ee94407877f4a1eac378f0a2ace63772519e8c43920174"
+    },
+    "cmd-provider-clis": {
+      "paths": [
+        "scanner/cmd/auditkit-aws/",
+        "scanner/cmd/auditkit-azure/",
+        "scanner/cmd/auditkit-gcp/"
+      ],
+      "file_count": 3,
+      "files": [
+        {
+          "path": "scanner/cmd/auditkit-aws/main.go",
+          "sha256": "7c45852502fdf29cd8722779afdf3f5c14e83d2c7be5dadfd90d1ffeabc18e2b"
+        },
+        {
+          "path": "scanner/cmd/auditkit-azure/main.go",
+          "sha256": "9ca2614dca2908b06539b0ecd2247a955c3f9f22f225fa111b418db3f83a4884"
+        },
+        {
+          "path": "scanner/cmd/auditkit-gcp/main.go",
+          "sha256": "b3f7b3ae2216ef595ff4e75bd449c06b2f94070ea7b5e66c5b5345eb11a3d6e3"
+        }
+      ],
+      "fingerprint": "9f5eb82eb7d70170fc76396daff372f508197557db44cad8650a4403437492f7"
+    },
+    "pkg-core": {
+      "paths": [
+        "scanner/pkg/core/"
+      ],
+      "file_count": 1,
+      "files": [
+        {
+          "path": "scanner/pkg/core/interfaces.go",
+          "sha256": "4e4545d2c67f05fd45984a1901c6e54cbf372ca3821b597d70f3b85d29f54ecc"
+        }
+      ],
+      "fingerprint": "4d6875a182102b827e641374e0ed65b3a1f4b0061e3c17d9deb1dff286c8fa98"
+    },
+    "pkg-providers": {
+      "paths": [
+        "scanner/pkg/providers/"
+      ],
+      "file_count": 4,
+      "files": [
+        {
+          "path": "scanner/pkg/providers/aws/provider.go",
+          "sha256": "6095b77fb5424928237031457a1f8c62c3c88cc0ee8474be234d3dc488a48a63"
+        },
+        {
+          "path": "scanner/pkg/providers/azure/provider.go",
+          "sha256": "84952cefd43acc285cab6ea7e6ccf8dc3a663d9891441c0ef92e04407ddbe307"
+        },
+        {
+          "path": "scanner/pkg/providers/gcp/provider.go",
+          "sha256": "b3e35b70d182047c9aea59c30b81444f90b4dd6b7a74c14db750713915d6f474"
+        },
+        {
+          "path": "scanner/pkg/providers/provider.go",
+          "sha256": "43f3cb28200552147069864ffc071a041ae4ef2f5906f3b54af1a486cff5e343"
+        }
+      ],
+      "fingerprint": "9b76b220579aa5bbb71439ca559ff80663be5de5e6650d0ab2d09530f96fa1d2"
+    },
+    "pkg-aws-scanner": {
+      "paths": [
+        "scanner/pkg/aws/scanner.go",
+        "scanner/pkg/aws/priority.go"
+      ],
+      "file_count": 2,
+      "files": [
+        {
+          "path": "scanner/pkg/aws/priority.go",
+          "sha256": "4e089cfe2f511cfe2b3e6951b8e4fa0ab57aa6ced15611e9060f0ab7f839499f"
+        },
+        {
+          "path": "scanner/pkg/aws/scanner.go",
+          "sha256": "8e44f154e653b3985719a7bc003bf504a1add54ead2ec0c87984f65152fe704a"
+        }
+      ],
+      "fingerprint": "ca855a8e4d05d81bbc84fe147d5f722350fcdbeaf50dee5c034de47bf13ec2e8"
+    },
+    "pkg-aws-checks": {
+      "paths": [
+        "scanner/pkg/aws/checks/"
+      ],
+      "file_count": 41,
+      "files": [
+        {
+          "path": "scanner/pkg/aws/checks/access_analyzer.go",
+          "sha256": "57ea0c50cf6239f07af53322905f12fdf79f9123f72714ee6bfc266badf2eca9"
+        },
+        {
+          "path": "scanner/pkg/aws/checks/acm.go",
+          "sha256": "7064da2b9e01efe4802931bc7f1047802634fae1786cac40418cbbdafb358ce0"
+        },
+        {
+          "path": "scanner/pkg/aws/checks/apigateway.go",
+          "sha256": "c0a4d0d377aa07843f17e21cd90ecf6af56c6ba784b8fdf725a3f66b6f65f616"
+        },
+        {
+          "path": "scanner/pkg/aws/checks/aurora.go",
+          "sha256": "e56426feaff45cadb15acc62c632d977e901d84b564e8ec5682540ce3a567d39"
+        },
+        {
+          "path": "scanner/pkg/aws/checks/backup_vault.go",
+          "sha256": "a31acc88ec855b06550e71cf87d2b7dab423396672f15c4d0fefd1c07d587eeb"
+        },
+        {
+          "path": "scanner/pkg/aws/checks/beanstalk.go",
+          "sha256": "c17396c18397551eeb6fcc472bbfd8a4d2f7106adec7fd171962a03f2ab67bd2"
+        },
+        {
+          "path": "scanner/pkg/aws/checks/cis_manual.go",
+          "sha256": "db1abbb800b345c125b049fed0a27a8e396fb99a4b38f2cdd4c07ebb0ec4d305"
+        },
+        {
+          "path": "scanner/pkg/aws/checks/cloudformation.go",
+          "sha256": "196e0da29c8a58fbd4b7745fcada0466cf06d39f2f3b7d030a15c1da204d1a59"
+        },
+        {
+          "path": "scanner/pkg/aws/checks/cloudtrail.go",
+          "sha256": "6bf6069274cdb7722d805775c84d297194d66d379f587ec3b58045e6fb3c39f7"
+        },
+        {
+          "path": "scanner/pkg/aws/checks/cmmc_level1.go",
+          "sha256": "92cd0f7b4b824bce948a666078ca0d9720269101d7cd81a83bdd6c41d4f6ed1b"
+        },
+        {
+          "path": "scanner/pkg/aws/checks/config.go",
+          "sha256": "0182af55ad02dee2a374f4f32d40ad0b22b6b32494bff8b9375b5a2d1824560e"
+        },
+        {
+          "path": "scanner/pkg/aws/checks/dynamodb.go",
+          "sha256": "eed779a03673454e7f29aa94ba38dbe20420ca9167e20033d2f3bce3d6f983ea"
+        },
+        {
+          "path": "scanner/pkg/aws/checks/ec2.go",
+          "sha256": "fa2e9d4d25bb4e695715ffe8bba693fdb951d0ca731cfa9991f2401f23a252e5"
+        },
+        {
+          "path": "scanner/pkg/aws/checks/ecr.go",
+          "sha256": "95d64cec208c147590e735f8d70d2c1d65a1da2a1a5cfbf7847c738366164085"
+        },
+        {
+          "path": "scanner/pkg/aws/checks/ecs.go",
+          "sha256": "4a70c4f16f5f65225d95efb28fb3d0dfb63c22db052741640ab66baafaec5033"
+        },
+        {
+          "path": "scanner/pkg/aws/checks/eks.go",
+          "sha256": "1179dc8efa66f6b0f216cc85f51606eff586cde6c62eafe4d027251855dd77f5"
+        },
+        {
+          "path": "scanner/pkg/aws/checks/elasticache.go",
+          "sha256": "f3fc2e48dc9ac86d8f52b16521b90d6846df00ed03b58ce7e33679d98069d38c"
+        },
+        {
+          "path": "scanner/pkg/aws/checks/iam.go",
+          "sha256": "0f4d6f1ac057e99a61ba3c05d8dbc48de10c128132eeb7c66b95951154ca2bff"
+        },
+        {
+          "path": "scanner/pkg/aws/checks/iam_advanced.go",
+          "sha256": "0ad596966a353d28af9aa523b07e76c9216e005266c7a8eb935a29f21b64f8d4"
+        },
+        {
+          "path": "scanner/pkg/aws/checks/iam_extended.go",
+          "sha256": "09873b30b479e4d53636c87b48884728c44ab06973111b6ad8a9e3dc4bc2991e"
+        },
+        {
+          "path": "scanner/pkg/aws/checks/lambda.go",
+          "sha256": "623e8be659ae532a14f5e76b9cf076168d78e72e0427f8188b8e85f4c73fe3ad"
+        },
+        {
+          "path": "scanner/pkg/aws/checks/messaging.go",
+          "sha256": "22f8b898c02076fa21cda3c6be65d2bdb5490b78cb25761f8c46c3e8cbffb9e9"
+        },
+        {
+          "path": "scanner/pkg/aws/checks/monitoring.go",
+          "sha256": "30641a7e2bdc7a56fac9042abf01f99f33bc0709a9d5901129d9daac299a7eb8"
+        },
+        {
+          "path": "scanner/pkg/aws/checks/network_firewall.go",
+          "sha256": "1c88b87ee55902ced740ffe106377b850be01d1c90901db1f0a4e0269400649e"
+        },
+        {
+          "path": "scanner/pkg/aws/checks/opensearch.go",
+          "sha256": "afc62f02c1c7c36667b7048885a386320d5e7730c33932bd0d5619102d10b7dd"
+        },
+        {
+          "path": "scanner/pkg/aws/checks/organizations_advanced.go",
+          "sha256": "7a981d84c2f897815f758536929b6da9f94558e252fd5dd4156e36f19830e6a8"
+        },
+        {
+          "path": "scanner/pkg/aws/checks/pci_dss.go",
+          "sha256": "a36cd88a6f7eecca319d7c478b16429fc2f6b789617b76d4223d6af10993b7aa"
+        },
+        {
+          "path": "scanner/pkg/aws/checks/rds.go",
+          "sha256": "613ddb0963c2af24cb15b6c3e0800715fb9b6061aa128fe7c5b86344f5fff5b9"
+        },
+        {
+          "path": "scanner/pkg/aws/checks/redshift.go",
+          "sha256": "723fa50d9aeb3bb0e7926f2c4a816ab4d6c63485f5312a15a087267a540e340e"
+        },
+        {
+          "path": "scanner/pkg/aws/checks/route53.go",
+          "sha256": "8e38199f4d942ace751aaf8e688cda7c6715f85ba4918fbe4608b2a60a85e317"
+        },
+        {
+          "path": "scanner/pkg/aws/checks/s3.go",
+          "sha256": "79dbbaed310581eac8e30d193f9e5669d3d80edeaeecf93e8d5cf36bdf34931c"
+        },
+        {
+          "path": "scanner/pkg/aws/checks/sagemaker.go",
+          "sha256": "3e0ed85d470c20179c3997c651e6bc185ce05f9d40c96cb3b8ee676c46b9039d"
+        },
+        {
+          "path": "scanner/pkg/aws/checks/secretsmanager.go",
+          "sha256": "9888d5edcedbd80c2978f355d50fde2e8fd0fba3e05482ed24390a464f3f76f1"
+        },
+        {
+          "path": "scanner/pkg/aws/checks/security_services.go",
+          "sha256": "559592b653f12ea92f3ef0001ac7ee898c49f7f3cd0cfa44128431791ed00cbd"
+        },
+        {
+          "path": "scanner/pkg/aws/checks/soc2_cc1_cc2.go",
+          "sha256": "9287e6934e7abc5e7f8f7cddafa0b2a0af43b0f360a73d16ac21437fff9d60ed"
+        },
+        {
+          "path": "scanner/pkg/aws/checks/soc2_cc3_cc5.go",
+          "sha256": "c37e47ee37fdb60185153b67562f709bd85c8dbc613ddece50cb803441453537"
+        },
+        {
+          "path": "scanner/pkg/aws/checks/soc2_cc6_cc9.go",
+          "sha256": "65fb40689102b3e6316ba9f2dc2662bb22b62cb7bdf1a8fa3b286755624faccb"
+        },
+        {
+          "path": "scanner/pkg/aws/checks/ssm.go",
+          "sha256": "5e4729226950cc15084fb013b882faceb56f87d0ff303a2e7f0aa16208e7ae12"
+        },
+        {
+          "path": "scanner/pkg/aws/checks/systems.go",
+          "sha256": "b0a475448278f10ee3866fe972f55aae4c6af6c9aac8c0798b9230dcb2657e9a"
+        },
+        {
+          "path": "scanner/pkg/aws/checks/types.go",
+          "sha256": "a6eac050b3661a5defb1132f27493dd8abb2e28e1280e86adcea67907b848b5d"
+        },
+        {
+          "path": "scanner/pkg/aws/checks/vpc.go",
+          "sha256": "873c37d342fb93cda3cca55a51f6ea7aeed3174b066d6eea4fc5bc25872ffba1"
+        }
+      ],
+      "fingerprint": "be358629cf259e6f9422793901b145b4603ecfe62f0bf280c967f4685bde7352"
+    },
+    "pkg-azure-scanner": {
+      "paths": [
+        "scanner/pkg/azure/scanner.go"
+      ],
+      "file_count": 1,
+      "files": [
+        {
+          "path": "scanner/pkg/azure/scanner.go",
+          "sha256": "75f5087ecd313a52105b2816543743d3dc8e5e8f3530946838f9292eaf4521e4"
+        }
+      ],
+      "fingerprint": "38d3913b59b5bcb7dab2db55f4069b65110e4f97953866f386bb8272649dcb4a"
+    },
+    "pkg-azure-checks": {
+      "paths": [
+        "scanner/pkg/azure/checks/"
+      ],
+      "file_count": 17,
+      "files": [
+        {
+          "path": "scanner/pkg/azure/checks/aad.go",
+          "sha256": "669529ec12d3ee4d742c47d7ab5aa6ebd8e966c6d9676cad2d6d0faaea379f73"
+        },
+        {
+          "path": "scanner/pkg/azure/checks/appservice.go",
+          "sha256": "cb04da8fe488649f783f8a7c97f2acad8f46819426233a6a69788728d5e08df7"
+        },
+        {
+          "path": "scanner/pkg/azure/checks/cis_manual.go",
+          "sha256": "bb823cc495bb9df7c8a790a202d463566928c51f3aa49dfa8c66d6918633b9c2"
+        },
+        {
+          "path": "scanner/pkg/azure/checks/cmmc_level1.go",
+          "sha256": "551ea5e92d4863340a33045cd4fc9ea687cfbabf618abf0cd2eca132d0a7f9d1"
+        },
+        {
+          "path": "scanner/pkg/azure/checks/compute.go",
+          "sha256": "ba4e07ae0ebcd2b680917501e706c25133a038fb3bf7d262e9b747b1dfe3760c"
+        },
+        {
+          "path": "scanner/pkg/azure/checks/defender.go",
+          "sha256": "d1e0a6b39ad4bad2e387cb385d0b515b01e8ed1ff45502add4b7e96b41eab045"
+        },
+        {
+          "path": "scanner/pkg/azure/checks/identity.go",
+          "sha256": "8a787d1a9517ed964fcda4a9f4275ed3e7001c18299439a748c5c0898ebf010a"
+        },
+        {
+          "path": "scanner/pkg/azure/checks/keyvault.go",
+          "sha256": "8e8a78e2910ddb8067af2eb90ad0f11c812d4e79f217d99b64d09cfb3bc2f782"
+        },
+        {
+          "path": "scanner/pkg/azure/checks/monitoring.go",
+          "sha256": "a78a68e9c7899db078b187eccdff5d2a4872ea21f04a5318af0fdd90f9542e8c"
+        },
+        {
+          "path": "scanner/pkg/azure/checks/network.go",
+          "sha256": "9cb919f3377170630548abb1773698c427390d1a19fd94501a865aca61802cf9"
+        },
+        {
+          "path": "scanner/pkg/azure/checks/pci_dss.go",
+          "sha256": "74ba5b0b1a79e4b77612473b90cef95f97bf935e018dd08d625e8a9edddce4ad"
+        },
+        {
+          "path": "scanner/pkg/azure/checks/soc2_cc1_cc2.go",
+          "sha256": "15e167149218dd29961603cfb63f1efb7bba188aa52ada8d7eed8d95a9fce6a4"
+        },
+        {
+          "path": "scanner/pkg/azure/checks/soc2_cc3_cc5.go",
+          "sha256": "d34f95fac9c9e6fd6400e7520cbc9eb249e7a5d9335baa9c8ff5fe0299117dc5"
+        },
+        {
+          "path": "scanner/pkg/azure/checks/soc2_cc6_cc9.go",
+          "sha256": "e45df300c390c57297881f0fa3c9298265154c33801e211fb48759bec856beb0"
+        },
+        {
+          "path": "scanner/pkg/azure/checks/sql.go",
+          "sha256": "4f7b2a71d11a0f02d58cfb32f4f444ed5392bea83163cb070cc1a3571564f94e"
+        },
+        {
+          "path": "scanner/pkg/azure/checks/storage.go",
+          "sha256": "7f6ebab90ad33517c87c01ce571efaa55a8a1dc717b5a984dcd1916d6692f869"
+        },
+        {
+          "path": "scanner/pkg/azure/checks/types.go",
+          "sha256": "22a5444367cd172018a544bc00882423e957adc70de0d810b64f0ba4bd19185d"
+        }
+      ],
+      "fingerprint": "7bba83d83d2a31d845bba2153dc2058823ed48c8f25b306c7bb3098c384cf843"
+    },
+    "pkg-gcp-scanner": {
+      "paths": [
+        "scanner/pkg/gcp/scanner.go"
+      ],
+      "file_count": 1,
+      "files": [
+        {
+          "path": "scanner/pkg/gcp/scanner.go",
+          "sha256": "50ee711a4d47e0de62eddd2a83fcc1c647ab92c3bbafbac0471d33e7f864b6a1"
+        }
+      ],
+      "fingerprint": "23c25c10d905e08ad00059fada8d0d8e6f1a38ae227f60197e0d7bc76e171911"
+    },
+    "pkg-gcp-checks": {
+      "paths": [
+        "scanner/pkg/gcp/checks/"
+      ],
+      "file_count": 16,
+      "files": [
+        {
+          "path": "scanner/pkg/gcp/checks/bigquery.go",
+          "sha256": "14404ac52ff5f42e2364821058c1dae4fa0f680693b42fb3f9057326c36b067d"
+        },
+        {
+          "path": "scanner/pkg/gcp/checks/cis_manual.go",
+          "sha256": "617d1c61a6038265a63cc1413f0115cdb7c22441c19e0f4313e26aae9b6c9997"
+        },
+        {
+          "path": "scanner/pkg/gcp/checks/cmmc_level1.go",
+          "sha256": "31e0136b43b5aa76e84353f4aecccb7bf195c4ad6a88e837719ecef2b64490e8"
+        },
+        {
+          "path": "scanner/pkg/gcp/checks/compute.go",
+          "sha256": "be3373e16b0847ac1fe8e1e488921aa425e0a1329bff5c199f415f0384596a1e"
+        },
+        {
+          "path": "scanner/pkg/gcp/checks/gke.go",
+          "sha256": "730be9fbbc8fce6f30319b2ba999f11aa4a25da966d497cfa811626b194c64c4"
+        },
+        {
+          "path": "scanner/pkg/gcp/checks/iam.go",
+          "sha256": "70e30e9e77144bb917ebf932bc3ca1c94ba27a02337766bf284fd9a6006f5d91"
+        },
+        {
+          "path": "scanner/pkg/gcp/checks/kms.go",
+          "sha256": "401c292846e4a6b58ca06108ab294e417150a805e809047ae494eea609d6cc11"
+        },
+        {
+          "path": "scanner/pkg/gcp/checks/logging.go",
+          "sha256": "3e7fd386bf5b8736afdca93cb33c82e873c86fdcccf2565d354a607e76736094"
+        },
+        {
+          "path": "scanner/pkg/gcp/checks/network.go",
+          "sha256": "588e829754b43751edafe39f5797bb237f59ff2ef78557a8112e3a6ae4938356"
+        },
+        {
+          "path": "scanner/pkg/gcp/checks/pci_dss.go",
+          "sha256": "917b6b7efdc9cda9e5b6ddf239fd19a60c08cec584031a1973db5bc558b4cd75"
+        },
+        {
+          "path": "scanner/pkg/gcp/checks/soc2_cc1_cc2.go",
+          "sha256": "605de52be8030517cfd52fd2f440b228a79c6354ab469fcb181f58410eb23a58"
+        },
+        {
+          "path": "scanner/pkg/gcp/checks/soc2_cc3_cc5.go",
+          "sha256": "b73f3ccad0d65fa08959d456ad6461ca2617346f1f7d2c8550aead68ed3d1203"
+        },
+        {
+          "path": "scanner/pkg/gcp/checks/soc2_cc6_cc9.go",
+          "sha256": "79c5be53fcb0b016e26503ef3870244fe0927a347e9529ab988c46e6091534e3"
+        },
+        {
+          "path": "scanner/pkg/gcp/checks/sql.go",
+          "sha256": "2555e5ca7ee7199a643df64f11c073f4407e65d7a79ad72a192a37ad6dd7b419"
+        },
+        {
+          "path": "scanner/pkg/gcp/checks/storage.go",
+          "sha256": "267f6e3929902abf9d0f068397792a14ab9a0dc119081e0b4e0b299dbc3d6666"
+        },
+        {
+          "path": "scanner/pkg/gcp/checks/types.go",
+          "sha256": "205221225c657fc7593a71218114fe8054a16fa30abdfa7f8eb43b658187d0ff"
+        }
+      ],
+      "fingerprint": "463a33a639fa5f4ac8428f0eaac546841a4630edff342aa01be26d56ad813704"
+    },
+    "pkg-report": {
+      "paths": [
+        "scanner/pkg/report/"
+      ],
+      "file_count": 2,
+      "files": [
+        {
+          "path": "scanner/pkg/report/html.go",
+          "sha256": "a87f39c64617406a9c0f39ad79631429983438551ebeaefd9007cc0c10c5e544"
+        },
+        {
+          "path": "scanner/pkg/report/pdf.go",
+          "sha256": "39c2425d50c3d48c8b5e9df7a2b87764add559f90dd9821f09f8d0052d07f42c"
+        }
+      ],
+      "fingerprint": "e70ecf33e0ee03fe13762f2bd7b923808fc231eab70402134a604f011405f056"
+    },
+    "pkg-tracker": {
+      "paths": [
+        "scanner/pkg/tracker/"
+      ],
+      "file_count": 2,
+      "files": [
+        {
+          "path": "scanner/pkg/tracker/evidence.go",
+          "sha256": "0959307d0d00e625be83f99f08c9c082447af09af6487ce6a73c8ba5558b342b"
+        },
+        {
+          "path": "scanner/pkg/tracker/progress.go",
+          "sha256": "9406a5b6e17b433e5d81b859ea96b64a7af1d7e866731b3da67832fd5b0a1dfa"
+        }
+      ],
+      "fingerprint": "deca6f38f899295ca4d92db0f7f4bfeb55e8e9e65fb7640441cac0ee6cd4029d"
+    },
+    "pkg-offline": {
+      "paths": [
+        "scanner/pkg/offline/"
+      ],
+      "file_count": 1,
+      "files": [
+        {
+          "path": "scanner/pkg/offline/cache.go",
+          "sha256": "0c4e89b3205bb3e5361f40eae5b9c50a2acfc728ed1d175daf79e7c8a0dd46fa"
+        }
+      ],
+      "fingerprint": "3d80c9355aca0e7daccdbacdd701a46a839d0d7db51df8ea4d66f5195b2482f2"
+    },
+    "pkg-mappings": {
+      "paths": [
+        "scanner/pkg/mappings/"
+      ],
+      "file_count": 3,
+      "files": [
+        {
+          "path": "scanner/pkg/mappings/crosswalk.go",
+          "sha256": "8b0ba94a345e53cae00fd7e17aa9296dbff279234bb2ecc1b907d8cad6ab21c7"
+        },
+        {
+          "path": "scanner/pkg/mappings/fedramp-baselines.yaml",
+          "sha256": "a7f678de2b05a04eb1970dcbf4c59df7ae6faedd4cd74592958f55e51450fe38"
+        },
+        {
+          "path": "scanner/pkg/mappings/framework-crosswalk.yaml",
+          "sha256": "8793997f47f339475089738d337fefac10e053a09e0f688c0ba4731a3ad9ad5d"
+        }
+      ],
+      "fingerprint": "ce863c6ccbb84d90093c15dbf7101253d5989bd11e1e2df18e7a24cdd51305f9"
+    },
+    "pkg-integrations": {
+      "paths": [
+        "scanner/pkg/integrations/",
+        "scanner/mappings/scubagear/"
+      ],
+      "file_count": 10,
+      "files": [
+        {
+          "path": "scanner/mappings/scubagear/defender.json",
+          "sha256": "05e045d3adeb214c89cb4b14ce5b8eb7cd88d585c614d194247cecd99eb85bf8"
+        },
+        {
+          "path": "scanner/mappings/scubagear/entra.json",
+          "sha256": "320c0a6d4053ee4ea9e94bd5432585c791f8666671db3ebabbe050d3c3fbe874"
+        },
+        {
+          "path": "scanner/mappings/scubagear/exo.json",
+          "sha256": "c91a48b46c97c67987542383019587cdcefb3992fbee9588ce04cbacc345d6b8"
+        },
+        {
+          "path": "scanner/mappings/scubagear/powerbi.json",
+          "sha256": "0f0f9c0446373e6c3cc238fe9eccc144c7f4516576df5b7761cf96f56be2dc89"
+        },
+        {
+          "path": "scanner/mappings/scubagear/powerplatform.json",
+          "sha256": "f73e89bb630e5eabece432b2f48c24309d0d6fa983d671fe54ec6b44053c6962"
+        },
+        {
+          "path": "scanner/mappings/scubagear/sharepoint.json",
+          "sha256": "67920a4ed216c57a07a0fe2fb256e5589351e0727393a14b675785bc89f275a1"
+        },
+        {
+          "path": "scanner/mappings/scubagear/teams.json",
+          "sha256": "714720668b59a2312931dd453f9752d794e437464c2800185ad9621a53821295"
+        },
+        {
+          "path": "scanner/pkg/integrations/prowler/parser.go",
+          "sha256": "ce12866600dd9e921e4fa92598b86f113ba03dc9631547211caf92339b64e8d2"
+        },
+        {
+          "path": "scanner/pkg/integrations/scubagear/parser.go",
+          "sha256": "fe24dd68d2b2348efab27b9d6ddc87eadff8957ac6e34292e6c950e8015720ff"
+        },
+        {
+          "path": "scanner/pkg/integrations/types.go",
+          "sha256": "f8f9ed509047a26b6d26ae658fedd5e480f7eea867147457853b499a0b1e4210"
+        }
+      ],
+      "fingerprint": "898d535242ee734c118af4f460c0ef853b2dc8a7452e27a05e8d3ecb5800496c"
+    },
+    "pkg-cli": {
+      "paths": [
+        "scanner/pkg/cli/"
+      ],
+      "file_count": 3,
+      "files": [
+        {
+          "path": "scanner/pkg/cli/box.go",
+          "sha256": "3c4ff019a09d0eee8aad383b441066fe6a0f90db30cc6084380f21f9224e4096"
+        },
+        {
+          "path": "scanner/pkg/cli/colors.go",
+          "sha256": "b19f878237f6f92b0de52fba2175c2562d9d45be002b894aa579d35091c712fa"
+        },
+        {
+          "path": "scanner/pkg/cli/spinner.go",
+          "sha256": "db4a17dfb49b48efc5c512b7b2c1e0576ca5b29f445d56a82b475182a889a299"
+        }
+      ],
+      "fingerprint": "093507794f5ef9b7f5f8997545c4e033e267093a3b42901c902366157a333291"
+    },
+    "pkg-updater": {
+      "paths": [
+        "scanner/pkg/updater/"
+      ],
+      "file_count": 1,
+      "files": [
+        {
+          "path": "scanner/pkg/updater/updater.go",
+          "sha256": "8c822eb0eca0735e08794330d3ab1eea1e9fbe6ed3cf0482fea8f5303b3b0f7c"
+        }
+      ],
+      "fingerprint": "039aff5f03f83d0faec792c21f175eee19017efe72f3592f644cb09bd6a3dd22"
+    },
+    "pkg-remediation": {
+      "paths": [
+        "scanner/pkg/remediation/"
+      ],
+      "file_count": 1,
+      "files": [
+        {
+          "path": "scanner/pkg/remediation/scripts.go",
+          "sha256": "8c5f9429b4dd7ce83949c8e6f33ca8fb58c63afc28730d6c94571f6baba24864"
+        }
+      ],
+      "fingerprint": "0cab6e76ef412279d0f598a73f309b02c026ae3f6429886db0daec4d680c5075"
+    },
+    "site-static": {
+      "paths": [
+        "site/"
+      ],
+      "file_count": 66,
+      "files": [
+        {
+          "path": "site/CNAME",
+          "sha256": "1ad8a5e8e3b5671fff788f121c8e3c43bb848dc35dbfffe07fc53aa495d39599"
+        },
+        {
+          "path": "site/about.html",
+          "sha256": "25151227769a3ac50c32ce042a9e5b06bb038eaabd159808977dd732ba5b0a93"
+        },
+        {
+          "path": "site/auditkit-logo-dark.svg",
+          "sha256": "3aa7d4f893c651615188fd2e63c09b7817091e99f1d78a3ee3be0ccee6e53c0c"
+        },
+        {
+          "path": "site/auditkit-logo.svg",
+          "sha256": "d644b27c8b01d119148a990d383f8b6c1ac0141156c0b130bf14718fbef97c41"
+        },
+        {
+          "path": "site/cli-reference.html",
+          "sha256": "e3bfe941ed03cbbf7898cbf59d282c9116c317e2ba3859f8eb69553816d36944"
+        },
+        {
+          "path": "site/community.html",
+          "sha256": "f8ff88cce60dcd377c1d9ce7cf72d51e71c25b51288e34250ae1ec4c19a78f17"
+        },
+        {
+          "path": "site/cookie-consent.js",
+          "sha256": "56af9c44680bceda4338ccb23c427f2415a3782889f4c3cfed19ca744265d4e4"
+        },
+        {
+          "path": "site/docs/cli-reference.html",
+          "sha256": "c9d9ecd51b7c9b7fb9bed821be7d8872dd39bfc57e8fb353d758a8c694349387"
+        },
+        {
+          "path": "site/docs/cli-reference.md",
+          "sha256": "09d4c36b721fe53d16d863de2a7042fdd42f650d413786a759205168102f3a70"
+        },
+        {
+          "path": "site/docs/faq.html",
+          "sha256": "efc058a0b95bd8fc785572204c99d6415759710399ae3ed089c84226adcf5bec"
+        },
+        {
+          "path": "site/docs/faq.md",
+          "sha256": "a410b131fa148ec8e33f49e3c8c3425d603816e667848dc0f0ef31d068e1a8a8"
+        },
+        {
+          "path": "site/docs/frameworks/README.md",
+          "sha256": "9f76d1fbe01ff773c3c9def65cd33945b8163f30be0165c5c940a272cc994870"
+        },
+        {
+          "path": "site/docs/frameworks/cis-benchmarks.html",
+          "sha256": "fa7a9c08929b00f8e17a69feeaaec8c6814fcd166e27bdf5b85cea216b5a1b75"
+        },
+        {
+          "path": "site/docs/frameworks/cis-benchmarks.md",
+          "sha256": "8974a485cd3bb57514d6308605da7674663f1a9416d80492deb994f2f6f37fe5"
+        },
+        {
+          "path": "site/docs/frameworks/cmmc.html",
+          "sha256": "ef9a87856d001175e5c2393502fac5d29551172bf0ffdc66cabc2809f19ed345"
+        },
+        {
+          "path": "site/docs/frameworks/cmmc.md",
+          "sha256": "dbc3df3d92eeefc5b00639f406f504c24adbb74eb4d34812a5f7e59c1831410c"
+        },
+        {
+          "path": "site/docs/frameworks/fedramp.html",
+          "sha256": "7e0c39020627eaa96ea35fd03d82eb015e3959ed81201b789e774ff9b4bc9418"
+        },
+        {
+          "path": "site/docs/frameworks/fedramp.md",
+          "sha256": "72b840a3a4825c1cb41421300ac0fc2f373b95b5a238730460096f87b9a358f2"
+        },
+        {
+          "path": "site/docs/frameworks/hipaa.html",
+          "sha256": "a6b32bd0f00aa730537d6db2a81985d40c83a4653c54a25402a27b81d622137f"
+        },
+        {
+          "path": "site/docs/frameworks/hipaa.md",
+          "sha256": "4d316db2de9119649bf7a6abbc5400f9d759b5b4782e14a714eb5649f5523feb"
+        },
+        {
+          "path": "site/docs/frameworks/iso27001.html",
+          "sha256": "fa72f18f0acc6291310a10c72c8d1898d0b3886add6c566a15b47d88dc495075"
+        },
+        {
+          "path": "site/docs/frameworks/iso27001.md",
+          "sha256": "e6ca9e6964eae9dba700a94aeaf66d1e7ac04db93f3bca79421c301269ae7918"
+        },
+        {
+          "path": "site/docs/frameworks/nist-800-53.html",
+          "sha256": "465d3a5c7270b2ecfd130a08ed4f9f631fa39712f75006960f42c087fe234164"
+        },
+        {
+          "path": "site/docs/frameworks/nist-800-53.md",
+          "sha256": "18b93bbdf3cbdbcca0029843f0fa46ce63c37774a5a43960e235890d1da9f837"
+        },
+        {
+          "path": "site/docs/frameworks/pci-dss.html",
+          "sha256": "ac7ba846291d3ec06fba41bdf9c750564245e037870c35dde584e34849e72477"
+        },
+        {
+          "path": "site/docs/frameworks/pci-dss.md",
+          "sha256": "1c824dcae39e66664eba2441bb1010fcc9d62a7eb89e8be95cccf6862a7b6196"
+        },
+        {
+          "path": "site/docs/frameworks/soc2.html",
+          "sha256": "8a00615228232ca68074448922780a414316ee730b8723700b76d47d74cffce9"
+        },
+        {
+          "path": "site/docs/frameworks/soc2.md",
+          "sha256": "55511371b173283aaad611f41068419df58625525b399e9d3ec195a882f1aeb1"
+        },
+        {
+          "path": "site/docs/getting-started.html",
+          "sha256": "7334919589141f490040ed4e3d330bc63a967260b23f732349dfcbc080306ada"
+        },
+        {
+          "path": "site/docs/getting-started.md",
+          "sha256": "366e4d7acf9cf5119ff633504c8b21bd7a08075d07ce963daed9e15220144a7d"
+        },
+        {
+          "path": "site/docs/index.html",
+          "sha256": "d4ccb0936ec419a6b87decdc864d2fab724e3589efc994e64c820f7dba23248f"
+        },
+        {
+          "path": "site/docs/installation.html",
+          "sha256": "74f2fa7461b9dcb49948514c6a95f22a150b18c0ff798577d7ef3434d1448a35"
+        },
+        {
+          "path": "site/docs/installation.md",
+          "sha256": "c0487e53acbde7f8bf98ca95e312c69a40646e75fd8ab880c223c40e948bab41"
+        },
+        {
+          "path": "site/docs/providers/arc.html",
+          "sha256": "6bdd4051b19350f9248c8393a2cc1c30feb9d6be3557d126d50abce5d48295ba"
+        },
+        {
+          "path": "site/docs/providers/arc.md",
+          "sha256": "d9910da8bed8865b12f9b3ee3e6c9ec6f70342426a0063ab8266c0556a52904e"
+        },
+        {
+          "path": "site/docs/providers/aws.md",
+          "sha256": "7fbcf02a7ac26a56bf87ac9d09b5100f098e1047b08bd284642e91a45e344728"
+        },
+        {
+          "path": "site/docs/providers/azure.md",
+          "sha256": "ad4504912a013a070e595b63d284efa890a2621b881e8317d0980505646c9ca3"
+        },
+        {
+          "path": "site/docs/providers/gcp.md",
+          "sha256": "bbb87ba02e799608de8507d893c33420c023d8b64a660f50fa733c42f478be20"
+        },
+        {
+          "path": "site/docs/providers/index.html",
+          "sha256": "1bb052dc68de0ef69584b2eef86cde055a38ac6634e6f5ab5c57d1435364dbe7"
+        },
+        {
+          "path": "site/docs/providers/m365.md",
+          "sha256": "8aa81825cc39391c43bce7484c7547f9bd11c643d41c268b11b1f33492621120"
+        },
+        {
+          "path": "site/docs/setup/aws.html",
+          "sha256": "d95fb902954e778cb71aecf941cba92137831f5fa3b32a2945dc18c5369b56e9"
+        },
+        {
+          "path": "site/docs/setup/aws.md",
+          "sha256": "df3ae7437437acc76f0f7c341aa9866ddc2181bb062e135fbce9bc28173fc5eb"
+        },
+        {
+          "path": "site/docs/setup/azure.html",
+          "sha256": "63711c83e1973a94d008483a4f382e52c2217873952602a7f8312a9cd37c0e36"
+        },
+        {
+          "path": "site/docs/setup/azure.md",
+          "sha256": "0d08dfcb258724de3692b8742d270a1f821022bea0399c0e788275727942598c"
+        },
+        {
+          "path": "site/docs/setup/gcp.html",
+          "sha256": "0c5057651f69ff5acd71b74e537487dc03bdffcc75262a4e685625c0c72b53fa"
+        },
+        {
+          "path": "site/docs/setup/gcp.md",
+          "sha256": "b046a3f692273c43425064025d5f9770e4217b953c63d7a2b8565237d7ab5d74"
+        },
+        {
+          "path": "site/docs/setup/m365.html",
+          "sha256": "e533f81f110f7075bed8912cdea42824fe5077c13a19fcb49fec3c39d25881db"
+        },
+        {
+          "path": "site/docs/setup/m365.md",
+          "sha256": "a64c4b4d50a832a8815052e0e6f7ae2a28ff025a9e5f26de2137d683d8fe6642"
+        },
+        {
+          "path": "site/examples/README.md",
+          "sha256": "dbc61b666e089fcf3ef8b2419ffa91a9d9916ff74d1ce2143995f03ff2f73d84"
+        },
+        {
+          "path": "site/examples/cicd.md",
+          "sha256": "ed5f232920c663594dadece01dfbe4c8510e57889cd93097e9492153368d2057"
+        },
+        {
+          "path": "site/examples/index.html",
+          "sha256": "687bec3c1ceec74d9d6b27e759da44a7fe1eabc59342896a1e3bc01cbfe7d307"
+        },
+        {
+          "path": "site/examples/scan-outputs/aws-cmmc-scan.txt",
+          "sha256": "0f25ef2ee978ae402b5781ce3e05c3606de223801ee4d447bcd2d5005e1d903e"
+        },
+        {
+          "path": "site/examples/scan-outputs/aws-pci-scan.txt",
+          "sha256": "21e3b7e4cae4beb40583190ab125450d93baa2ed7d96177943fcb9b72d5f39f8"
+        },
+        {
+          "path": "site/examples/scan-outputs/aws-soc2-scan.txt",
+          "sha256": "f974e9c106b735ee69549c87834ad6817c55bb039e678a6eace962096f17b185"
+        },
+        {
+          "path": "site/examples/scan-outputs/azure-cmmc-scan.txt",
+          "sha256": "206c7da036d69d043ec32127ff0c9c71da7adec62596b26fd240ab08f5f33e4c"
+        },
+        {
+          "path": "site/examples/scan-outputs/index.html",
+          "sha256": "99086ba593edb1f8071679fd75a1cf920d3b934285e6f2d3a82f74e2b0468b68"
+        },
+        {
+          "path": "site/faq.html",
+          "sha256": "ee66f7d0ba6a8ca9ba865d72bd3fdc26c0a72ae030d4b3b6142d3822c0cba040"
+        },
+        {
+          "path": "site/getting-started.html",
+          "sha256": "65c764134b84178f09abd22b0fdb570773c38b7826625ea09b0a6a9099285fc9"
+        },
+        {
+          "path": "site/index.html",
+          "sha256": "3f23a35d3a6a40b617fad0ac6b6969e4840abf9bafc6641bbdc68fa452d534f9"
+        },
+        {
+          "path": "site/installation.html",
+          "sha256": "2cef3ddd97ba1d07843bd9e60a879476378afcd066ae4c9039c7ded276343b08"
+        },
+        {
+          "path": "site/main.js",
+          "sha256": "59ed80016b9b252a3a4d5704e4114496a6fe5711c617ecd0633cd69b278c59a6"
+        },
+        {
+          "path": "site/pricing.html",
+          "sha256": "24b9869b53c424b4e677b355b10bb495d92c18de1fdc7bdf8baddd0df8d18343"
+        },
+        {
+          "path": "site/pricing.md",
+          "sha256": "40327abe4839dea3d8c833abc59252ba9a0d2624294c45f900c90687f928bb18"
+        },
+        {
+          "path": "site/pro/index.html",
+          "sha256": "f16f0e6d103e7205c317019571485c41c2024cc6fdc84d4fffae0c511fd16ecb"
+        },
+        {
+          "path": "site/providers/arc.html",
+          "sha256": "b2d828049a0e35d94edcb4807a86d1a609a2ed49f211912a5e88304e3ef4dd8e"
+        },
+        {
+          "path": "site/styles.css",
+          "sha256": "ae0c93eb619716e3720a6708059bca5680aa80bebf69e8abadd0f080ed6d0e6a"
+        }
+      ],
+      "fingerprint": "5228bb7046da5585ae1fd6b2295f02ba9e24f4c98814a9c8e89e01fcace01fb5"
+    },
+    "site-cookie-consent": {
+      "paths": [
+        "site/cookie-consent.js"
+      ],
+      "file_count": 1,
+      "files": [
+        {
+          "path": "site/cookie-consent.js",
+          "sha256": "56af9c44680bceda4338ccb23c427f2415a3782889f4c3cfed19ca744265d4e4"
+        }
+      ],
+      "fingerprint": "086fe346a095edf3f4d18d563eae5caaf69b61290d80e464bd648961a80f6ad1"
+    },
+    "pkg-cache": {
+      "paths": [
+        "scanner/pkg/cache/"
+      ],
+      "file_count": 1,
+      "files": [
+        {
+          "path": "scanner/pkg/cache/results.go",
+          "sha256": "8bfd5865834485cc831e0ba9a88d4f820bca5be67e20de82fe14803c7f166ed0"
+        }
+      ],
+      "fingerprint": "b337c2bb1c4516d5fb7d4b37ce4d92eaaee1874851263b7b46612c9771dc74ab"
+    },
+    "pkg-evidence": {
+      "paths": [
+        "scanner/pkg/evidence/"
+      ],
+      "file_count": 1,
+      "files": [
+        {
+          "path": "scanner/pkg/evidence/screenshots.go",
+          "sha256": "dde531d83d83c006efba436f2339c0b3bb1d18fda8a2c5ff72f0bdedce9bb96a"
+        }
+      ],
+      "fingerprint": "f4598ecddc1951a4fe518e6decf5d51bb250e470fd6594cf2299227ce408c12d"
+    },
+    "ci-pages": {
+      "paths": [
+        ".github/workflows/pages.yml"
+      ],
+      "file_count": 1,
+      "files": [
+        {
+          "path": ".github/workflows/pages.yml",
+          "sha256": "d1112b090a3fc885d7125273d5a7d9c0fad00952e8d59439f3b963386c496440"
+        }
+      ],
+      "fingerprint": "394f28171969c550a7ac386c4c5396d2d4b480786f3316f3b31934b19aca5e24"
+    },
+    "ci-release": {
+      "paths": [
+        "scanner/.github/workflows/release.yml"
+      ],
+      "file_count": 1,
+      "files": [
+        {
+          "path": "scanner/.github/workflows/release.yml",
+          "sha256": "f87c593e224c08a2eca34ea1843533936febd1d57cf84dd3c2ebd740da02beb1"
+        }
+      ],
+      "fingerprint": "af166dfd321f1411a944b3e092ace66584b312583b2fcc5b922fa4e24550cb10"
+    }
+  }
+}

@@ -1,0 +1,439 @@
+model = "gpt-6-sol"
+model_reasoning_effort = "medium"
+personality = "pragmatic"
+
+approvals_reviewer = "auto_review"
+
+notify = ["/Users/randallnoval/.codex/computer-use/Codex Computer Use.app/Contents/SharedSupport/SkyComputerUseClient.app/Contents/MacOS/SkyComputerUseClient", "turn-ended"]
+service_tier = "default"
+
+[projects."/Users/randallnoval/Code/aerie"]
+trust_level = "trusted"
+
+[projects."/Users/randallnoval/Downloads/scripted workflow summary"]
+trust_level = "trusted"
+
+[projects."/Users/randallnoval/Code/AppletScriptorium"]
+trust_level = "trusted"
+
+[projects."/Users/randallnoval/Code/docs-osascript"]
+trust_level = "trusted"
+
+[projects."/Users/randallnoval/Code/canvas"]
+trust_level = "trusted"
+
+[projects."/Users/randallnoval/Code/contactripple"]
+trust_level = "trusted"
+
+[projects."/Users/randallnoval/Code/gggd"]
+trust_level = "trusted"
+
+[projects."/Users/randallnoval/Code/surge_sites"]
+trust_level = "trusted"
+
+[projects."/Users/randallnoval/Code/peekdown"]
+trust_level = "trusted"
+
+[projects."/Users/randallnoval"]
+trust_level = "untrusted"
+
+[projects."/Users/randallnoval/Code/mqol-aerie"]
+trust_level = "trusted"
+
+[projects."/Users/randallnoval/Code/wemo-rescue"]
+trust_level = "trusted"
+
+[projects."/Users/randallnoval/Code/cc-hooks-metrics"]
+trust_level = "trusted"
+
+[projects."/Users/randallnoval/Code/agentic-sdlc-telemetry"]
+trust_level = "trusted"
+
+[projects."/Users/randallnoval/Code/secu-gum"]
+trust_level = "trusted"
+
+[projects."/Users/randallnoval/Code/agent-feed"]
+trust_level = "trusted"
+
+[projects."/Users/randallnoval/Code/skills"]
+trust_level = "trusted"
+
+[projects."/Users/randallnoval/Code/drata-cli"]
+trust_level = "trusted"
+
+[projects."/Users/randallnoval/Code/gapbot-crew"]
+trust_level = "trusted"
+
+[projects."/Users/randallnoval/Code/starfysh/cross-browser-extensions"]
+trust_level = "trusted"
+
+[projects."/Users/randallnoval/Code/gapbot-bolt-2"]
+trust_level = "trusted"
+
+[projects."/Users/randallnoval/Code/ASH Abstracts"]
+trust_level = "trusted"
+
+[projects."/private/tmp/codex-worktree-bug-I3kHm"]
+trust_level = "trusted"
+
+[projects."/Users/randallnoval/Code/mqol-locomotion"]
+trust_level = "trusted"
+
+[projects."/Users/randallnoval/Documents/Codex/2026-07-06/re"]
+trust_level = "trusted"
+
+[notice]
+hide_gpt5_1_migration_prompt = true
+
+[notice.model_migrations]
+"gpt-5.2-codex" = "gpt-5.3-codex"
+"gpt-5.3-codex" = "gpt-5.4"
+
+[mcp_servers.xcode]
+command = "xcrun"
+args = ["mcpbridge"]
+
+[mcp_servers.code-review-graph]
+command = "uvx"
+args = ["code-review-graph", "serve"]
+
+[mcp_servers.code-review-graph.tools.apply_refactor_tool]
+approval_mode = "approve"
+
+[mcp_servers.code-review-graph.tools.build_or_update_graph_tool]
+approval_mode = "approve"
+
+[mcp_servers.code-review-graph.tools.cross_repo_search_tool]
+approval_mode = "approve"
+
+[mcp_servers.code-review-graph.tools.detect_changes_tool]
+approval_mode = "approve"
+
+[mcp_servers.code-review-graph.tools.embed_graph_tool]
+approval_mode = "approve"
+
+[mcp_servers.code-review-graph.tools.find_large_functions_tool]
+approval_mode = "approve"
+
+[mcp_servers.code-review-graph.tools.generate_wiki_tool]
+approval_mode = "approve"
+
+[mcp_servers.code-review-graph.tools.get_affected_flows_tool]
+approval_mode = "approve"
+
+[mcp_servers.code-review-graph.tools.get_architecture_overview_tool]
+approval_mode = "approve"
+
+[mcp_servers.code-review-graph.tools.get_bridge_nodes_tool]
+approval_mode = "approve"
+
+[mcp_servers.code-review-graph.tools.get_community_tool]
+approval_mode = "approve"
+
+[mcp_servers.code-review-graph.tools.get_docs_section_tool]
+approval_mode = "approve"
+
+[mcp_servers.code-review-graph.tools.get_flow_tool]
+approval_mode = "approve"
+
+[mcp_servers.code-review-graph.tools.get_hub_nodes_tool]
+approval_mode = "approve"
+
+[mcp_servers.code-review-graph.tools.get_impact_radius_tool]
+approval_mode = "approve"
+
+[mcp_servers.code-review-graph.tools.get_knowledge_gaps_tool]
+approval_mode = "approve"
+
+[mcp_servers.code-review-graph.tools.get_minimal_context_tool]
+approval_mode = "approve"
+
+[mcp_servers.code-review-graph.tools.get_review_context_tool]
+approval_mode = "approve"
+
+[mcp_servers.code-review-graph.tools.get_suggested_questions_tool]
+approval_mode = "approve"
+
+[mcp_servers.code-review-graph.tools.get_surprising_connections_tool]
+approval_mode = "approve"
+
+[mcp_servers.code-review-graph.tools.get_wiki_page_tool]
+approval_mode = "approve"
+
+[mcp_servers.code-review-graph.tools.list_communities_tool]
+approval_mode = "approve"
+
+[mcp_servers.code-review-graph.tools.list_flows_tool]
+approval_mode = "approve"
+
+[mcp_servers.code-review-graph.tools.list_graph_stats_tool]
+approval_mode = "approve"
+
+[mcp_servers.code-review-graph.tools.list_repos_tool]
+approval_mode = "approve"
+
+[mcp_servers.code-review-graph.tools.query_graph_tool]
+approval_mode = "approve"
+
+[mcp_servers.code-review-graph.tools.refactor_tool]
+approval_mode = "approve"
+
+[mcp_servers.code-review-graph.tools.run_postprocess_tool]
+approval_mode = "approve"
+
+[mcp_servers.code-review-graph.tools.semantic_search_nodes_tool]
+approval_mode = "approve"
+
+[mcp_servers.code-review-graph.tools.traverse_graph_tool]
+approval_mode = "approve"
+
+[mcp_servers.node_repl]
+args = []
+command = "/Applications/ChatGPT.app/Contents/Resources/cua_node/bin/node_repl"
+startup_timeout_sec = 120
+
+[mcp_servers.node_repl.env]
+NODE_REPL_NATIVE_PIPE_CONNECT_TIMEOUT_MS = "1000"
+NODE_REPL_NODE_MODULE_DIRS = "/Applications/ChatGPT.app/Contents/Resources/cua_node/lib/node_modules"
+NODE_REPL_NODE_PATH = "/Applications/ChatGPT.app/Contents/Resources/cua_node/bin/node"
+NODE_REPL_TRUSTED_CODE_PATHS = "/Users/randallnoval/.codex:/Applications/ChatGPT.app/Contents/Resources/cua_node/lib/node_modules"
+CODEX_HOME = "/Users/randallnoval/.codex"
+BROWSER_USE_AVAILABLE_BACKENDS = "chrome,iab"
+BROWSER_USE_TINYSKY_ENABLED = "1"
+NODE_REPL_INSTRUCTIONS_USE_CASE_BROWSER = ""
+NODE_REPL_INSTRUCTIONS_USE_CASE_CHROME = ""
+NODE_REPL_INSTRUCTIONS_USE_CASE_COMPUTER_USE = ""
+BROWSER_USE_CODEX_APP_BUILD_FLAVOR = "prod"
+BROWSER_USE_CODEX_APP_VERSION = "26.924.22138"
+NODE_REPL_TRUSTED_SERVICES = '{"browser":"/Users/randallnoval/.codex/plugins/cache/openai-bundled/browser/26.924.22138/scripts/browser-service.mjs","sky":"@oai/sky/service"}'
+SKY_CUA_SERVICE_PATH = "/Users/randallnoval/.codex/computer-use/Codex Computer Use.app"
+CODEX_CLI_PATH = "/Applications/ChatGPT.app/Contents/Resources/codex-cli/CodexCLI.app/Contents/MacOS/codex"
+
+[mcp_servers.vibedrop]
+url = "https://mcp.vibedrop.sh/mcp"
+
+[mcp_servers.computer-use]
+command = "./Codex Computer Use.app/Contents/SharedSupport/SkyComputerUseClient.app/Contents/MacOS/SkyComputerUseClient"
+args = ["mcp"]
+cwd = "."
+enabled = false
+
+[marketplaces.openai-bundled]
+source_type = "local"
+source = "/Users/randallnoval/.codex/.tmp/bundled-marketplaces/openai-bundled"
+
+[marketplaces.openai-primary-runtime]
+source_type = "local"
+source = "/Users/randallnoval/.cache/codex-runtimes/codex-primary-runtime/plugins/openai-primary-runtime"
+
+[marketplaces.claude-plugins-official]
+last_updated = "2026-08-30T15:39:32Z"
+last_revision = "ed404106fcd80ba98ecb7c851e531dcb626d13b7"
+source_type = "git"
+source = "https://github.com/anthropics/claude-plugins-official.git"
+
+[marketplaces.context7-marketplace]
+last_updated = "2026-08-30T15:39:40Z"
+last_revision = "4e980f6b494d6f970cc5ec1df417ba684b2f6e0b"
+source_type = "git"
+source = "https://github.com/upstash/context7.git"
+
+[marketplaces.nautilai]
+last_updated = "2026-08-30T15:39:43Z"
+last_revision = "4c9e7a296c04999948ee44e5b95964b7f3cbf048"
+source_type = "git"
+source = "https://github.com/starfysh-tech/nautilai.git"
+
+[marketplaces.ponytail]
+last_updated = "2026-08-11T00:41:00Z"
+last_revision = "2ed6c52c9d7e5e56942508591085fd45dea277d3"
+source_type = "git"
+source = "https://github.com/DietrichGebert/ponytail.git"
+
+[marketplaces.caveman]
+last_updated = "2026-08-30T15:39:22Z"
+last_revision = "df2ccd85c94ec3c8289cb62ac020d241ccfb0c60"
+source_type = "git"
+source = "https://github.com/JuliusBrussee/caveman.git"
+
+[plugins."documents@openai-primary-runtime"]
+enabled = true
+
+[plugins."spreadsheets@openai-primary-runtime"]
+enabled = true
+
+[plugins."presentations@openai-primary-runtime"]
+enabled = true
+
+[plugins."superpowers@openai-curated"]
+enabled = true
+
+[plugins."cloudflare@openai-curated"]
+enabled = true
+
+[plugins."build-macos-apps@openai-curated"]
+enabled = true
+
+[plugins."codex-security@openai-curated"]
+enabled = true
+
+[plugins."build-ios-apps@openai-curated"]
+enabled = true
+
+[plugins."supabase@openai-curated"]
+enabled = true
+
+[plugins."pdf@openai-primary-runtime"]
+enabled = true
+
+[plugins."frontend-design@claude-plugins-official"]
+enabled = true
+
+[plugins."template-creator@openai-primary-runtime"]
+enabled = true
+
+[plugins."context7@context7-marketplace"]
+enabled = true
+
+[plugins."visualize@openai-bundled"]
+enabled = true
+
+[plugins."commitcraft@nautilai"]
+enabled = true
+
+[plugins."pr-comment-review@nautilai"]
+enabled = true
+
+[plugins."pr-review-deep@nautilai"]
+enabled = true
+
+[plugins."review-plan@nautilai"]
+enabled = true
+
+[plugins."wireframe@nautilai"]
+enabled = true
+
+[plugins."dep-review@nautilai"]
+enabled = true
+
+[plugins."autodev@nautilai"]
+enabled = true
+
+[plugins."browser@openai-bundled"]
+enabled = true
+
+[plugins."ponytail@ponytail"]
+enabled = true
+
+[plugins."caveman@caveman"]
+enabled = true
+
+[plugins."codex-app-tools@openai-bundled"]
+enabled = true
+
+[plugins."unified-computer-use@openai-bundled"]
+enabled = true
+
+[plugins."computer-use@openai-bundled"]
+enabled = true
+
+[tui.model_availability_nux]
+"gpt-5.5" = 2
+"gpt-5.6-sol" = 1
+gpt-6-astra = 1
+
+[features]
+memories = true
+js_repl = false
+
+[memories]
+generate_memories = true
+use_memories = true
+disable_on_external_context = false
+
+[apps.asdk_app_69d3e5ee6a708191baa733f7b8931995.tools.supabase_execute_sql]
+approval_mode = "approve"
+
+[desktop]
+usePointerCursors = true
+followUpQueueMode = "steer"
+composerEnterBehavior = "cmdIfMultiline"
+git-create-pull-request-as-draft = false
+git-pull-request-merge-method = "squash"
+git-show-sidebar-pr-icons = true
+reviewDelivery = "inline"
+dock-icon-preference = "codex-system"
+conversationDetailMode = "STEPS_COMMANDS"
+enabled-reasoning-efforts = ["low", "medium", "high", "xhigh", "ultra", "max"]
+selected-avatar-id = "custom:aster"
+
+[desktop.open-in-target-preferences]
+global = "zed"
+
+[shell_environment_policy.set]
+NODE_REPL_TRUSTED_BROWSER_CLIENT_SHA256S = "091a81603ff202a16ed56557709bf42d97caf8f0dd2e07ae9e26d7c014d71035"
+
+[hooks.state]
+
+[hooks.state."/Users/randallnoval/.codex/hooks.json:pre_tool_use:0:0"]
+trusted_hash = "sha256:a10e17a7a96cdb6c55bc500d204242f83121f52b3a99426ce3ba94950ed00257"
+
+[hooks.state."/Users/randallnoval/.codex/hooks.json:permission_request:0:0"]
+trusted_hash = "sha256:8007900c4371adbcc20d275887b23639af7add88654d3512ba9df890d3bb8332"
+
+[hooks.state."/Users/randallnoval/.codex/hooks.json:post_tool_use:0:0"]
+trusted_hash = "sha256:5512a488b5dff327105a3fb15f10d10fca5829d87cdf9a64471bb9111728acd1"
+
+[hooks.state."/Users/randallnoval/.codex/hooks.json:session_start:0:0"]
+trusted_hash = "sha256:189e0e1eee5acc1264ee02107f08f07bf4a60eecd9c966575779d91cf9fc2abf"
+
+[hooks.state."/Users/randallnoval/.codex/hooks.json:user_prompt_submit:0:0"]
+trusted_hash = "sha256:b0ca23ff6c916ef61007f68fe9c0f59ec1e6b9de186367c6dccdeb9ca1c9d813"
+
+[hooks.state."/Users/randallnoval/.codex/hooks.json:subagent_start:0:0"]
+trusted_hash = "sha256:320d86a78cf39ed8531f6c3e763a7d20906740962f27b02af3fe860a99a6c9ae"
+
+[hooks.state."/Users/randallnoval/.codex/hooks.json:subagent_stop:0:0"]
+trusted_hash = "sha256:91d3b36786dd2999e568ba22e4662cc807fb3a4c0d3cc5691eceb83565cc0ec7"
+
+[hooks.state."/Users/randallnoval/.codex/hooks.json:stop:0:0"]
+trusted_hash = "sha256:bd63d4ae60d45b9bc95a56013c4e9a86382e693330e9083e7e91edcedd3f8247"
+
+[hooks.state."ponytail@ponytail:hooks/claude-codex-hooks.json:session_start:0:0"]
+trusted_hash = "sha256:5f81d38f47448a1581c08ec877e044d9e04dd6f814dce3f2671f7a8edadd719b"
+
+[hooks.state."ponytail@ponytail:hooks/claude-codex-hooks.json:user_prompt_submit:0:0"]
+trusted_hash = "sha256:6a6f42bc3b58d6262db38bfd74d7f340fcca2b09cdb134aad365063f0bfefca4"
+
+[hooks.state."ponytail@ponytail:hooks/claude-codex-hooks.json:subagent_start:0:0"]
+trusted_hash = "sha256:1423b56c1322f96c8f74c51c1e7ae9a047b904c1fa43ee9165d462fd7a6e70ef"
+
+[projects."/Users/randallnoval/.orca/workspaces/gapbot-crew/kingfish"]
+trust_level = "trusted"
+
+[projects."/Users/randallnoval/.orca/workspaces/gapbot-bolt-2/hagfish"]
+trust_level = "trusted"
+
+[projects."/Users/randallnoval/Documents/Codex/2026-07-09/wha"]
+trust_level = "trusted"
+
+[projects."/Users/randallnoval/Documents/Codex/2026-07-31/referenced-chatgpt-conversation-this-is-an"]
+trust_level = "trusted"
+
+[projects."/Users/randallnoval/Documents/Codex/2026-07-31/realtime-voice-chat"]
+trust_level = "trusted"
+
+[projects."/Users/randallnoval/Code/fluxe"]
+trust_level = "trusted"
+
+[projects."/Users/randallnoval/Documents/Codex/2026-08-30/referenced-chatgpt-conversation-this-is-an"]
+trust_level = "trusted"
+
+[projects."/Users/randallnoval/Documents/Codex/2026-08-30/hatch-pet-users-randallnoval-codex-skills"]
+trust_level = "trusted"
+
+[projects."/Users/randallnoval/Documents/Codex/2026-09-03/build-and-sign-an-iphone-ipad"]
+trust_level = "trusted"
+
+[projects."/Users/randallnoval/Documents/Codex/2026-09-07/tur"]
+trust_level = "trusted"

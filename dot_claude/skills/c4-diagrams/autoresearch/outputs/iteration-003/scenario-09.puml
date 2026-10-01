@@ -1,0 +1,21 @@
+@startuml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Sequence.puml
+HIDE_STEREOTYPE()
+
+title User Login Flow - Sequence
+
+Person(user, "User", "End user accessing the application")
+Container(web_app, "Web Application", "React", "Browser-based frontend")
+Container(api_server, "API Server", "Node.js", "Handles authentication logic")
+ContainerDb(database, "Database", "PostgreSQL", "Stores user credentials")
+
+== Login Flow ==
+
+Rel(user, web_app, "Submits credentials", "HTTPS")
+Rel(web_app, api_server, "POST /auth/login", "REST/JSON")
+Rel(api_server, database, "Queries user record", "SQL")
+Rel(database, api_server, "Returns password hash", "SQL")
+Rel(api_server, web_app, "Returns JWT token", "JSON")
+Rel(web_app, user, "Redirects to dashboard", "Browser")
+
+@enduml

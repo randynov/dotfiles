@@ -1,0 +1,136 @@
+{
+  "commit": "aec3855804f806a582f363e4124a249693ade948",
+  "branch": "codemap-page",
+  "dirty": true,
+  "dirty_excludes": [
+    "../../../../../.claude/skills/codemap-workspace/iteration-1/eval-1-regeneration/without_skill/outputs/codemap/"
+  ],
+  "generated_at": "2026-09-24T12:20:11+00:00",
+  "scope": [
+    "client/src",
+    "client-v2/src",
+    "shared/src",
+    "packages/ui/src",
+    "server/aerie"
+  ],
+  "excluded_dirs": [
+    ".claude/worktrees",
+    ".venv",
+    "__pycache__",
+    "client-v2/node_modules",
+    "client/node_modules",
+    "dist",
+    "docs/_build",
+    "graphify-out",
+    "infra",
+    "node_modules",
+    "observations",
+    "server/aerie/*/migrations",
+    "specs",
+    "static"
+  ],
+  "fingerprint_algorithm": "sha256 over newline-joined '<tracked path>:<sha256 of file bytes>' entries, paths sorted ascending, module scope = include prefixes minus exclude prefixes",
+  "modules": {
+    "client-v1": {
+      "include": [
+        "client/src/"
+      ],
+      "exclude": [],
+      "file_count": 228,
+      "fingerprint": "6551b6298ae4c2029d11f747bb6c8e1a6b0faf58c73bb0a9af2d43749d9c7806"
+    },
+    "client-v2": {
+      "include": [
+        "client-v2/src/"
+      ],
+      "exclude": [],
+      "file_count": 181,
+      "fingerprint": "fd30bf1390d8a5d03c3e578cdee817d933543d5a1d035e4e58bd5df7ee6dfb5d"
+    },
+    "shared-ts": {
+      "include": [
+        "shared/src/",
+        "packages/ui/src/"
+      ],
+      "exclude": [],
+      "file_count": 48,
+      "fingerprint": "2c7294206f8c67b0d116b246039908dfdff241ad1356ae0a9e32d15400339209"
+    },
+    "api-core": {
+      "include": [
+        "server/aerie/core/"
+      ],
+      "exclude": [],
+      "file_count": 142,
+      "fingerprint": "2a996c9a375b8bd5be9acb2a49bffa95d201c2bcf8d3dd38db5c516dbb523c06"
+    },
+    "api-surveys": {
+      "include": [
+        "server/aerie/surveys/"
+      ],
+      "exclude": [
+        "server/aerie/surveys/services/"
+      ],
+      "file_count": 483,
+      "fingerprint": "ff5b5929669429fc9ab2744b64459c079aaadca206a0d860416491520e3ec224"
+    },
+    "surveys-services": {
+      "include": [
+        "server/aerie/surveys/services/"
+      ],
+      "exclude": [],
+      "file_count": 21,
+      "fingerprint": "a493887b74fb5505c4d5745b936c9c2f0ff75a9bd7b67e5713b67dd91ebfdab6"
+    },
+    "api-medications": {
+      "include": [
+        "server/aerie/medications/"
+      ],
+      "exclude": [],
+      "file_count": 119,
+      "fingerprint": "cd4e090a88e779dd3584cd5571ab7284db9a386dbd90ee9a9ee20be57f626272"
+    },
+    "api-chat": {
+      "include": [
+        "server/aerie/chat/"
+      ],
+      "exclude": [],
+      "file_count": 16,
+      "fingerprint": "af8f20090f982c688879fc9d699dc174f005bbe12fc24f714a15a70dc19fa87f"
+    },
+    "ops-tooling": {
+      "include": [
+        "server/aerie/ops/",
+        "server/aerie/seeds/"
+      ],
+      "exclude": [],
+      "file_count": 82,
+      "fingerprint": "2abeeb736aad2095f22847c4ffb22e33291e70298fb6497698da05a9154041e8"
+    },
+    "platform": {
+      "include": [
+        "server/aerie/common/",
+        "server/aerie/utils/",
+        "server/aerie/db/",
+        "server/aerie/settings/",
+        "server/aerie/urls.py",
+        "server/aerie/routing.py",
+        "server/aerie/asgi.py",
+        "server/aerie/conftest.py"
+      ],
+      "exclude": [
+        "server/aerie/common/background_tasks.py"
+      ],
+      "file_count": 56,
+      "fingerprint": "e992bca6cedbd6017fba9c06ddf1a165324ccf0a6bc1a7c227c33a0eac99a96f"
+    },
+    "task-queue": {
+      "include": [
+        "server/aerie/common/background_tasks.py"
+      ],
+      "exclude": [],
+      "file_count": 1,
+      "fingerprint": "f4698e81b5e4a97686115e0c4b762c4a055b17c07a1df70c3683302affc7c2f7"
+    }
+  }
+}

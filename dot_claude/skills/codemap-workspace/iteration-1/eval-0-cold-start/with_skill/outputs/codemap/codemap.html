@@ -1,0 +1,1501 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>scrumlr.io code map</title>
+<style>
+:root {
+  --bg:#0d1117; --panel:#161b22; --line:#2b3440; --fg:#e6edf3; --muted:#8b98a9;
+  --accent:#5eb0ef; --dim:#3a4553;
+}
+* { box-sizing:border-box; }
+html,body { margin:0; height:100%; background:var(--bg); color:var(--fg);
+  font:14px/1.5 ui-sans-serif,-apple-system,"Segoe UI",Roboto,sans-serif; }
+header { padding:10px 16px; border-bottom:1px solid var(--line); background:var(--panel);
+  display:flex; flex-wrap:wrap; gap:12px 20px; align-items:baseline; }
+header h1 { font-size:16px; margin:0; letter-spacing:.2px; }
+header .meta { color:var(--muted); font-size:12px; font-family:ui-monospace,monospace; }
+.bar { display:flex; flex-wrap:wrap; gap:8px; align-items:center;
+  padding:8px 16px; border-bottom:1px solid var(--line); background:var(--panel); }
+input,select { background:var(--bg); color:var(--fg); border:1px solid var(--line);
+  border-radius:6px; padding:5px 8px; font:inherit; font-size:13px; }
+input:focus,select:focus { outline:2px solid var(--accent); outline-offset:1px; }
+button { background:var(--bg); color:var(--fg); border:1px solid var(--line);
+  border-radius:6px; padding:5px 10px; font:inherit; font-size:13px; cursor:pointer; }
+button:hover { border-color:var(--accent); }
+.chip { display:inline-flex; align-items:center; gap:5px; font-size:12px; color:var(--muted);
+  cursor:pointer; user-select:none; padding:2px 6px; border-radius:6px; border:1px solid transparent; }
+.chip.off { opacity:.35; }
+.chip:hover { border-color:var(--line); }
+.chip i { width:10px; height:10px; border-radius:3px; display:inline-block; }
+main { display:flex; height:calc(100vh - 104px); }
+#stage { flex:1; min-width:0; position:relative; }
+svg { width:100%; height:100%; display:block; cursor:grab; touch-action:none; }
+svg.grabbing { cursor:grabbing; }
+aside { width:340px; flex:none; border-left:1px solid var(--line); background:var(--panel);
+  overflow:auto; padding:14px 16px; }
+aside h2 { font-size:14px; margin:0 0 4px; }
+aside h3 { font-size:11px; letter-spacing:.09em; text-transform:uppercase;
+  color:var(--muted); margin:16px 0 6px; }
+aside p { margin:0 0 6px; color:var(--fg); }
+aside .path { font-family:ui-monospace,monospace; font-size:12px; color:var(--accent);
+  word-break:break-all; }
+aside ul { margin:0; padding-left:18px; }
+aside li { margin-bottom:4px; font-size:13px; }
+aside code { font-family:ui-monospace,monospace; font-size:12px; color:var(--muted);
+  word-break:break-all; }
+.unknown { color:#ffc95e; }
+.node rect { stroke-width:1.5px; }
+.node text { pointer-events:none; }
+.node .label { font-size:12.5px; font-weight:600; fill:#0d1117; }
+.node .sub { font-size:10.5px; fill:#0d1117; opacity:.72; }
+.node.dim { opacity:.14; }
+.node.sel rect { stroke:#fff; stroke-width:3px; }
+.edge { fill:none; stroke:var(--dim); stroke-width:1.4px; }
+.edge.dim { opacity:.06; }
+.edge.up { stroke:#ff8fa3; stroke-width:2.4px; }
+.edge.down { stroke:#7ee2b8; stroke-width:2.4px; }
+.edge.flow { stroke:#ffc95e; stroke-width:3px; }
+.edge.hop { stroke-dasharray:7 6; opacity:.75; }
+.edge.unknown { stroke-dasharray:5 4; }
+.hint { color:var(--muted); font-size:11.5px; }
+.tierlabel { fill:var(--muted); font-size:11px; letter-spacing:.09em; text-transform:uppercase; }
+@media (max-width:900px) { main { flex-direction:column; } aside { width:auto; height:42%; border-left:0; border-top:1px solid var(--line); } }
+</style>
+</head>
+<body>
+<header>
+  <h1>scrumlr.io &middot; code map</h1>
+  <span class="meta">commit fbf673788a32</span>
+  <span class="meta">generated 2026-09-24T12:53:33+00:00</span>
+  <span class="meta">20 nodes &middot; 35 edges &middot; 5 flows</span>
+</header>
+<div class="bar">
+  <input id="q" type="search" placeholder="Search nodes, paths, symbols&hellip;" size="30">
+  <select id="flow"><option value="">All flows</option></select>
+  <span id="legend"><span class="chip"><i style="background:#5eb0ef"></i>client</span><span class="chip"><i style="background:#7ee2b8"></i>api</span><span class="chip"><i style="background:#c9a0ff"></i>service</span><span class="chip"><i style="background:#ffc95e"></i>queue</span><span class="chip"><i style="background:#ff8fa3"></i>datastore</span><span class="chip"><i style="background:#8c9bb5"></i>external</span></span>
+  <button id="zin">+</button><button id="zout">&minus;</button><button id="reset">Reset</button>
+  <span class="hint">In a selected flow, a dashed gold link is an ordering step with no single code edge behind it.</span>
+</div>
+<main>
+  <div id="stage"><svg id="svg"><g id="root"></g></svg></div>
+  <aside id="panel"></aside>
+</main>
+
+<script type="application/json" id="codemap">
+{
+  "generated_at": "2026-09-24T12:53:33+00:00",
+  "generated_from_commit": "fbf673788a329ae62a1f4f1dfd4b2df73e13dd19",
+  "scope": [
+    "src/",
+    "server/src/",
+    "docs/",
+    "cypress/",
+    "deployment/",
+    "k8s/",
+    ".github/",
+    "Dockerfile",
+    "nginx.conf"
+  ],
+  "nodes": [
+    {
+      "id": "web-ui",
+      "path": "src/components",
+      "role": "client",
+      "title": "React UI (components + routes)",
+      "summary": "Every screen and widget: the board canvas, columns, notes, voting and timer dialogs, settings, login screens. Routes wire them to URLs; components read state with useAppSelector and mutate it by dispatching actions.",
+      "entrypoints": [
+        {
+          "path": "src/routes/Router.tsx",
+          "symbol": "BrowserRouter"
+        },
+        {
+          "path": "src/routes/Board/BoardGuard.tsx",
+          "symbol": "const BoardGuard"
+        }
+      ],
+      "constraints": [
+        "Most components dispatch an action and let store middleware do the I/O, but four call the API directly: SettingsDialog/Feedback, Timer, NewBoard and ExportBoard/PrintView.",
+        "LoginProviders renders Google and Microsoft buttons only, even though the server supports five providers."
+      ],
+      "evidence": {
+        "path": "src/components/Note/Note.tsx",
+        "symbol": "import {useAppSelector} from \"store\""
+      },
+      "tests": [
+        "src/components/AccessPolicySelection/__tests__/AccessPolicySelection.test.tsx",
+        "src/components/Avatar/__tests__/Avatar.test.tsx",
+        "src/components/Avatar/__tests__/__snapshots__/Avatar.test.tsx.snap",
+        "src/components/Board/__tests__/Board.test.tsx",
+        "src/components/BoardHeader/HeaderMenu/__tests__/HeaderMenu.test.tsx",
+        "src/components/BoardHeader/HeaderMenu/__tests__/__snapshots__/HeaderMenu.test.tsx.snap",
+        "src/components/BoardHeader/__tests__/BoardHeader.test.tsx",
+        "src/components/BoardReactionMenu/__tests__/BoardReactionMenu.test.tsx",
+        "src/components/BoardReactionMenu/__tests__/__snapshots__/BoardReactionMenu.test.tsx.snap",
+        "src/components/BoardUsers/__tests__/BoardUsers.test.tsx",
+        "src/components/Column/__tests__/Column.test.tsx",
+        "src/components/Column/__tests__/__snapshots__/Column.test.tsx.snap"
+      ],
+      "tier": 0,
+      "x": 960.0,
+      "y": 90.0
+    },
+    {
+      "id": "web-store",
+      "path": "src/store",
+      "role": "client",
+      "title": "Redux store (actions + reducers)",
+      "summary": "Redux Toolkit store. One reducer per domain slice (board, columns, notes, reactions, participants, requests, votes, votings, auth, view, skinTone) combined in store/index.ts.",
+      "entrypoints": [
+        {
+          "path": "src/store/index.ts",
+          "symbol": "const rootReducer = combineReducers"
+        }
+      ],
+      "constraints": [
+        "A parseMiddleware wrapper stamps action.context (user, board, voting, serverTimeOffset) onto every action before the reducers see it.",
+        "Side effects run in the middleware's finally block, so the reducer has already applied the action when the API call is made."
+      ],
+      "evidence": {
+        "path": "src/store/index.ts",
+        "symbol": "const store = configureStore"
+      },
+      "tests": [],
+      "tier": 0,
+      "x": 240.0,
+      "y": 90.0
+    },
+    {
+      "id": "web-middleware",
+      "path": "src/store/middleware",
+      "role": "client",
+      "title": "Store middleware (side effects + websocket)",
+      "summary": "The only place in the frontend that performs I/O. Each pass*Middleware function matches on action.type and calls the API; board.tsx additionally owns the single board websocket and dispatches server events back into the store.",
+      "entrypoints": [
+        {
+          "path": "src/store/middleware/board.tsx",
+          "symbol": "export const passBoardMiddleware"
+        },
+        {
+          "path": "src/store/middleware/note.tsx",
+          "symbol": "export const passNoteMiddleware"
+        }
+      ],
+      "constraints": [
+        "One module-level `socket` variable holds the board connection; PermittedBoardAccess opens it, LeaveBoard closes it.",
+        "There are two websockets, not one: board.tsx holds the board socket and request.tsx holds a second socket for join-request updates.",
+        "Failed writes surface as a Toast with a retry button that re-dispatches the same action — there is no request queue."
+      ],
+      "evidence": {
+        "path": "src/store/middleware/board.tsx",
+        "symbol": "import Socket from \"sockette\""
+      },
+      "tests": [],
+      "tier": 0,
+      "x": 720.0,
+      "y": 90.0
+    },
+    {
+      "id": "web-api",
+      "path": "src/api",
+      "role": "client",
+      "title": "REST client modules",
+      "summary": "One module per resource, each a plain object of async fetch() calls against SERVER_HTTP_URL. api/index.ts spreads them all into a single flat `API` object.",
+      "entrypoints": [
+        {
+          "path": "src/api/index.ts",
+          "symbol": "export const API"
+        }
+      ],
+      "constraints": [
+        "Authenticated calls pass credentials: \"include\" — auth is the HttpOnly `jwt` cookie, never an Authorization header. The public /info call in info.ts omits it.",
+        "Non-2xx responses are turned into thrown Errors here, not returned as values."
+      ],
+      "evidence": {
+        "path": "src/api/note.ts",
+        "symbol": "export const NoteAPI"
+      },
+      "tests": [],
+      "tier": 0,
+      "x": 480.0,
+      "y": 90.0
+    },
+    {
+      "id": "web-platform",
+      "path": "src/utils",
+      "role": "client",
+      "title": "Frontend platform (entry, config, types, i18n, utils)",
+      "summary": "index.tsx mounts the app; config.ts resolves the server and websocket URLs; types/ holds the shared DTOs including the websocket event union; i18n/ holds the en and de translation bundles.",
+      "entrypoints": [
+        {
+          "path": "src/index.tsx",
+          "symbol": "createRoot"
+        },
+        {
+          "path": "src/config.ts",
+          "symbol": "export const SERVER_HTTP_URL"
+        }
+      ],
+      "constraints": [
+        "Runtime config comes from cookies first (scrumlr__server-url, scrumlr__websocket-url), then REACT_APP_* env vars, then window.location — so one built image serves every environment.",
+        "types/websocket.ts is the hand-maintained mirror of the Go BoardEventType constants; adding a server event means editing it too."
+      ],
+      "evidence": {
+        "path": "src/config.ts",
+        "symbol": "SERVER_WEBSOCKET_URL"
+      },
+      "tests": [
+        "src/__tests__/locales.test.ts",
+        "src/utils/__tests__/images.test.ts",
+        "src/utils/__tests__/timer.test.ts",
+        "src/utils/__tests__/toast.test.tsx",
+        "src/utils/test/export.test.ts"
+      ],
+      "tier": 0,
+      "x": 1200.0,
+      "y": 90.0
+    },
+    {
+      "id": "server-bootstrap",
+      "path": "server/src/main.go",
+      "role": "service",
+      "title": "Server bootstrap (main.go)",
+      "summary": "The composition root. Parses CLI flags / env / TOML with urfave/cli, migrates the database, picks Redis or NATS for the broker, builds every service and hands them to api.New().",
+      "entrypoints": [
+        {
+          "path": "server/src/main.go",
+          "symbol": "func main()"
+        },
+        {
+          "path": "server/src/main.go",
+          "symbol": "func run(c *cli.Context) error"
+        }
+      ],
+      "constraints": [
+        "Wiring is manual constructor injection — there is no DI container, so a new service means editing main.go and api.New().",
+        "The process refuses to start without a private key unless the `insecure` flag is set.",
+        "If redis-address is set it wins over the NATS URL; otherwise NATS is used."
+      ],
+      "evidence": {
+        "path": "server/src/main.go",
+        "symbol": "migrations.MigrateDatabase"
+      },
+      "tests": [],
+      "tier": 2,
+      "x": 636.0,
+      "y": 510.0
+    },
+    {
+      "id": "api-http",
+      "path": "server/src/api",
+      "role": "api",
+      "title": "HTTP + websocket API (chi)",
+      "summary": "chi router with a public group (/info, /health, /feedback, /login/*) and a JWT-protected group (/boards, /boards/{id}/**, /user). Also upgrades and serves the per-board websocket and the join-request websocket.",
+      "entrypoints": [
+        {
+          "path": "server/src/api/router.go",
+          "symbol": "func (s *Server) protectedRoutes"
+        },
+        {
+          "path": "server/src/api/router.go",
+          "symbol": "func (s *Server) publicRoutes"
+        },
+        {
+          "path": "server/src/api/boards_listen_on_board.go",
+          "symbol": "func (s *Server) openBoardSocket"
+        }
+      ],
+      "constraints": [
+        "Authorization is middleware, not handler code: BoardParticipantContext / BoardModeratorContext / BoardEditableContext / BoardCandidateContext decide who may call what.",
+        "POST /boards/{id}/participants is rate limited to 3 requests per 5 seconds per IP.",
+        "Board subscriptions live in in-process maps on the Server struct, so a horizontally scaled deployment relies on the broker, not on sticky state."
+      ],
+      "evidence": {
+        "path": "server/src/api/router.go",
+        "symbol": "func New("
+      },
+      "tests": [],
+      "tier": 1,
+      "x": 840.0,
+      "y": 300.0
+    },
+    {
+      "id": "server-auth",
+      "path": "server/src/auth",
+      "role": "service",
+      "title": "Auth (JWT + OAuth providers)",
+      "summary": "Signs and verifies ES512 JWTs, and registers the goth OAuth providers that were configured at startup. Also exposes AuthContext, which puts the caller's user id into the request context.",
+      "entrypoints": [
+        {
+          "path": "server/src/auth/auth.go",
+          "symbol": "func NewAuthConfiguration"
+        },
+        {
+          "path": "server/src/auth/auth_context.go",
+          "symbol": "func AuthContext"
+        }
+      ],
+      "constraints": [
+        "A provider is only registered when its client id, secret and the auth-callback-host are all set — an unset provider simply does not appear.",
+        "JWTs are ES512 (ECDSA); the `unsafe-key` flag exists to rotate off an old key by verifying with both.",
+        "devkeys/ holds an embedded keypair used only under the `insecure` flag.",
+        "The two login paths issue different cookie lifetimes: anonymous gets MaxAge math.MaxInt32, the OAuth callback gets a three-week expiry."
+      ],
+      "evidence": {
+        "path": "server/src/auth/auth.go",
+        "symbol": "func (a *AuthConfiguration) initializeProviders()"
+      },
+      "tests": [],
+      "tier": 2,
+      "x": 1044.0,
+      "y": 510.0
+    },
+    {
+      "id": "server-services",
+      "path": "server/src/services",
+      "role": "service",
+      "title": "Domain services",
+      "summary": "Business logic per domain: boards (incl. columns, timer, export), notes, reactions, board_reactions, votings, users, feedback, health. services.go declares the interfaces the API depends on.",
+      "entrypoints": [
+        {
+          "path": "server/src/services/services.go",
+          "symbol": "type Boards interface"
+        },
+        {
+          "path": "server/src/services/notes/notes.go",
+          "symbol": "func NewNoteService"
+        }
+      ],
+      "constraints": [
+        "Mutating methods write to the database and then broadcast the new state on the board channel — the HTTP response is not how other clients learn about a change. The broadcast is not always in the obvious file: vote changes are broadcast from notes.go, and votings/votes.go broadcasts nothing itself.",
+        "Services depend on narrow local DB interfaces (e.g. notes.DB), not on *database.Database, which is what makes them unit-testable.",
+        "Internal errors are mapped to common.InternalServerError before leaving the service; raw driver errors are logged, not returned."
+      ],
+      "evidence": {
+        "path": "server/src/services/notes/notes.go",
+        "symbol": "s.realtime.BroadcastToBoard"
+      },
+      "tests": [],
+      "tier": 2,
+      "x": 24.0,
+      "y": 510.0
+    },
+    {
+      "id": "server-data",
+      "path": "server/src/database",
+      "role": "service",
+      "title": "Data access + migrations (bun)",
+      "summary": "bun ORM over PostgreSQL. One file per table (boards, columns, notes, votes, votings, reactions, sessions, session requests, users) plus the embedded SQL migrations run at startup.",
+      "entrypoints": [
+        {
+          "path": "server/src/database/database.go",
+          "symbol": "func New(db *sql.DB, verbose bool)"
+        },
+        {
+          "path": "server/src/database/migrations/migrations.go",
+          "symbol": "MigrateDatabase"
+        }
+      ],
+      "constraints": [
+        "Connection pool is sized 4 * GOMAXPROCS for both max-open and max-idle.",
+        "Migrations are numbered up/down SQL pairs under migrations/sql and are applied by the server on boot, not by a separate job.",
+        "database.Get() loads a whole board (board, requests, sessions, columns, notes, reactions, votings, votes) in one call — that is what the websocket INIT event is built from."
+      ],
+      "evidence": {
+        "path": "server/src/database/database.go",
+        "symbol": "pgdialect.New()"
+      },
+      "tests": [],
+      "tier": 2,
+      "x": 840.0,
+      "y": 510.0
+    },
+    {
+      "id": "server-realtime",
+      "path": "server/src/realtime",
+      "role": "queue",
+      "title": "Realtime broker abstraction",
+      "summary": "One Client interface with two implementations, NATS and Redis pub/sub. Broker.BroadcastToBoard publishes a BoardEvent; GetBoardChannel subscribes and returns a Go channel the websocket handler drains.",
+      "entrypoints": [
+        {
+          "path": "server/src/realtime/broker.go",
+          "symbol": "type Client interface"
+        },
+        {
+          "path": "server/src/realtime/boards.go",
+          "symbol": "func (b *Broker) BroadcastToBoard"
+        }
+      ],
+      "constraints": [
+        "BoardEventType is the contract with the frontend; the browser's types/websocket.ts must be updated in lockstep.",
+        "Subjects are derived, not configured — boardsSubject(boardID) builds the channel name from the board UUID.",
+        "Neither backend persists events: a client that is disconnected during a broadcast recovers only by reconnecting and reading the INIT snapshot."
+      ],
+      "evidence": {
+        "path": "server/src/realtime/boards.go",
+        "symbol": "func boardsSubject"
+      },
+      "tests": [],
+      "tier": 2,
+      "x": 228.0,
+      "y": 510.0
+    },
+    {
+      "id": "server-common",
+      "path": "server/src/common",
+      "role": "service",
+      "title": "Server platform (dto, errors, logging, context keys)",
+      "summary": "Shared plumbing: the dto package that defines every JSON payload, the filter types, HTTP error helpers, cookie sealing, the zap logger and the typed context-key identifiers.",
+      "entrypoints": [
+        {
+          "path": "server/src/common/error.go",
+          "symbol": "func Throw"
+        },
+        {
+          "path": "server/src/identifiers/identifiers.go",
+          "symbol": "BoardIdentifier"
+        }
+      ],
+      "constraints": [
+        "Context values are read through the identifiers constants, never through raw strings.",
+        "common.SealCookie sets HttpOnly always, adds Secure + SameSite=Strict only when the request protocol is https, and pins Domain to the top-level host — so local http and deployed https share one code path."
+      ],
+      "evidence": {
+        "path": "server/src/common/http.go",
+        "symbol": "func SealCookie"
+      },
+      "tests": [],
+      "tier": 2,
+      "x": 432.0,
+      "y": 510.0
+    },
+    {
+      "id": "postgres",
+      "path": "server/src/database/migrations",
+      "role": "datastore",
+      "title": "PostgreSQL",
+      "summary": "System of record for boards, columns, notes, reactions, votes, votings, sessions and users. Schema lives in 28 numbered up/down SQL migration files.",
+      "entrypoints": [
+        {
+          "path": "server/src/database/migrations/sql/1_initial_schema.up.sql",
+          "symbol": "create table board_sessions"
+        }
+      ],
+      "constraints": [
+        "The connection URL is a single env var, SCRUMLR_SERVER_DATABASE_URL; there is no read replica split."
+      ],
+      "evidence": {
+        "path": "deployment/docker/docker-compose.yml",
+        "symbol": "SCRUMLR_SERVER_DATABASE_URL"
+      },
+      "tests": [],
+      "tier": 3,
+      "x": 672.0,
+      "y": 720.0
+    },
+    {
+      "id": "nats",
+      "path": "server/src/realtime/nats.go",
+      "role": "queue",
+      "title": "NATS (default broker)",
+      "summary": "Default pub/sub transport for board events. Used unless a Redis address is configured.",
+      "entrypoints": [
+        {
+          "path": "server/src/realtime/nats.go",
+          "symbol": "func NewNats"
+        }
+      ],
+      "constraints": [
+        "Core NATS, not JetStream — messages are fire-and-forget with no replay."
+      ],
+      "evidence": {
+        "path": "server/src/main.go",
+        "symbol": "SCRUMLR_SERVER_NATS_URL"
+      },
+      "tests": [],
+      "tier": 2,
+      "x": 1452.0,
+      "y": 510.0
+    },
+    {
+      "id": "redis",
+      "path": "server/src/realtime/redis.go",
+      "role": "queue",
+      "title": "Redis pub/sub (alternative broker)",
+      "summary": "Drop-in replacement for NATS. Selected when SCRUMLR_SERVER_REDIS_HOST is set.",
+      "entrypoints": [
+        {
+          "path": "server/src/realtime/redis.go",
+          "symbol": "func NewRedis"
+        }
+      ],
+      "constraints": [
+        "Both transports carry JSON: this path marshals by hand in encodeEvent, the NATS path uses nats.NewEncodedConn(nc, nats.JSON_ENCODER)."
+      ],
+      "evidence": {
+        "path": "server/src/main.go",
+        "symbol": "SCRUMLR_SERVER_REDIS_HOST"
+      },
+      "tests": [],
+      "tier": 2,
+      "x": 1656.0,
+      "y": 510.0
+    },
+    {
+      "id": "ext-oauth",
+      "path": "server/src/auth/auth.go",
+      "role": "external",
+      "title": "OAuth providers (Google, GitHub, Microsoft, Azure AD, Apple)",
+      "summary": "Identity providers reached through markbates/goth. Each is optional and only registered when its credentials are configured.",
+      "entrypoints": [
+        {
+          "path": "server/src/api/login.go",
+          "symbol": "func (s *Server) beginAuthProviderVerification"
+        }
+      ],
+      "constraints": [
+        "Callback URLs are built as {auth-callback-host}{base-path}/login/{provider}/callback — the provider console must match exactly."
+      ],
+      "evidence": {
+        "path": "server/src/auth/auth.go",
+        "symbol": "\"github.com/markbates/goth/providers/google\""
+      },
+      "tests": [],
+      "tier": 3,
+      "x": 1344.0,
+      "y": 720.0
+    },
+    {
+      "id": "ext-feedback-webhook",
+      "path": "server/src/services/feedback/feedback.go",
+      "role": "external",
+      "title": "Feedback webhook (Slack-shaped)",
+      "summary": "POST target for the in-app feedback form. The payload is a hand-built Slack blocks JSON body with German copy.",
+      "entrypoints": [
+        {
+          "path": "server/src/api/feedback.go",
+          "symbol": "func (s *Server) createFeedback"
+        }
+      ],
+      "constraints": [
+        "Unset SCRUMLR_FEEDBACK_WEBHOOK_URL disables the feature via Enabled(); it is not an error state."
+      ],
+      "evidence": {
+        "path": "server/src/services/feedback/feedback.go",
+        "symbol": "http.Post(s.webhookUrl"
+      },
+      "tests": [],
+      "tier": 3,
+      "x": 336.0,
+      "y": 720.0
+    },
+    {
+      "id": "ext-plausible",
+      "path": "src/index.tsx",
+      "role": "external",
+      "title": "Plausible analytics",
+      "summary": "Optional, self-hostable pageview tracking. Only initialised when both the analytics domain and host cookies are present.",
+      "entrypoints": [
+        {
+          "path": "src/index.tsx",
+          "symbol": "Plausible({"
+        }
+      ],
+      "constraints": [
+        "Board ids are SHA-256 hashed before the pageview URL is sent, so board identifiers never reach the analytics host."
+      ],
+      "evidence": {
+        "path": "src/config.ts",
+        "symbol": "ANALYTICS_DATA_DOMAIN"
+      },
+      "tests": [],
+      "tier": 3,
+      "x": 1008.0,
+      "y": 720.0
+    },
+    {
+      "id": "ops-deploy",
+      "path": "deployment",
+      "role": "service",
+      "title": "Build, packaging and deployment",
+      "summary": "Multi-stage Dockerfiles for frontend and server, the nginx image that serves the built SPA, docker-compose for local self-hosting, Kubernetes manifests and Terraform for the SKE cluster, and the GitHub Actions workflows.",
+      "entrypoints": [
+        {
+          "path": "deployment/docker/docker-compose.yml",
+          "symbol": "scrumlr-backend"
+        },
+        {
+          "path": ".github/workflows/continuous-integration.yml",
+          "symbol": "jobs:"
+        }
+      ],
+      "constraints": [
+        "nginx injects runtime config into the SPA as Set-Cookie headers on /index.html; that is why one frontend image works across environments.",
+        "index.html is served with no-store while JS/JSON get 3 days and media 14 days — a stale index.html would pin clients to an old bundle."
+      ],
+      "evidence": {
+        "path": "nginx.conf",
+        "symbol": "scrumlr__server-url="
+      },
+      "tests": [],
+      "tier": 2,
+      "x": 1248.0,
+      "y": 510.0
+    },
+    {
+      "id": "docs-site",
+      "path": "docs",
+      "role": "client",
+      "title": "Documentation site (Astro Starlight)",
+      "summary": "Separate yarn workspace holding the getting-started, development and self-hosting docs. Published to GitHub Pages.",
+      "entrypoints": [
+        {
+          "path": "docs/astro.config.mjs",
+          "symbol": "starlight({"
+        }
+      ],
+      "constraints": [
+        "It has its own package.json and yarn.lock — installing the root dependencies does not install the docs ones."
+      ],
+      "evidence": {
+        "path": "docs/package.json",
+        "symbol": "\"@astrojs/starlight\""
+      },
+      "tests": [],
+      "tier": 0,
+      "x": 1440.0,
+      "y": 90.0
+    }
+  ],
+  "edges": [
+    {
+      "from": "web-ui",
+      "to": "web-store",
+      "type": "imports",
+      "evidence": {
+        "path": "src/components/Note/Note.tsx",
+        "symbol": "import {Actions} from \"store/action\""
+      }
+    },
+    {
+      "from": "web-ui",
+      "to": "web-platform",
+      "type": "imports",
+      "evidence": {
+        "path": "src/components/Board/Board.tsx",
+        "symbol": "from \"utils/hooks/useStripeOffset\""
+      }
+    },
+    {
+      "from": "web-platform",
+      "to": "web-ui",
+      "type": "imports",
+      "evidence": {
+        "path": "src/index.tsx",
+        "symbol": "import Router from \"routes/Router\""
+      }
+    },
+    {
+      "from": "web-platform",
+      "to": "web-store",
+      "type": "imports",
+      "evidence": {
+        "path": "src/index.tsx",
+        "symbol": "import store from \"store\""
+      }
+    },
+    {
+      "from": "web-store",
+      "to": "web-middleware",
+      "type": "imports",
+      "evidence": {
+        "path": "src/store/index.ts",
+        "symbol": "passNoteMiddleware(stateAPI, dispatch, action)"
+      }
+    },
+    {
+      "from": "web-middleware",
+      "to": "web-api",
+      "type": "imports",
+      "evidence": {
+        "path": "src/store/middleware/note.tsx",
+        "symbol": "import {API} from \"api\""
+      }
+    },
+    {
+      "from": "web-middleware",
+      "to": "web-store",
+      "type": "writes",
+      "evidence": {
+        "path": "src/store/middleware/board.tsx",
+        "symbol": "store.dispatch(Actions.initializeBoard("
+      },
+      "note": "Server websocket events are dispatched straight back into the store."
+    },
+    {
+      "from": "web-api",
+      "to": "web-platform",
+      "type": "imports",
+      "evidence": {
+        "path": "src/api/request.ts",
+        "symbol": "import {SERVER_HTTP_URL} from \"../config\""
+      }
+    },
+    {
+      "from": "web-ui",
+      "to": "web-api",
+      "type": "calls",
+      "evidence": {
+        "path": "src/components/SettingsDialog/Feedback/Feedback.tsx",
+        "symbol": "import {FeedbackAPI} from \"api/feedback\""
+      },
+      "note": "Four components bypass the middleware and call the API directly."
+    },
+    {
+      "from": "web-platform",
+      "to": "web-api",
+      "type": "calls",
+      "evidence": {
+        "path": "src/utils/auth.ts",
+        "symbol": "API.signInAnonymously(displayName)"
+      }
+    },
+    {
+      "from": "web-api",
+      "to": "api-http",
+      "type": "calls",
+      "evidence": {
+        "path": "src/api/note.ts",
+        "symbol": "${SERVER_HTTP_URL}/boards/${boardId}/notes"
+      }
+    },
+    {
+      "from": "web-middleware",
+      "to": "api-http",
+      "type": "subscribes",
+      "evidence": {
+        "path": "src/store/middleware/board.tsx",
+        "symbol": "new Socket(`${SERVER_WEBSOCKET_URL}/boards/"
+      }
+    },
+    {
+      "from": "web-platform",
+      "to": "ext-plausible",
+      "type": "calls",
+      "evidence": {
+        "path": "src/index.tsx",
+        "symbol": "trackPageview"
+      }
+    },
+    {
+      "from": "server-bootstrap",
+      "to": "api-http",
+      "type": "calls",
+      "evidence": {
+        "path": "server/src/main.go",
+        "symbol": "api.New("
+      }
+    },
+    {
+      "from": "server-bootstrap",
+      "to": "server-services",
+      "type": "calls",
+      "evidence": {
+        "path": "server/src/main.go",
+        "symbol": "boards.NewBoardService(dbConnection, rt)"
+      }
+    },
+    {
+      "from": "server-bootstrap",
+      "to": "server-auth",
+      "type": "calls",
+      "evidence": {
+        "path": "server/src/main.go",
+        "symbol": "auth.NewAuthConfiguration("
+      }
+    },
+    {
+      "from": "server-bootstrap",
+      "to": "server-data",
+      "type": "calls",
+      "evidence": {
+        "path": "server/src/main.go",
+        "symbol": "database.New(db, c.Bool(\"verbose\"))"
+      }
+    },
+    {
+      "from": "server-bootstrap",
+      "to": "server-realtime",
+      "type": "calls",
+      "evidence": {
+        "path": "server/src/main.go",
+        "symbol": "realtime.NewNats("
+      }
+    },
+    {
+      "from": "server-bootstrap",
+      "to": "postgres",
+      "type": "writes",
+      "evidence": {
+        "path": "server/src/main.go",
+        "symbol": "migrations.MigrateDatabase("
+      },
+      "note": "Schema migrations are applied in-process at boot, before the HTTP server starts."
+    },
+    {
+      "from": "api-http",
+      "to": "server-services",
+      "type": "calls",
+      "evidence": {
+        "path": "server/src/api/router.go",
+        "symbol": "boards services.Boards,"
+      }
+    },
+    {
+      "from": "api-http",
+      "to": "server-auth",
+      "type": "calls",
+      "evidence": {
+        "path": "server/src/api/router.go",
+        "symbol": "r.Use(s.auth.Verifier())"
+      }
+    },
+    {
+      "from": "api-http",
+      "to": "server-realtime",
+      "type": "subscribes",
+      "evidence": {
+        "path": "server/src/api/boards_listen_on_board.go",
+        "symbol": "s.realtime.GetBoardChannel(boardID)"
+      }
+    },
+    {
+      "from": "api-http",
+      "to": "server-common",
+      "type": "imports",
+      "evidence": {
+        "path": "server/src/api/login.go",
+        "symbol": "\"scrumlr.io/server/common\""
+      }
+    },
+    {
+      "from": "server-services",
+      "to": "server-data",
+      "type": "calls",
+      "evidence": {
+        "path": "server/src/services/notes/notes.go",
+        "symbol": "database.NoteInsert{"
+      }
+    },
+    {
+      "from": "server-services",
+      "to": "server-realtime",
+      "type": "publishes",
+      "evidence": {
+        "path": "server/src/services/notes/notes.go",
+        "symbol": "s.realtime.BroadcastToBoard("
+      }
+    },
+    {
+      "from": "server-services",
+      "to": "server-common",
+      "type": "imports",
+      "evidence": {
+        "path": "server/src/services/notes/notes.go",
+        "symbol": "common.InternalServerError"
+      }
+    },
+    {
+      "from": "server-services",
+      "to": "ext-feedback-webhook",
+      "type": "calls",
+      "evidence": {
+        "path": "server/src/services/feedback/feedback.go",
+        "symbol": "http.Post(s.webhookUrl"
+      }
+    },
+    {
+      "from": "server-auth",
+      "to": "ext-oauth",
+      "type": "calls",
+      "evidence": {
+        "path": "server/src/auth/auth.go",
+        "symbol": "gothic"
+      }
+    },
+    {
+      "from": "server-auth",
+      "to": "server-data",
+      "type": "calls",
+      "evidence": {
+        "path": "server/src/auth/auth.go",
+        "symbol": "\"scrumlr.io/server/database\""
+      }
+    },
+    {
+      "from": "server-data",
+      "to": "postgres",
+      "type": "writes",
+      "evidence": {
+        "path": "server/src/database/database.go",
+        "symbol": "bun.NewDB(db, pgdialect.New())"
+      }
+    },
+    {
+      "from": "server-realtime",
+      "to": "nats",
+      "type": "publishes",
+      "evidence": {
+        "path": "server/src/realtime/nats.go",
+        "symbol": "n.con.Publish(subject, event)"
+      }
+    },
+    {
+      "from": "server-realtime",
+      "to": "redis",
+      "type": "publishes",
+      "evidence": {
+        "path": "server/src/realtime/redis.go",
+        "symbol": "redis.NewClient("
+      }
+    },
+    {
+      "from": "ops-deploy",
+      "to": "web-platform",
+      "type": "writes",
+      "evidence": {
+        "path": "nginx.conf",
+        "symbol": "scrumlr__websocket-url="
+      },
+      "note": "nginx sets the runtime-config cookies that src/config.ts reads on load."
+    },
+    {
+      "from": "ops-deploy",
+      "to": "server-bootstrap",
+      "type": "writes",
+      "evidence": {
+        "path": "deployment/docker/docker-compose.yml",
+        "symbol": "SCRUMLR_SERVER_PORT"
+      },
+      "note": "Every server flag is supplied as a SCRUMLR_* environment variable by the deployment."
+    },
+    {
+      "from": "ops-deploy",
+      "to": "docs-site",
+      "type": "reads",
+      "evidence": {
+        "path": ".github/workflows/deploy_docs.yml",
+        "symbol": "withastro/action@v2"
+      }
+    }
+  ],
+  "flows": [
+    {
+      "id": "flow-anonymous-join",
+      "name": "Anonymous user opens a board",
+      "trigger": "Someone opens /board/{id} without an existing session.",
+      "steps": [
+        {
+          "node": "web-ui",
+          "detail": "RequireAuthentication sends the visitor to LoginBoard; handleLogin calls Auth.signInAnonymously(displayName) and then sets window.location.pathname back to the board."
+        },
+        {
+          "node": "web-platform",
+          "detail": "utils/auth.ts calls API.signInAnonymously and dispatches Actions.signIn on success."
+        },
+        {
+          "node": "web-api",
+          "detail": "POST /login/anonymous."
+        },
+        {
+          "node": "api-http",
+          "detail": "signInAnonymously creates the user, signs an ES512 JWT and sets it as an HttpOnly `jwt` cookie with MaxAge math.MaxInt32."
+        },
+        {
+          "node": "server-auth",
+          "detail": "AuthConfiguration.Sign issues the token; the protected routes later verify it via jwtauth."
+        },
+        {
+          "node": "web-ui",
+          "detail": "Back on /board/{id}, BoardGuard dispatches Actions.joinBoard(boardId)."
+        },
+        {
+          "node": "web-middleware",
+          "detail": "passRequestMiddleware calls API.joinBoard and branches on the returned status: ACCEPTED, PENDING, PASSPHRASE_REQUIRED, WRONG_PASSPHRASE, REJECTED, BANNED or TOO_MANY_JOIN_REQUESTS."
+        },
+        {
+          "node": "api-http",
+          "detail": "POST /boards/{id}/participants — rate limited to 3 requests per 5 seconds per IP."
+        },
+        {
+          "node": "server-services",
+          "detail": "BoardSessions.Create creates the session, or a pending board_session_request."
+        },
+        {
+          "node": "postgres",
+          "detail": "User and session rows committed."
+        }
+      ],
+      "outcome": "On ACCEPTED the store dispatches permittedBoardAccess, which is what opens the board websocket. PENDING instead opens the join-request socket in request.tsx and waits for a moderator."
+    },
+    {
+      "id": "flow-board-socket",
+      "name": "Board websocket opens and receives its INIT snapshot",
+      "trigger": "The store dispatches PermittedBoardAccess after the join succeeds.",
+      "steps": [
+        {
+          "node": "web-middleware",
+          "detail": "passBoardMiddleware opens `new Socket(${SERVER_WEBSOCKET_URL}/boards/{id})`."
+        },
+        {
+          "node": "api-http",
+          "detail": "openBoardSocket upgrades the connection and calls boards.FullBoard for the snapshot."
+        },
+        {
+          "node": "server-services",
+          "detail": "Boards.FullBoard assembles board, columns, notes, reactions, votings, votes, sessions and requests."
+        },
+        {
+          "node": "server-data",
+          "detail": "database.Get() loads the whole board in one pass."
+        },
+        {
+          "node": "postgres",
+          "detail": "Rows read."
+        },
+        {
+          "node": "api-http",
+          "detail": "Sends the INIT event, then subscribes to the board channel via GetBoardChannel."
+        },
+        {
+          "node": "server-realtime",
+          "detail": "SubscribeToBoardEvents binds the broker subject for this board id."
+        },
+        {
+          "node": "web-store",
+          "detail": "The INIT message is dispatched as Actions.initializeBoard and populates every slice."
+        }
+      ],
+      "outcome": "The client holds a full board snapshot and is subscribed to further board events."
+    },
+    {
+      "id": "flow-add-note",
+      "name": "Adding a note fans out to every participant",
+      "trigger": "A participant submits text in NoteInput.",
+      "steps": [
+        {
+          "node": "web-ui",
+          "detail": "NoteInput dispatches Actions.addNote(columnId, content)."
+        },
+        {
+          "node": "web-middleware",
+          "detail": "passNoteMiddleware calls API.addNote; a failure raises a Toast with a retry button."
+        },
+        {
+          "node": "web-api",
+          "detail": "POST /boards/{id}/notes with credentials included."
+        },
+        {
+          "node": "api-http",
+          "detail": "POST /boards/{id}/notes runs under BoardParticipantContext plus BoardEditableContext before createNote calls the service."
+        },
+        {
+          "node": "server-services",
+          "detail": "NoteService.Create inserts the note, then calls UpdatedNotes for the board."
+        },
+        {
+          "node": "server-data",
+          "detail": "CreateNote writes the row and re-reads the board's notes."
+        },
+        {
+          "node": "postgres",
+          "detail": "Note row committed."
+        },
+        {
+          "node": "server-realtime",
+          "detail": "BroadcastToBoard publishes a NOTES_UPDATED BoardEvent on the board subject."
+        },
+        {
+          "node": "nats",
+          "detail": "Default transport fans the event out to every subscribed server instance."
+        },
+        {
+          "node": "api-http",
+          "detail": "Each board subscription writes the event to its websocket clients."
+        },
+        {
+          "node": "web-store",
+          "detail": "passBoardMiddleware dispatches Actions.updatedNotes and every open board re-renders."
+        }
+      ],
+      "outcome": "All participants see the new note; the author's own view updates from the broadcast, not from the POST response."
+    },
+    {
+      "id": "flow-oauth-login",
+      "name": "OAuth sign-in with an external provider",
+      "trigger": "A visitor picks Google / GitHub / Microsoft / Azure AD / Apple on the login screen.",
+      "steps": [
+        {
+          "node": "web-ui",
+          "detail": "LoginProviders renders a button per enabled provider (Google and Microsoft only) and calls Auth.signInWithAuthProvider."
+        },
+        {
+          "node": "web-platform",
+          "detail": "utils/auth.ts sets window.location.href to ${SERVER_HTTP_URL}/login/{provider}?state={originURL}."
+        },
+        {
+          "node": "api-http",
+          "detail": "beginAuthProviderVerification hands off to gothic for the provider redirect."
+        },
+        {
+          "node": "server-auth",
+          "detail": "initializeProviders registered only the providers whose client id, secret and callback host were configured."
+        },
+        {
+          "node": "ext-oauth",
+          "detail": "The provider authenticates the user and redirects to {callback-host}{base-path}/login/{provider}/callback."
+        },
+        {
+          "node": "api-http",
+          "detail": "verifyAuthProviderCallback runs gothic.CompleteUserAuth, then switches on the provider to pick the right Create*User call."
+        },
+        {
+          "node": "server-services",
+          "detail": "users.CreateGoogleUser (or the sibling per provider) upserts the account."
+        },
+        {
+          "node": "postgres",
+          "detail": "User and account rows persisted."
+        }
+      ],
+      "outcome": "A three-week jwt cookie is set and the handler replies 303 to the state URL the client sent, or to the app root."
+    },
+    {
+      "id": "flow-feedback",
+      "name": "In-app feedback reaches the team webhook",
+      "trigger": "A user submits the feedback form in the settings dialog.",
+      "steps": [
+        {
+          "node": "web-ui",
+          "detail": "The SettingsDialog Feedback panel collects type, contact and text and calls FeedbackAPI.sendFeedback directly — this one does not go through the store."
+        },
+        {
+          "node": "web-api",
+          "detail": "POST /feedback — a public route, no JWT required."
+        },
+        {
+          "node": "api-http",
+          "detail": "createFeedback rejects an unknown feedback type, defaults empty contact/text to \"/\", and rejects an empty BUG_REPORT or FEATURE_REQUEST body."
+        },
+        {
+          "node": "server-services",
+          "detail": "FeedbackService.Create builds a Slack blocks JSON body and POSTs it."
+        },
+        {
+          "node": "ext-feedback-webhook",
+          "detail": "The configured webhook receives the message."
+        }
+      ],
+      "outcome": "Feedback lands in the team's channel. With SCRUMLR_FEEDBACK_WEBHOOK_URL unset, Enabled() reports false, GET /info returns feedbackEnabled: false and the Feedback panel renders nothing."
+    }
+  ]
+}
+</script>
+<script>
+const DATA = JSON.parse(document.getElementById('codemap').textContent);
+const COLORS = {"client": "#5eb0ef", "api": "#7ee2b8", "service": "#c9a0ff", "queue": "#ffc95e", "datastore": "#ff8fa3", "external": "#8c9bb5"};
+const TIER_NAMES = ['clients', 'api apps', 'services & queue', 'data & external'];
+const NW = 178, NH = 52;
+const svg = document.getElementById('svg'), root = document.getElementById('root');
+const panel = document.getElementById('panel');
+const byId = Object.fromEntries(DATA.nodes.map(n => [n.id, n]));
+const hidden = new Set();
+let selected = null, activeFlow = '';
+
+const ns = 'http://www.w3.org/2000/svg';
+const el = (t, a) => { const e = document.createElementNS(ns, t);
+  for (const k in a) e.setAttribute(k, a[k]); return e; };
+
+// tier bands
+DATA.nodes.forEach(n => { n.cx = n.x; n.cy = n.y; });
+TIER_NAMES.forEach((name, t) => {
+  const rows = DATA.nodes.filter(n => n.tier === t);
+  if (!rows.length) return;
+  const y = Math.min(...rows.map(n => n.cy)) - NH / 2 - 22;
+  const x = Math.min(...DATA.nodes.map(n => n.cx)) - NW / 2;
+  const lbl = el('text', { x: x, y: y, class: 'tierlabel' });
+  lbl.textContent = name; root.appendChild(lbl);
+});
+
+const edgeEls = DATA.edges.map((e, i) => {
+  const p = el('path', { class: 'edge' + (e.evidence === 'unknown' ? ' unknown' : '') });
+  p.dataset.i = i; root.appendChild(p); return p;
+});
+
+const nodeEls = DATA.nodes.map(n => {
+  const g = el('g', { class: 'node' });
+  g.dataset.id = n.id;
+  const r = el('rect', { x: -NW / 2, y: -NH / 2, width: NW, height: NH, rx: 9,
+    fill: COLORS[n.role], stroke: COLORS[n.role] });
+  const t1 = el('text', { class: 'label', 'text-anchor': 'middle', y: -4 });
+  t1.textContent = n.title.length > 26 ? n.title.slice(0, 25) + '\u2026' : n.title;
+  const t2 = el('text', { class: 'sub', 'text-anchor': 'middle', y: 13 });
+  t2.textContent = n.id;
+  g.append(r, t1, t2); root.appendChild(g); return g;
+});
+
+function place() {
+  DATA.nodes.forEach((n, i) => {
+    nodeEls[i].setAttribute('transform', `translate(${n.cx},${n.cy})`);
+    nodeEls[i].style.display = hidden.has(n.role) ? 'none' : '';
+  });
+  DATA.edges.forEach((e, i) => {
+    const a = byId[e.from], b = byId[e.to];
+    const mx = (a.cx + b.cx) / 2, my = (a.cy + b.cy) / 2 + (a.cy === b.cy ? -54 : 0);
+    edgeEls[i].setAttribute('d', `M${a.cx},${a.cy} Q${mx},${my} ${b.cx},${b.cy}`);
+    edgeEls[i].style.display =
+      (hidden.has(a.role) || hidden.has(b.role)) ? 'none' : '';
+  });
+}
+
+// A flow hop is an ordering of steps, not necessarily a single code edge. Hops that
+// match a graph edge light that edge; hops that do not get a dashed connector, so the
+// path reads end to end without the map claiming an edge the source does not have.
+function flowEdgeSet(flow) {
+  const s = new Set(), hops = [];
+  for (let i = 0; i < flow.steps.length - 1; i++) {
+    const a = flow.steps[i].node, b = flow.steps[i + 1].node;
+    if (a === b) continue;
+    let found = false;
+    DATA.edges.forEach((e, idx) => {
+      if ((e.from === a && e.to === b) || (e.from === b && e.to === a)) {
+        s.add(idx); found = true;
+      }
+    });
+    if (!found) hops.push([a, b]);
+  }
+  return { edges: s, hops };
+}
+
+const hopLayer = el('g', {});
+root.appendChild(hopLayer);
+
+function drawHops(hops) {
+  hopLayer.textContent = '';
+  hops.forEach(([a, b]) => {
+    const p = byId[a], q = byId[b];
+    const mx = (p.cx + q.cx) / 2, my = (p.cy + q.cy) / 2 + (p.cy === q.cy ? -54 : 0);
+    const path = el('path', { class: 'edge flow hop',
+      d: `M${p.cx},${p.cy} Q${mx},${my} ${q.cx},${q.cy}` });
+    hopLayer.appendChild(path);
+  });
+}
+
+function paint() {
+  const q = document.getElementById('q').value.trim().toLowerCase();
+  const flow = DATA.flows.find(f => f.id === activeFlow);
+  const flowNodes = flow ? new Set(flow.steps.map(s => s.node)) : null;
+  const path = flow ? flowEdgeSet(flow) : null;
+  const flowEdges = path ? path.edges : null;
+  drawHops(path ? path.hops : []);
+  const up = new Set(), down = new Set();
+  if (selected) DATA.edges.forEach((e, i) => {
+    if (e.to === selected) up.add(i);
+    if (e.from === selected) down.add(i);
+  });
+  const related = new Set(selected ? [selected] : []);
+  DATA.edges.forEach((e, i) => { if (up.has(i)) related.add(e.from);
+    if (down.has(i)) related.add(e.to); });
+
+  DATA.nodes.forEach((n, i) => {
+    let dim = false;
+    if (q) {
+      const hay = [n.id, n.title, n.path, n.summary, n.role,
+        ...(n.entrypoints || []).map(x => x.path + ' ' + x.symbol),
+        ...(n.tests || [])].join(' ').toLowerCase();
+      dim = !hay.includes(q);
+    }
+    if (flowNodes && !flowNodes.has(n.id)) dim = true;
+    if (selected && !related.has(n.id)) dim = true;
+    nodeEls[i].classList.toggle('dim', dim);
+    nodeEls[i].classList.toggle('sel', n.id === selected);
+  });
+
+  // A search keeps the edges whose BOTH ends matched, so a hit reads as a subgraph
+  // rather than a scatter of disconnected boxes.
+  const lit = new Set(DATA.nodes.filter((n, i) =>
+    !nodeEls[i].classList.contains('dim')).map(n => n.id));
+  DATA.edges.forEach((e, i) => {
+    const c = edgeEls[i].classList;
+    c.remove('up', 'down', 'flow', 'dim');
+    const joinsLit = lit.has(e.from) && lit.has(e.to);
+    if (flowEdges && flowEdges.has(i)) c.add('flow');
+    else if (up.has(i)) c.add('up');
+    else if (down.has(i)) c.add('down');
+    else if (q && !selected && !flowNodes && joinsLit) c.add('up');
+    else if (selected || flowNodes || q) c.add('dim');
+  });
+}
+
+const esc = s => String(s).replace(/[&<>]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]));
+const ev = e => e.evidence === 'unknown'
+  ? `<span class="unknown">unknown</span>${e.note ? ' &mdash; ' + esc(e.note) : ''}`
+  : `<code>${esc(e.evidence.path)}</code> &middot; <code>${esc(e.evidence.symbol)}</code>`;
+
+function showNode(id) {
+  const n = byId[id];
+  const up = DATA.edges.filter(e => e.to === id);
+  const down = DATA.edges.filter(e => e.from === id);
+  const flows = DATA.flows.filter(f => f.steps.some(s => s.node === id));
+  panel.innerHTML = `
+    <h2>${esc(n.title)}</h2>
+    <p class="path">${esc(n.path)}</p>
+    <p>${esc(n.summary)}</p>
+    <h3>evidence</h3><p><code>${esc(n.evidence.path)}</code> &middot; <code>${esc(n.evidence.symbol)}</code></p>
+    <h3>entrypoints</h3><ul>${n.entrypoints.map(e =>
+      `<li><code>${esc(e.path)}</code> &middot; <code>${esc(e.symbol)}</code></li>`).join('') || '<li>none</li>'}</ul>
+    <h3>upstream callers (${up.length})</h3><ul>${up.map(e =>
+      `<li><b>${esc(e.from)}</b> <i>${esc(e.type)}</i><br>${ev(e)}</li>`).join('') || '<li>none</li>'}</ul>
+    <h3>downstream dependencies (${down.length})</h3><ul>${down.map(e =>
+      `<li><b>${esc(e.to)}</b> <i>${esc(e.type)}</i><br>${ev(e)}</li>`).join('') || '<li>none</li>'}</ul>
+    <h3>tests (${n.tests.length})</h3><ul>${n.tests.map(t =>
+      `<li><code>${esc(t)}</code></li>`).join('') || '<li>none found in scope</li>'}</ul>
+    <h3>flows</h3><ul>${flows.map(f =>
+      `<li>${esc(f.name)}</li>`).join('') || '<li>none</li>'}</ul>
+    <h3>constraints</h3><ul>${n.constraints.map(c => `<li>${esc(c)}</li>`).join('')}</ul>`;
+}
+
+function showFlow(f) {
+  panel.innerHTML = `
+    <h2>${esc(f.name)}</h2>
+    <h3>trigger</h3><p>${esc(f.trigger)}</p>
+    <h3>steps</h3><ol>${f.steps.map(s =>
+      `<li><b>${esc(s.node)}</b><br>${esc(s.detail)}</li>`).join('')}</ol>
+    <h3>outcome</h3><p>${esc(f.outcome)}</p>`;
+}
+
+function showOverview() {
+  const unknown = DATA.edges.filter(e => e.evidence === 'unknown');
+  panel.innerHTML = `
+    <h2>Overview</h2>
+    <p>Click any module to highlight its upstream callers, downstream dependencies,
+       tests and flows. Pick a flow to trace a full path. Drag a module to reposition it;
+       drag the background to pan, scroll to zoom.</p>
+    <h3>scope</h3><ul>${DATA.scope.map(s => `<li><code>${esc(s)}</code></li>`).join('')}</ul>
+    <h3>flows</h3><ol>${DATA.flows.map(f => `<li>${esc(f.name)}</li>`).join('')}</ol>
+    <h3>unmapped relationships (${unknown.length})</h3>
+    <ul>${unknown.map(e =>
+      `<li><b>${esc(e.from)} &rarr; ${esc(e.to)}</b><br>${ev(e)}</li>`).join('') || '<li>none</li>'}</ul>`;
+}
+
+nodeEls.forEach((g, i) => {
+  g.addEventListener('click', ev2 => {
+    ev2.stopPropagation();
+    if (dragMoved) return;
+    const id = DATA.nodes[i].id;
+    selected = selected === id ? null : id;
+    selected ? showNode(selected) : showOverview();
+    paint();
+  });
+});
+
+// pan / zoom / drag
+let view = { x: 0, y: 0, k: 1 }, panning = null, dragging = null, dragMoved = false;
+const apply = () => root.setAttribute('transform',
+  `translate(${view.x},${view.y}) scale(${view.k})`);
+
+svg.addEventListener('pointerdown', e => {
+  const g = e.target.closest('.node');
+  dragMoved = false;
+  if (g) {
+    dragging = { node: byId[g.dataset.id], x: e.clientX, y: e.clientY };
+  } else {
+    panning = { x: e.clientX - view.x, y: e.clientY - view.y };
+    svg.classList.add('grabbing');
+  }
+  // Capture can throw if the pointer was already released elsewhere; the drag
+  // still works without it, so never let it abort the handler.
+  try { svg.setPointerCapture(e.pointerId); } catch { /* no active pointer */ }
+});
+svg.addEventListener('pointermove', e => {
+  if (dragging) {
+    const dx = (e.clientX - dragging.x) / view.k, dy = (e.clientY - dragging.y) / view.k;
+    if (Math.abs(dx) + Math.abs(dy) > 1) dragMoved = true;
+    dragging.node.cx += dx; dragging.node.cy += dy;
+    dragging.x = e.clientX; dragging.y = e.clientY;
+    place();
+  } else if (panning) {
+    view.x = e.clientX - panning.x; view.y = e.clientY - panning.y; apply();
+  }
+});
+svg.addEventListener('pointerup', e => {
+  dragging = null; panning = null; svg.classList.remove('grabbing');
+  try { svg.releasePointerCapture(e.pointerId); } catch { /* already released */ }
+});
+svg.addEventListener('wheel', e => {
+  e.preventDefault();
+  const r = svg.getBoundingClientRect();
+  const mx = e.clientX - r.left, my = e.clientY - r.top;
+  const k = Math.min(3, Math.max(0.25, view.k * (e.deltaY < 0 ? 1.12 : 1 / 1.12)));
+  view.x = mx - (mx - view.x) * (k / view.k);
+  view.y = my - (my - view.y) * (k / view.k);
+  view.k = k; apply();
+}, { passive: false });
+
+function fit() {
+  const r = svg.getBoundingClientRect();
+  const xs = DATA.nodes.map(n => n.cx), ys = DATA.nodes.map(n => n.cy);
+  const x0 = Math.min(...xs) - NW / 2 - 40, y0 = Math.min(...ys) - NH / 2 - 46;
+  const w = Math.max(...xs) + NW / 2 + 40 - x0;
+  const h = Math.max(...ys) + NH / 2 + 24 - y0;
+  view.k = Math.min(r.width / w, r.height / h, 1.4);
+  view.x = (r.width - w * view.k) / 2 - x0 * view.k;
+  view.y = (r.height - h * view.k) / 2 - y0 * view.k;
+  apply();
+}
+
+document.getElementById('zin').onclick = () => { view.k = Math.min(3, view.k * 1.2); apply(); };
+document.getElementById('zout').onclick = () => { view.k = Math.max(0.25, view.k / 1.2); apply(); };
+document.getElementById('reset').onclick = () => {
+  DATA.nodes.forEach(n => { n.cx = n.x; n.cy = n.y; });
+  selected = null; activeFlow = ''; hidden.clear();
+  document.getElementById('q').value = ''; document.getElementById('flow').value = '';
+  document.querySelectorAll('.chip').forEach(c => c.classList.remove('off'));
+  place(); paint(); showOverview(); fit();
+};
+document.getElementById('q').addEventListener('input', paint);
+
+const sel = document.getElementById('flow');
+DATA.flows.forEach(f => {
+  const o = document.createElement('option'); o.value = f.id; o.textContent = f.name;
+  sel.appendChild(o);
+});
+sel.addEventListener('change', () => {
+  activeFlow = sel.value;
+  const f = DATA.flows.find(x => x.id === activeFlow);
+  selected = null;
+  f ? showFlow(f) : showOverview();
+  paint();
+});
+
+document.querySelectorAll('#legend .chip').forEach(chip => {
+  const role = chip.textContent.trim();
+  chip.addEventListener('click', () => {
+    hidden.has(role) ? hidden.delete(role) : hidden.add(role);
+    chip.classList.toggle('off', hidden.has(role));
+    place(); paint();
+  });
+});
+
+svg.addEventListener('click', e => {
+  if (e.target.closest('.node') || dragMoved) return;
+  selected = null; showOverview(); paint();
+});
+
+place(); paint(); showOverview();
+window.addEventListener('resize', fit);
+fit();
+</script>
+</body>
+</html>

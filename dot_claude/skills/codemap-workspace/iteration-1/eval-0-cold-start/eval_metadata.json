@@ -1,0 +1,67 @@
+{
+  "eval_id": 0,
+  "eval_name": "cold-start-unfamiliar-repo",
+  "prompt": "I'm onboarding a contractor onto this repo next week and they've never seen it. Can you build me a code map they can actually click around in? I want the major modules, what calls what, where the database and any external APIs sit, and a few of the important end-to-end flows traced out. Put it under docs/codemap/.",
+  "assertions": [
+    {
+      "id": "a1",
+      "text": "All three files exist: codemap.html, codemap.json, codemap.lock"
+    },
+    {
+      "id": "a2",
+      "text": "codemap.json parses as valid JSON and has the six required top-level keys (generated_at, generated_from_commit, scope, nodes, edges, flows)"
+    },
+    {
+      "id": "a3",
+      "text": "Every node has id, path, role, entrypoints, tests, constraints, evidence"
+    },
+    {
+      "id": "a4",
+      "text": "Every node path exists on disk in the repo"
+    },
+    {
+      "id": "a5",
+      "text": "Every evidence symbol is literally findable in the file its path names (grep, not judgment)"
+    },
+    {
+      "id": "a6",
+      "text": "Every edge type is one of: imports, calls, reads, writes, publishes, subscribes \u2014 no other value appears"
+    },
+    {
+      "id": "a7",
+      "text": "Every edge from/to and every flow step node resolves to an existing node id"
+    },
+    {
+      "id": "a8",
+      "text": "Node count is 20 or fewer"
+    },
+    {
+      "id": "a9",
+      "text": "codemap.html contains its nodes/edges/flows inline and they are identical to codemap.json"
+    },
+    {
+      "id": "a10",
+      "text": "codemap.html loads with zero external network references (no CDN script/style src pointing off-origin)"
+    },
+    {
+      "id": "a11",
+      "text": "codemap.html header shows the repository name, a generation timestamp, and the commit it was generated from"
+    },
+    {
+      "id": "a12",
+      "text": "codemap.lock records commit, dirty flag, scope, excluded dirs, fingerprint algorithm, and a per-module fingerprint"
+    },
+    {
+      "id": "a13",
+      "text": "codemap.lock commit matches the repo's actual HEAD"
+    },
+    {
+      "id": "a14",
+      "text": "At least 3 flows are present, each with trigger, steps and outcome"
+    },
+    {
+      "id": "a15",
+      "text": "Any edge lacking source evidence is marked unknown in the evidence field (never as a type value) and carries an explanatory note"
+    }
+  ]
+}

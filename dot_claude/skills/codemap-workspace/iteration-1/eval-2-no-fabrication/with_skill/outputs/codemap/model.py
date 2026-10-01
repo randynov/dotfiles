@@ -1,0 +1,754 @@
+"""Codemap model for AuditKit-Community-Edition.
+
+Two things ship from this repo: a Go CLI cloud-compliance scanner under `scanner/`,
+and a static marketing/docs site under `site/` deployed to GitHub Pages. They share
+no code. Every external service edge below cites a call site in one or the other.
+"""
+
+MODULES = {
+    "cli-auditkit": {
+        "include": ["scanner/cmd/auditkit/"],
+        "exclude": [],
+    },
+    "site-marketing": {
+        "include": ["site/", ".github/workflows/pages.yml"],
+        "exclude": ["site/examples/"],
+    },
+    "provider-abstraction": {
+        "include": [
+            "scanner/pkg/core/",
+            "scanner/pkg/providers/",
+            "scanner/cmd/",
+        ],
+        "exclude": ["scanner/cmd/auditkit/"],
+    },
+    "scan-aws": {
+        "include": ["scanner/pkg/aws/"],
+        "exclude": [],
+    },
+    "scan-azure": {
+        "include": ["scanner/pkg/azure/"],
+        "exclude": [],
+    },
+    "scan-gcp": {
+        "include": ["scanner/pkg/gcp/"],
+        "exclude": [],
+    },
+    "integrations": {
+        "include": ["scanner/pkg/integrations/"],
+        "exclude": [],
+    },
+    "mappings-crosswalk": {
+        "include": ["scanner/pkg/mappings/", "scanner/mappings/"],
+        "exclude": [],
+    },
+    "reporting": {
+        "include": ["scanner/pkg/report/"],
+        "exclude": [],
+    },
+    "tracker-evidence": {
+        "include": ["scanner/pkg/tracker/", "scanner/pkg/evidence/"],
+        "exclude": [],
+    },
+    "offline-cache": {
+        "include": ["scanner/pkg/offline/", "scanner/pkg/cache/"],
+        "exclude": [],
+    },
+    "platform-support": {
+        "include": [
+            "scanner/pkg/cli/",
+            "scanner/pkg/remediation/",
+            "scanner/pkg/updater/",
+        ],
+        "exclude": [],
+    },
+}
+
+SCOPE = [
+    "scanner/",
+    "site/",
+    ".github/workflows/",
+]
+
+EXCLUDED_DIRS = [
+    # Generated / vendored / sample artefacts
+    "scanner/vendor/",
+    "site/examples/",
+    # Scope judgments
+    "scanner/scripts/",
+    "scanner/.github/workflows/release.yml",
+]
+
+NODES = [
+    {
+        "id": "cli-auditkit",
+        "path": "scanner/cmd/auditkit",
+        "role": "client",
+        "title": "auditkit CLI (unified entrypoint)",
+        "summary": (
+            "The single 2.6k-line binary users actually run. Parses flags, picks a "
+            "cloud provider and framework, drives the scan, then renders console, "
+            "HTML, PDF, fix-script and evidence-tracker output."
+        ),
+        "entrypoints": [
+            {"path": "scanner/cmd/auditkit/main.go", "symbol": "func main() {"},
+        ],
+        "constraints": [
+            "CurrentVersion is a const in main.go and a second const in pkg/updater/updater.go; they are already out of step (v0.8.2 vs v0.3.0).",
+            "main.go re-implements saveProgress/showProgress and the evidence-tracker HTML locally instead of calling pkg/tracker.",
+            "ComplianceResult is declared three times in the tree — here, in pkg/core/interfaces.go and in pkg/report/pdf.go — and converted field by field between them.",
+        ],
+        "evidence": {
+            "path": "scanner/cmd/auditkit/main.go",
+            "symbol": 'const CurrentVersion = "v0.8.2"',
+        },
+    },
+    {
+        "id": "site-marketing",
+        "path": "site",
+        "role": "client",
+        "title": "auditkit.io static site (GitHub Pages)",
+        "summary": (
+            "Hand-written HTML marketing and docs pages plus a consent manager. This "
+            "is where both third-party services in the repo live: the Stripe hosted "
+            "checkout link and Google's gtag.js. No scanner code touches either."
+        ),
+        "entrypoints": [
+            {"path": "site/index.html", "symbol": "<title>"},
+            {
+                "path": ".github/workflows/pages.yml",
+                "symbol": "actions/deploy-pages@v4",
+            },
+        ],
+        "constraints": [
+            "gtag.js is injected only after the visitor opts into the analytics category; the Stripe conversion event additionally requires the marketing category.",
+            "The gtag id is a Google Ads conversion id (AW-...), not a GA4 measurement id — no G-/UA- property exists in the repo.",
+        ],
+        "evidence": {
+            "path": "site/cookie-consent.js",
+            "symbol": "var GTAG_ID = 'AW-17730440946';",
+        },
+    },
+    {
+        "id": "provider-abstraction",
+        "path": "scanner/pkg/core",
+        "role": "api",
+        "title": "core interfaces, provider registry, per-cloud binaries",
+        "summary": (
+            "Provider/Scanner/Reporter interfaces and a BaseProvider + registry that "
+            "wrap each cloud scanner behind a uniform Initialize/Scan surface, plus "
+            "the three thin auditkit-aws/-azure/-gcp binaries that are its only "
+            "consumers."
+        ),
+        "entrypoints": [
+            {"path": "scanner/pkg/core/interfaces.go", "symbol": "type Provider interface {"},
+            {
+                "path": "scanner/pkg/providers/provider.go",
+                "symbol": "type ProviderRegistry struct {",
+            },
+            {"path": "scanner/cmd/auditkit-aws/main.go", "symbol": "func main() {"},
+        ],
+        "constraints": [
+            "The unified auditkit CLI bypasses this layer entirely and imports the cloud scanners directly.",
+            "The release workflow builds only ./cmd/auditkit, and it sits at scanner/.github/workflows/ rather than the repo root — the root .github/workflows/ holds pages.yml alone.",
+        ],
+        "evidence": {
+            "path": "scanner/pkg/core/interfaces.go",
+            "symbol": "type Provider interface {",
+        },
+    },
+    {
+        "id": "scan-aws",
+        "path": "scanner/pkg/aws",
+        "role": "service",
+        "title": "AWS scanner + checks",
+        "summary": (
+            "AWSScanner holds ~40 aws-sdk-go-v2 service clients and fans out to the "
+            "check files under pkg/aws/checks, grouped by framework (CIS, SOC2, PCI, CMMC)."
+        ),
+        "entrypoints": [
+            {"path": "scanner/pkg/aws/scanner.go", "symbol": "func NewScanner(profile string) (*AWSScanner, error) {"},
+        ],
+        "constraints": [
+            "All API calls are read-only describe/list/get operations; the scanner never mutates cloud state.",
+            "CMMC Level 2 check files are gitignored (paid tier), so this tree only covers Level 1.",
+        ],
+        "evidence": {
+            "path": "scanner/pkg/aws/scanner.go",
+            "symbol": "type AWSScanner struct {",
+        },
+    },
+    {
+        "id": "scan-azure",
+        "path": "scanner/pkg/azure",
+        "role": "service",
+        "title": "Azure scanner + checks",
+        "summary": (
+            "AzureScanner authenticates with DefaultAzureCredential and talks to both "
+            "Azure Resource Manager SDKs and Microsoft Graph."
+        ),
+        "entrypoints": [
+            {"path": "scanner/pkg/azure/scanner.go", "symbol": "func NewScanner(subscriptionID string) (*AzureScanner, error) {"},
+        ],
+        "constraints": [
+            "Subscription id comes from the -subscription flag or AZURE_SUBSCRIPTION_ID; the CLI falls back to the -profile value.",
+        ],
+        "evidence": {
+            "path": "scanner/pkg/azure/scanner.go",
+            "symbol": "type AzureScanner struct {",
+        },
+    },
+    {
+        "id": "scan-gcp",
+        "path": "scanner/pkg/gcp",
+        "role": "service",
+        "title": "GCP scanner + checks",
+        "summary": (
+            "GCPScanner builds storage, IAM admin, compute, sqladmin, logging, KMS and "
+            "GKE clients from application default credentials."
+        ),
+        "entrypoints": [
+            {"path": "scanner/pkg/gcp/scanner.go", "symbol": "func NewScanner(projectID string) (*GCPScanner, error) {"},
+        ],
+        "constraints": [
+            "Unlike the AWS and Azure scanners this one owns a Close() that must be called to release the gRPC clients.",
+        ],
+        "evidence": {
+            "path": "scanner/pkg/gcp/scanner.go",
+            "symbol": "type GCPScanner struct {",
+        },
+    },
+    {
+        "id": "integrations",
+        "path": "scanner/pkg/integrations",
+        "role": "service",
+        "title": "Prowler / ScubaGear import",
+        "summary": (
+            "Parses third-party scanner output files off disk and converts findings "
+            "into AuditKit control results. ScubaGear findings are mapped through the "
+            "JSON rule files in scanner/mappings/scubagear."
+        ),
+        "entrypoints": [
+            {
+                "path": "scanner/pkg/integrations/prowler/parser.go",
+                "symbol": "func (p *ProwlerIntegration) ParseFile(",
+            },
+            {
+                "path": "scanner/pkg/integrations/scubagear/parser.go",
+                "symbol": "func (s *ScubaGearIntegration) ParseFile(",
+            },
+        ],
+        "constraints": [
+            "These read files the user already produced; neither integration calls the Prowler or ScubaGear vendors over the network.",
+        ],
+        "evidence": {
+            "path": "scanner/pkg/integrations/types.go",
+            "symbol": "type Integration interface {",
+        },
+    },
+    {
+        "id": "mappings-crosswalk",
+        "path": "scanner/pkg/mappings",
+        "role": "service",
+        "title": "framework crosswalk + FedRAMP baselines",
+        "summary": (
+            "Loads framework-crosswalk.yaml and fedramp-baselines.yaml and answers "
+            "'which NIST 800-53 controls does this finding satisfy'."
+        ),
+        "entrypoints": [
+            {"path": "scanner/pkg/mappings/crosswalk.go", "symbol": "func GetCrosswalk() (*Crosswalk, error) {"},
+        ],
+        "constraints": [
+            "globalCrosswalk is a package-level singleton; LoadCrosswalk assigns it, so a second call replaces it process-wide.",
+            "GetCrosswalk falls back to the relative path \"pkg/mappings/framework-crosswalk.yaml\", so it only resolves when the binary runs from scanner/.",
+        ],
+        "evidence": {
+            "path": "scanner/pkg/mappings/crosswalk.go",
+            "symbol": "func LoadCrosswalk(filepath string) (*Crosswalk, error) {",
+        },
+    },
+    {
+        "id": "reporting",
+        "path": "scanner/pkg/report",
+        "role": "service",
+        "title": "HTML + PDF report generation",
+        "summary": (
+            "Renders the auditor-facing deliverables. PDF goes through gofpdf; HTML is "
+            "assembled as a string. pdf.go declares the package's own ComplianceResult, "
+            "distinct from the CLI's and from pkg/core's."
+        ),
+        "entrypoints": [
+            {"path": "scanner/pkg/report/pdf.go", "symbol": "func GeneratePDF(result ComplianceResult, outputPath string) error {"},
+            {"path": "scanner/pkg/report/html.go", "symbol": "func GenerateHTML(result ComplianceResult) string {"},
+        ],
+        "constraints": [
+            "pdf.go and the CLI each define their own ComplianceResult/ControlResult; the CLI converts between them field by field.",
+            "Report filenames are derived from provider/framework/date when -output is omitted.",
+        ],
+        "evidence": {
+            "path": "scanner/pkg/report/pdf.go",
+            "symbol": "func GeneratePDF(result ComplianceResult, outputPath string) error {",
+        },
+    },
+    {
+        "id": "tracker-evidence",
+        "path": "scanner/pkg/tracker",
+        "role": "service",
+        "title": "evidence tracker + progress history",
+        "summary": (
+            "Persists per-account control progress and an evidence checklist under "
+            "~/.auditkit, and can emit a standalone checklist page."
+        ),
+        "entrypoints": [
+            {"path": "scanner/pkg/tracker/evidence.go", "symbol": "func NewTracker(accountID string) (*EvidenceTracker, error) {"},
+            {"path": "scanner/pkg/tracker/progress.go", "symbol": "func SaveProgress("},
+        ],
+        "constraints": [
+            "Only the tracker.ControlResult type is referenced from the CLI — NewTracker, SaveProgress and ShowProgress have no callers in this tree; main.go writes the same ~/.auditkit files itself.",
+            "pkg/evidence (screenshot guides) has no importers at all at this commit.",
+        ],
+        "evidence": {
+            "path": "scanner/pkg/tracker/evidence.go",
+            "symbol": "type EvidenceTracker struct {",
+        },
+    },
+    {
+        "id": "offline-cache",
+        "path": "scanner/pkg/offline",
+        "role": "service",
+        "title": "offline scan cache",
+        "summary": (
+            "Saves each scan under ~/.auditkit/cache so a report can be regenerated "
+            "with no cloud credentials and no network."
+        ),
+        "entrypoints": [
+            {"path": "scanner/pkg/offline/cache.go", "symbol": "func NewCache() (*Cache, error) {"},
+        ],
+        "constraints": [
+            "pkg/cache is a second, older cache implementation with zero importers; pkg/offline is the live one.",
+        ],
+        "evidence": {
+            "path": "scanner/pkg/offline/cache.go",
+            "symbol": "func (c *Cache) Save(scan CachedScan) error {",
+        },
+    },
+    {
+        "id": "platform-support",
+        "path": "scanner/pkg/cli",
+        "role": "service",
+        "title": "terminal UI, fix scripts, update check",
+        "summary": (
+            "Shared plumbing folded into one node: ANSI colours/boxes/spinner, the "
+            "remediation shell-script generator, and the GitHub release update check."
+        ),
+        "entrypoints": [
+            {"path": "scanner/pkg/cli/spinner.go", "symbol": "func NewSpinner("},
+            {"path": "scanner/pkg/remediation/scripts.go", "symbol": "func GenerateFixScript("},
+            {"path": "scanner/pkg/updater/updater.go", "symbol": "func CheckForUpdates() {"},
+        ],
+        "constraints": [
+            "CheckForUpdates runs only under the `update` subcommand, and pkg/updater is the only package in scanner/ that imports net/http — so a scan makes no non-cloud network call.",
+            "updater.go carries its own CurrentVersion const (v0.3.0), already out of step with main.go (v0.8.2).",
+        ],
+        "evidence": {
+            "path": "scanner/pkg/updater/updater.go",
+            "symbol": "func CheckForUpdates() {",
+        },
+    },
+    {
+        "id": "ds-auditkit-home",
+        "path": "scanner/pkg/offline/cache.go",
+        "role": "datastore",
+        "title": "~/.auditkit (local JSON state)",
+        "summary": (
+            "The only persistence the tool has: JSON files in the user's home "
+            "directory. ~/.auditkit/cache holds scans written by pkg/offline; "
+            "~/.auditkit/<account>.json holds score history written by main.go. No "
+            "database, no server, nothing leaves the machine."
+        ),
+        "entrypoints": [],
+        "constraints": [
+            "Directories are created 0755; scan output can contain account ids and resource names.",
+        ],
+        "evidence": {
+            "path": "scanner/pkg/offline/cache.go",
+            "symbol": 'filepath.Join(homeDir, ".auditkit", "cache")',
+        },
+    },
+    {
+        "id": "ext-aws",
+        "path": "scanner/pkg/aws/scanner.go",
+        "role": "external",
+        "title": "AWS APIs (aws-sdk-go-v2)",
+        "summary": (
+            "~40 AWS service APIs read during a scan — IAM, S3, EC2, CloudTrail, KMS, "
+            "GuardDuty, RDS, Organizations, STS and the rest."
+        ),
+        "entrypoints": [],
+        "constraints": [
+            "Credentials come from the standard AWS chain via the -profile flag; the tool never asks for or stores keys.",
+        ],
+        "evidence": {
+            "path": "scanner/pkg/aws/scanner.go",
+            "symbol": '"github.com/aws/aws-sdk-go-v2/service/sts"',
+        },
+    },
+    {
+        "id": "ext-azure",
+        "path": "scanner/pkg/azure/scanner.go",
+        "role": "external",
+        "title": "Azure Resource Manager + Microsoft Graph",
+        "summary": (
+            "ARM data-plane/control-plane clients (storage, SQL, key vault, monitor) "
+            "plus a Microsoft Graph client for identity checks."
+        ),
+        "entrypoints": [],
+        "constraints": [
+            "Both clients share one DefaultAzureCredential; Graph is requested with the .default scope.",
+        ],
+        "evidence": {
+            "path": "scanner/pkg/azure/scanner.go",
+            "symbol": '"https://graph.microsoft.com/.default"',
+        },
+    },
+    {
+        "id": "ext-gcp",
+        "path": "scanner/pkg/gcp/scanner.go",
+        "role": "external",
+        "title": "Google Cloud APIs",
+        "summary": (
+            "Cloud Storage, IAM Admin, Compute, Cloud SQL Admin, Cloud Logging, KMS "
+            "and GKE, all through application default credentials."
+        ),
+        "entrypoints": [],
+        "constraints": [],
+        "evidence": {
+            "path": "scanner/pkg/gcp/scanner.go",
+            "symbol": "storageClient, err := storage.NewClient(ctx)",
+        },
+    },
+    {
+        "id": "ext-github-releases",
+        "path": "scanner/pkg/updater/updater.go",
+        "role": "external",
+        "title": "GitHub Releases API",
+        "summary": (
+            "api.github.com is polled for the latest release tag when the user runs "
+            "the version/update path. Unauthenticated GET, no payload sent."
+        ),
+        "entrypoints": [],
+        "constraints": [
+            "This is a version check, not telemetry — nothing about the scan is transmitted.",
+        ],
+        "evidence": {
+            "path": "scanner/pkg/updater/updater.go",
+            "symbol": '"https://api.github.com/repos/guardian-nexus/AuditKit-Community-Edition/releases/latest"',
+        },
+    },
+    {
+        "id": "ext-google-fonts",
+        "path": "site/index.html",
+        "role": "external",
+        "title": "Google Fonts (fonts.googleapis.com / gstatic)",
+        "summary": (
+            "Every site page <link>s a Google Fonts stylesheet for DM Sans, Source "
+            "Serif 4 and JetBrains Mono, with a preconnect to fonts.gstatic.com."
+        ),
+        "entrypoints": [],
+        "constraints": [
+            "This load is NOT gated by cookie-consent.js — it fires for every visitor, including one who declines all cookies.",
+        ],
+        "evidence": {
+            "path": "site/index.html",
+            "symbol": '<link rel="preconnect" href="https://fonts.googleapis.com">',
+        },
+    },
+    {
+        "id": "ext-stripe",
+        "path": "site/index.html",
+        "role": "external",
+        "title": "Stripe hosted checkout (buy.stripe.com link)",
+        "summary": (
+            "The payments provider in this repo. It appears only as an outbound "
+            "<a href> to a Stripe Payment Link on the marketing pages and in the "
+            "README. There is no Stripe SDK, no API key and no server-side code."
+        ),
+        "entrypoints": [],
+        "constraints": [
+            "The same payment link id is hard-coded in 25 files under site/ plus README.md; changing it means editing every one.",
+            "The CLI is unaware of Stripe — nothing in scanner/ references it.",
+        ],
+        "evidence": {
+            "path": "site/index.html",
+            "symbol": "https://buy.stripe.com/28E14m5MS5xM0mj4r7gnK01",
+        },
+    },
+    {
+        "id": "ext-google-tag",
+        "path": "site/cookie-consent.js",
+        "role": "external",
+        "title": "Google gtag.js (Ads conversion tracking)",
+        "summary": (
+            "The analytics service in this repo. cookie-consent.js injects "
+            "googletagmanager.com/gtag/js for conversion id AW-17730440946 once the "
+            "visitor consents; the trial links then fire a $297 conversion event."
+        ),
+        "entrypoints": [],
+        "constraints": [
+            "Loaded lazily and only on consent — a visitor who declines never fetches the script.",
+            "The scanner ships no telemetry; CHANGELOG records it as removed and SECURITY.md states 'No telemetry or phone-home'.",
+        ],
+        "evidence": {
+            "path": "site/cookie-consent.js",
+            "symbol": "s.src = 'https://www.googletagmanager.com/gtag/js?id=' + GTAG_ID;",
+        },
+    },
+]
+
+EDGES = [
+    {
+        "from": "cli-auditkit",
+        "to": "scan-aws",
+        "type": "imports",
+        "evidence": {
+            "path": "scanner/cmd/auditkit/main.go",
+            "symbol": 'awsScanner "github.com/guardian-nexus/auditkit/scanner/pkg/aws"',
+        },
+    },
+    {
+        "from": "cli-auditkit",
+        "to": "scan-azure",
+        "type": "imports",
+        "evidence": {
+            "path": "scanner/cmd/auditkit/main.go",
+            "symbol": 'azureScanner "github.com/guardian-nexus/auditkit/scanner/pkg/azure"',
+        },
+    },
+    {
+        "from": "cli-auditkit",
+        "to": "scan-gcp",
+        "type": "imports",
+        "evidence": {
+            "path": "scanner/cmd/auditkit/main.go",
+            "symbol": 'gcpScanner "github.com/guardian-nexus/auditkit/scanner/pkg/gcp"',
+        },
+    },
+    {
+        "from": "cli-auditkit",
+        "to": "reporting",
+        "type": "calls",
+        "evidence": {
+            "path": "scanner/cmd/auditkit/main.go",
+            "symbol": "report.GeneratePDF(pdfResult, output)",
+        },
+    },
+    {
+        "from": "cli-auditkit",
+        "to": "offline-cache",
+        "type": "calls",
+        "evidence": {
+            "path": "scanner/cmd/auditkit/main.go",
+            "symbol": "cache, err := offline.NewCache()",
+        },
+    },
+    {
+        "from": "cli-auditkit",
+        "to": "integrations",
+        "type": "calls",
+        "evidence": {
+            "path": "scanner/cmd/auditkit/main.go",
+            "symbol": "prowlerIntegration := prowler.NewProwlerIntegration()",
+        },
+    },
+    {
+        "from": "cli-auditkit",
+        "to": "mappings-crosswalk",
+        "type": "calls",
+        "evidence": {
+            "path": "scanner/cmd/auditkit/main.go",
+            "symbol": "crosswalk, crosswalkErr = mappings.GetCrosswalk()",
+        },
+    },
+    {
+        "from": "cli-auditkit",
+        "to": "platform-support",
+        "type": "calls",
+        "evidence": {
+            "path": "scanner/cmd/auditkit/main.go",
+            "symbol": "updater.CheckForUpdates()",
+        },
+    },
+    {
+        "from": "cli-auditkit",
+        "to": "tracker-evidence",
+        "type": "imports",
+        "evidence": {
+            "path": "scanner/cmd/auditkit/main.go",
+            "symbol": "var controls []tracker.ControlResult",
+        },
+    },
+    {
+        "from": "provider-abstraction",
+        "to": "scan-aws",
+        "type": "calls",
+        "evidence": {
+            "path": "scanner/pkg/providers/aws/provider.go",
+            "symbol": "scanner, err := aws.NewScanner(profile)",
+        },
+    },
+    {
+        "from": "provider-abstraction",
+        "to": "scan-azure",
+        "type": "calls",
+        "evidence": {
+            "path": "scanner/pkg/providers/azure/provider.go",
+            "symbol": "scanner, err := azure.NewScanner(subscriptionID)",
+        },
+    },
+    {
+        "from": "provider-abstraction",
+        "to": "scan-gcp",
+        "type": "calls",
+        "evidence": {
+            "path": "scanner/pkg/providers/gcp/provider.go",
+            "symbol": "scanner, err := gcp.NewScanner(projectID)",
+        },
+    },
+    {
+        "from": "scan-aws",
+        "to": "ext-aws",
+        "type": "reads",
+        "evidence": {
+            "path": "scanner/pkg/aws/scanner.go",
+            "symbol": "sts.NewFromConfig(cfg)",
+        },
+    },
+    {
+        "from": "scan-azure",
+        "to": "ext-azure",
+        "type": "reads",
+        "evidence": {
+            "path": "scanner/pkg/azure/scanner.go",
+            "symbol": "msgraphsdk.NewGraphServiceClientWithCredentials(cred",
+        },
+    },
+    {
+        "from": "scan-gcp",
+        "to": "ext-gcp",
+        "type": "reads",
+        "evidence": {
+            "path": "scanner/pkg/gcp/scanner.go",
+            "symbol": "storageClient, err := storage.NewClient(ctx)",
+        },
+    },
+    {
+        "from": "platform-support",
+        "to": "ext-github-releases",
+        "type": "reads",
+        "evidence": {
+            "path": "scanner/pkg/updater/updater.go",
+            "symbol": 'http.Get("https://api.github.com/repos/guardian-nexus/AuditKit-Community-Edition/releases/latest")',
+        },
+    },
+    {
+        "from": "offline-cache",
+        "to": "ds-auditkit-home",
+        "type": "writes",
+        "evidence": {
+            "path": "scanner/pkg/offline/cache.go",
+            "symbol": 'basePath := filepath.Join(homeDir, ".auditkit", "cache")',
+        },
+    },
+    {
+        "from": "cli-auditkit",
+        "to": "ds-auditkit-home",
+        "type": "writes",
+        "evidence": {
+            "path": "scanner/cmd/auditkit/main.go",
+            "symbol": 'dataPath := filepath.Join(homeDir, ".auditkit", accountID+".json")',
+        },
+        "note": "pkg/tracker has an identical writer, but nothing calls it — main.go writes this file itself.",
+    },
+    {
+        "from": "site-marketing",
+        "to": "ext-google-fonts",
+        "type": "reads",
+        "evidence": {
+            "path": "site/index.html",
+            "symbol": 'href="https://fonts.googleapis.com/css2?family=DM+Sans',
+        },
+    },
+    {
+        "from": "site-marketing",
+        "to": "ext-stripe",
+        "type": "calls",
+        "evidence": {
+            "path": "site/pricing.html",
+            "symbol": "https://buy.stripe.com/28E14m5MS5xM0mj4r7gnK01",
+        },
+    },
+    {
+        "from": "site-marketing",
+        "to": "ext-google-tag",
+        "type": "calls",
+        "evidence": {
+            "path": "site/cookie-consent.js",
+            "symbol": "s.src = 'https://www.googletagmanager.com/gtag/js?id=' + GTAG_ID;",
+        },
+    },
+]
+
+FLOWS = [
+    {
+        "id": "flow-aws-scan-to-pdf",
+        "name": "AWS SOC 2 scan to auditor PDF",
+        "trigger": "`auditkit scan -provider aws -framework soc2 -format pdf`.",
+        "steps": [
+            {"node": "cli-auditkit", "detail": "Parses flags and starts a spinner. The update check is a separate `update` subcommand and does not run here."},
+            {"node": "scan-aws", "detail": "NewScanner(profile) builds the SDK clients; runSOC2Checks fans out over pkg/aws/checks."},
+            {"node": "ext-aws", "detail": "Read-only describe/list/get calls against ~40 AWS services."},
+            {"node": "mappings-crosswalk", "detail": "GetCrosswalk() attaches NIST 800-53 control ids to each finding."},
+            {"node": "cli-auditkit", "detail": "saveProgress appends a score point to ~/.auditkit/<account>.json."},
+            {"node": "offline-cache", "detail": "saveScanToCache always stores the run as a CachedScan."},
+            {"node": "ds-auditkit-home", "detail": "JSON lands under ~/.auditkit/cache."},
+            {"node": "reporting", "detail": "GeneratePDF renders cover page, disclaimer, score, findings and evidence guide."},
+        ],
+        "outcome": "An auditkit-aws-soc2-report-<date>.pdf on disk plus a cached scan for later offline reruns.",
+    },
+    {
+        "id": "flow-offline-replay",
+        "name": "Offline report regeneration",
+        "trigger": "`auditkit scan -offline` with no cloud credentials available.",
+        "steps": [
+            {"node": "cli-auditkit", "detail": "offline.NewCache() instead of a provider scanner."},
+            {"node": "offline-cache", "detail": "LoadLatest(provider, accountID, framework), or LoadFromFile when -cache-file is given."},
+            {"node": "ds-auditkit-home", "detail": "Reads the stored CachedScan JSON."},
+            {"node": "reporting", "detail": "Same GeneratePDF path, output suffixed '-offline'."},
+        ],
+        "outcome": "A report identical in shape to a live scan, marked offline, with zero network traffic.",
+    },
+    {
+        "id": "flow-import-third-party",
+        "name": "Prowler / ScubaGear findings import",
+        "trigger": "The user points the CLI at a Prowler or ScubaGear JSON output file.",
+        "steps": [
+            {"node": "cli-auditkit", "detail": "NewProwlerIntegration() / NewScubaGearIntegration(mappingsDir)."},
+            {"node": "integrations", "detail": "ParseFile reads the vendor JSON and converts findings to IntegrationResult."},
+            {"node": "integrations", "detail": "ScubaGearIntegration.LoadMappings() reads scanner/mappings/scubagear/*.json to map rules to frameworks."},
+            {"node": "reporting", "detail": "convertIntegrationResults feeds the same PDF/HTML renderers."},
+        ],
+        "outcome": "Third-party scanner output becomes an AuditKit compliance report without a second cloud scan.",
+    },
+    {
+        "id": "flow-site-conversion",
+        "name": "Marketing site visitor to Stripe checkout",
+        "trigger": "A visitor loads any page on auditkit.io.",
+        "steps": [
+            {"node": "site-marketing", "detail": "cookie-consent.js shows the banner; window.auditKitConsent starts all-false except necessary."},
+            {"node": "ext-google-fonts", "detail": "The font stylesheet has already loaded from the page <head>, before and regardless of any consent choice."},
+            {"node": "ext-google-tag", "detail": "On analytics consent, gtag/js?id=AW-17730440946 is injected and configured."},
+            {"node": "ext-stripe", "detail": "The 'Start Free Trial' anchor navigates to the Stripe Payment Link; with marketing consent a $297 conversion event fires first."},
+        ],
+        "outcome": "Checkout happens entirely on Stripe's hosted page — this repo holds no payment code, keys or webhooks.",
+    },
+]

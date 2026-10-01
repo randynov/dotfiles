@@ -1,0 +1,4 @@
+iteration	timestamp	score	completeness	technology	relationships	abstraction	best_score	action	notes
+1	2026-03-17T00:00:00Z	34	4	10	10	10	34	baseline	baseline - element names omit identifying keywords (redis, elastic, rabbit, etc.)
+2	2026-03-17T00:01:00Z	40	10	10	10	10	40	keep	applied name-identifying-term rule: embed technology/role keyword in element Name param
+3	2026-03-17T00:02:00Z	39	9	10	10	10	40	keep	no mutation - confirming score post-iteration-2

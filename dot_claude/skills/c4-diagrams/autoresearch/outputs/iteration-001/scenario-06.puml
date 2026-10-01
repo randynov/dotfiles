@@ -1,0 +1,26 @@
+@startuml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+HIDE_STEREOTYPE()
+
+title CI/CD Pipeline Platform - Container Diagram
+
+Person(developer, "Developer", "Triggers builds and monitors pipeline status")
+
+System_Boundary(cicd_platform, "CI/CD Pipeline Platform") {
+  Container(vue_dashboard, "Dashboard", "Vue.js", "Developer UI for triggering and monitoring builds")
+  Container(build_orchestrator, "Build Orchestrator", "Python", "Manages and schedules build jobs")
+  Container(build_agents, "Build Agents", "Docker", "Execute build and test jobs in containers")
+  ContainerDb(s3_storage, "Artifact Storage", "S3", "Stores compiled build artifacts")
+  ContainerDb(postgres_db, "Build Database", "PostgreSQL", "Tracks build history and metadata")
+}
+
+Container_Ext(slack, "Slack", "Webhook", "Receives build status notifications")
+
+Rel(developer, vue_dashboard, "Triggers builds, monitors status", "HTTPS")
+Rel(vue_dashboard, build_orchestrator, "Triggers builds", "REST/JSON")
+Rel(build_orchestrator, build_agents, "Dispatches build jobs", "Internal API")
+Rel(build_agents, s3_storage, "Uploads artifacts", "S3 API/HTTPS")
+Rel(build_orchestrator, postgres_db, "Records build history", "JDBC")
+Rel(build_orchestrator, slack, "Sends notifications", "Webhook/HTTPS")
+
+@enduml

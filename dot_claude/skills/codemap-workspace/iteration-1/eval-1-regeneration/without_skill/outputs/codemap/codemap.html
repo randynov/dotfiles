@@ -1,0 +1,1652 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>mqol-aerie code map</title>
+<style>
+:root {
+  --bg:#0d1117; --panel:#161b22; --line:#2b3440; --fg:#e6edf3; --muted:#8b98a9;
+  --accent:#5eb0ef; --dim:#3a4553;
+}
+* { box-sizing:border-box; }
+html,body { margin:0; height:100%; background:var(--bg); color:var(--fg);
+  font:14px/1.5 ui-sans-serif,-apple-system,"Segoe UI",Roboto,sans-serif; }
+header { padding:10px 16px; border-bottom:1px solid var(--line); background:var(--panel);
+  display:flex; flex-wrap:wrap; gap:12px 20px; align-items:baseline; }
+header h1 { font-size:16px; margin:0; letter-spacing:.2px; }
+header .meta { color:var(--muted); font-size:12px; font-family:ui-monospace,monospace; }
+.bar { display:flex; flex-wrap:wrap; gap:8px; align-items:center;
+  padding:8px 16px; border-bottom:1px solid var(--line); background:var(--panel); }
+input,select { background:var(--bg); color:var(--fg); border:1px solid var(--line);
+  border-radius:6px; padding:5px 8px; font:inherit; font-size:13px; }
+input:focus,select:focus { outline:2px solid var(--accent); outline-offset:1px; }
+button { background:var(--bg); color:var(--fg); border:1px solid var(--line);
+  border-radius:6px; padding:5px 10px; font:inherit; font-size:13px; cursor:pointer; }
+button:hover { border-color:var(--accent); }
+.chip { display:inline-flex; align-items:center; gap:5px; font-size:12px; color:var(--muted);
+  cursor:pointer; user-select:none; padding:2px 6px; border-radius:6px; border:1px solid transparent; }
+.chip.off { opacity:.35; }
+.chip:hover { border-color:var(--line); }
+.chip i { width:10px; height:10px; border-radius:3px; display:inline-block; }
+main { display:flex; height:calc(100vh - 104px); }
+#stage { flex:1; min-width:0; position:relative; }
+svg { width:100%; height:100%; display:block; cursor:grab; touch-action:none; }
+svg.grabbing { cursor:grabbing; }
+aside { width:340px; flex:none; border-left:1px solid var(--line); background:var(--panel);
+  overflow:auto; padding:14px 16px; }
+aside h2 { font-size:14px; margin:0 0 4px; }
+aside h3 { font-size:11px; letter-spacing:.09em; text-transform:uppercase;
+  color:var(--muted); margin:16px 0 6px; }
+aside p { margin:0 0 6px; color:var(--fg); }
+aside .path { font-family:ui-monospace,monospace; font-size:12px; color:var(--accent);
+  word-break:break-all; }
+aside ul { margin:0; padding-left:18px; }
+aside li { margin-bottom:4px; font-size:13px; }
+aside code { font-family:ui-monospace,monospace; font-size:12px; color:var(--muted);
+  word-break:break-all; }
+.unknown { color:#ffc95e; }
+.node rect { stroke-width:1.5px; }
+.node text { pointer-events:none; }
+.node .label { font-size:12.5px; font-weight:600; fill:#0d1117; }
+.node .sub { font-size:10.5px; fill:#0d1117; opacity:.72; }
+.node.dim { opacity:.14; }
+.node.sel rect { stroke:#fff; stroke-width:3px; }
+.edge { fill:none; stroke:var(--dim); stroke-width:1.4px; }
+.edge.dim { opacity:.06; }
+.edge.up { stroke:#ff8fa3; stroke-width:2.4px; }
+.edge.down { stroke:#7ee2b8; stroke-width:2.4px; }
+.edge.flow { stroke:#ffc95e; stroke-width:3px; }
+.edge.hop { stroke-dasharray:7 6; opacity:.75; }
+.edge.unknown { stroke-dasharray:5 4; }
+.hint { color:var(--muted); font-size:11.5px; }
+.tierlabel { fill:var(--muted); font-size:11px; letter-spacing:.09em; text-transform:uppercase; }
+@media (max-width:900px) { main { flex-direction:column; } aside { width:auto; height:42%; border-left:0; border-top:1px solid var(--line); } }
+</style>
+</head>
+<body>
+<header>
+  <h1>mqol-aerie &middot; code map</h1>
+  <span class="meta">commit aec3855804f8</span>
+  <span class="meta">generated 2026-09-24T12:20:11+00:00</span>
+  <span class="meta">20 nodes &middot; 43 edges &middot; 5 flows</span>
+</header>
+<div class="bar">
+  <input id="q" type="search" placeholder="Search nodes, paths, symbols&hellip;" size="30">
+  <select id="flow"><option value="">All flows</option></select>
+  <span id="legend"><span class="chip"><i style="background:#5eb0ef"></i>client</span><span class="chip"><i style="background:#7ee2b8"></i>api</span><span class="chip"><i style="background:#c9a0ff"></i>service</span><span class="chip"><i style="background:#ffc95e"></i>queue</span><span class="chip"><i style="background:#ff8fa3"></i>datastore</span><span class="chip"><i style="background:#8c9bb5"></i>external</span></span>
+  <button id="zin">+</button><button id="zout">&minus;</button><button id="reset">Reset</button>
+  <span class="hint">In a selected flow, a dashed gold link is an ordering step with no single code edge behind it.</span>
+</div>
+<main>
+  <div id="stage"><svg id="svg"><g id="root"></g></svg></div>
+  <aside id="panel"></aside>
+</main>
+
+<script type="application/json" id="codemap">
+{
+  "generated_at": "2026-09-24T12:20:11+00:00",
+  "generated_from_commit": "aec3855804f806a582f363e4124a249693ade948",
+  "scope": [
+    "client/src",
+    "client-v2/src",
+    "shared/src",
+    "packages/ui/src",
+    "server/aerie"
+  ],
+  "nodes": [
+    {
+      "id": "client-v1",
+      "path": "client/src",
+      "role": "client",
+      "title": "Client v1 (React SPA)",
+      "summary": "Shipping clinician portal. TanStack Query over tn-models service modules.",
+      "entrypoints": [
+        {
+          "path": "client/src/main.tsx",
+          "symbol": "createRoot"
+        },
+        {
+          "path": "client/src/app.tsx",
+          "symbol": "App"
+        }
+      ],
+      "constraints": [
+        "axiosInstance pre-pends /api — a service baseUri must not repeat it.",
+        "Server state lives in TanStack Query; Zustand holds UI state only."
+      ],
+      "evidence": {
+        "path": "client/src/services/axios-instance.ts",
+        "symbol": "axiosInstance"
+      },
+      "tests": [
+        "client/tests/e2e/specs/auto-login-relogin.spec.ts",
+        "client/tests/e2e/specs/consent-flow.spec.ts",
+        "client/tests/e2e/specs/intake-attestation.spec.ts",
+        "client/tests/e2e/specs/intake-cancel.spec.ts",
+        "client/tests/e2e/specs/intake-consent-only.spec.ts",
+        "client/tests/e2e/specs/login.spec.ts",
+        "client/tests/e2e/specs/patient-reset.spec.ts",
+        "client/tests/scripts/generate-manifest.test.ts",
+        "client/tests/unit/components/active-context-switcher.test.tsx",
+        "client/tests/unit/components/conflict-modal.test.tsx",
+        "client/tests/unit/components/custom-select.test.tsx",
+        "client/tests/unit/components/error-boundary.test.tsx"
+      ],
+      "tier": 0,
+      "x": 1260.0,
+      "y": 90.0
+    },
+    {
+      "id": "client-v2",
+      "path": "client-v2/src",
+      "role": "client",
+      "title": "Client v2 (React SPA)",
+      "summary": "Work-in-progress replacement UI. Ships alongside v1; owns the medication-reminder screens.",
+      "entrypoints": [
+        {
+          "path": "client-v2/src/main.tsx",
+          "symbol": "createRoot"
+        },
+        {
+          "path": "client-v2/src/app.tsx",
+          "symbol": "App"
+        }
+      ],
+      "constraints": [
+        "Deployed builds set VITE_BACKEND_URL; local dev relies on the Vite proxy at same-origin /api.",
+        "Only client-v2 consumes @aerie/shared and @aerie/ui."
+      ],
+      "evidence": {
+        "path": "client-v2/src/services/axios-instance.ts",
+        "symbol": "axiosInstance"
+      },
+      "tests": [
+        "client-v2/tests/e2e/specs/home.spec.ts",
+        "client-v2/tests/e2e/specs/local/account-settings.spec.ts",
+        "client-v2/tests/e2e/specs/local/adherence-sidebar.spec.ts",
+        "client-v2/tests/e2e/specs/local/enrollment-form.spec.ts",
+        "client-v2/tests/e2e/specs/local/login-redesign.spec.ts",
+        "client-v2/tests/e2e/specs/local/login-v2.spec.ts",
+        "client-v2/tests/e2e/specs/local/login.spec.ts",
+        "client-v2/tests/e2e/specs/local/med-reminders-dashboard.spec.ts",
+        "client-v2/tests/e2e/specs/local/patient-detail.spec.ts",
+        "client-v2/tests/e2e/specs/local/patient-table.spec.ts",
+        "client-v2/tests/e2e/specs/local/patients-list.spec.ts",
+        "client-v2/tests/e2e/specs/local/verify-email.spec.ts"
+      ],
+      "tier": 0,
+      "x": 840.0,
+      "y": 90.0
+    },
+    {
+      "id": "shared-ts",
+      "path": "shared/src",
+      "role": "client",
+      "title": "Shared TS packages",
+      "summary": "@aerie/shared API models plus the @aerie/ui Tailwind preset, built with tsup and consumed by client-v2.",
+      "entrypoints": [
+        {
+          "path": "shared/src/index.ts",
+          "symbol": "export"
+        },
+        {
+          "path": "packages/ui/src/preset.ts",
+          "symbol": "preset"
+        }
+      ],
+      "constraints": [
+        "npm workspace packages — must be built (tsup) before client-v2 can resolve dist/."
+      ],
+      "evidence": {
+        "path": "shared/package.json",
+        "symbol": "@aerie/shared"
+      },
+      "tests": [
+        "packages/ui/src/preset.test.ts"
+      ],
+      "tier": 0,
+      "x": 420.0,
+      "y": 90.0
+    },
+    {
+      "id": "api-core",
+      "path": "server/aerie/core",
+      "role": "api",
+      "title": "core (identity + RBAC)",
+      "summary": "User, Organization, Clinic, UserClinicMembership, token auth, permissions, admin.",
+      "entrypoints": [
+        {
+          "path": "server/aerie/core/urls.py",
+          "symbol": "urlpatterns"
+        },
+        {
+          "path": "server/aerie/core/views.py",
+          "symbol": "UserViewSet"
+        },
+        {
+          "path": "server/aerie/core/authentication.py",
+          "symbol": "ExpiringTokenAuthentication"
+        }
+      ],
+      "constraints": [
+        "AUTH_USER_MODEL = core.User; email is the username field.",
+        "core/common URLs are included last so they cannot shadow other apps.",
+        "Non-staff querysets must be filtered by User.get_clinics()."
+      ],
+      "evidence": {
+        "path": "server/aerie/core/models.py",
+        "symbol": "class User"
+      },
+      "tests": [
+        "server/aerie/core/tests/test_access_controls.py",
+        "server/aerie/core/tests/test_admin_host_redirect.py",
+        "server/aerie/core/tests/test_audit_dashboard.py",
+        "server/aerie/core/tests/test_audit_isolation.py",
+        "server/aerie/core/tests/test_axes_admin.py",
+        "server/aerie/core/tests/test_cleanup_completed_tasks.py",
+        "server/aerie/core/tests/test_cleanup_inactive_users.py",
+        "server/aerie/core/tests/test_clinic_admin.py",
+        "server/aerie/core/tests/test_clinic_api.py",
+        "server/aerie/core/tests/test_clinic_model.py",
+        "server/aerie/core/tests/test_core.py",
+        "server/aerie/core/tests/test_cors_wildcard_hosts.py"
+      ],
+      "tier": 1,
+      "x": 1008.0,
+      "y": 300.0
+    },
+    {
+      "id": "api-surveys",
+      "path": "server/aerie/surveys",
+      "role": "api",
+      "title": "surveys (patients, studies, notifications)",
+      "summary": "Largest app: Patient, Study, Survey, NotificationInstance, consent + signature flows, dashboard.",
+      "entrypoints": [
+        {
+          "path": "server/aerie/surveys/urls.py",
+          "symbol": "urlpatterns"
+        },
+        {
+          "path": "server/aerie/surveys/views.py",
+          "symbol": "PatientViewSet"
+        },
+        {
+          "path": "server/aerie/surveys/views.py",
+          "symbol": "dropbox_sign_webhook"
+        },
+        {
+          "path": "server/aerie/surveys/tasks.py",
+          "symbol": "sync_switchbird_surveys_continuous"
+        }
+      ],
+      "constraints": [
+        "Assessment in the UI is Survey in code and in the vendor API (glossary divergence).",
+        "PHI-touching viewsets mix in PHIAuditMixin.",
+        "Deletes are soft (is_active=False)."
+      ],
+      "evidence": {
+        "path": "server/aerie/surveys/apps.py",
+        "symbol": "class SurveysConfig"
+      },
+      "tests": [
+        "server/aerie/surveys/tests/test_admin_cet_inline.py",
+        "server/aerie/surveys/tests/test_admin_forms.py",
+        "server/aerie/surveys/tests/test_admin_query_counts.py",
+        "server/aerie/surveys/tests/test_admin_switchbird_retry.py",
+        "server/aerie/surveys/tests/test_aerie_survey_create_endpoint.py",
+        "server/aerie/surveys/tests/test_app_autostart.py",
+        "server/aerie/surveys/tests/test_apps_start_once.py",
+        "server/aerie/surveys/tests/test_assessment_schedule_change.py",
+        "server/aerie/surveys/tests/test_assessment_schedule_rewrite.py",
+        "server/aerie/surveys/tests/test_assign_calendar_events.py",
+        "server/aerie/surveys/tests/test_attestation_consent_complete.py",
+        "server/aerie/surveys/tests/test_audit_stale_switchbird_contacts.py"
+      ],
+      "tier": 1,
+      "x": 672.0,
+      "y": 300.0
+    },
+    {
+      "id": "surveys-services",
+      "path": "server/aerie/surveys/services",
+      "role": "service",
+      "title": "surveys services (vendor doors)",
+      "summary": "Single door per external vendor plus notification delivery, scheduling and caches.",
+      "entrypoints": [
+        {
+          "path": "server/aerie/surveys/services/switchbird.py",
+          "symbol": "get_switchbird_service"
+        },
+        {
+          "path": "server/aerie/surveys/services/firsthx.py",
+          "symbol": "class FirstHxService"
+        },
+        {
+          "path": "server/aerie/surveys/services/dropbox_sign.py",
+          "symbol": "class DropboxSignService"
+        },
+        {
+          "path": "server/aerie/surveys/services/survey_ingestion.py",
+          "symbol": "class SurveyIngestionService"
+        }
+      ],
+      "constraints": [
+        "Never construct SwitchBirdService directly — use get_switchbird_service() (ruff TID251).",
+        "A SwitchBird calendar event that is not scheduled must never be written.",
+        "Credentials and PHI must not be logged."
+      ],
+      "evidence": {
+        "path": "server/aerie/surveys/services/switchbird.py",
+        "symbol": "class SwitchBirdService"
+      },
+      "tests": [
+        "server/aerie/surveys/tests/test_admin_switchbird_retry.py",
+        "server/aerie/surveys/tests/test_assessment_schedule_change.py",
+        "server/aerie/surveys/tests/test_assessment_schedule_rewrite.py",
+        "server/aerie/surveys/tests/test_audit_stale_switchbird_contacts.py",
+        "server/aerie/surveys/tests/test_dropbox_sign_configuration.py",
+        "server/aerie/surveys/tests/test_dropbox_sign_service.py",
+        "server/aerie/surveys/tests/test_dropbox_sign_webhook.py",
+        "server/aerie/surveys/tests/test_inventory_switchbird_templates.py",
+        "server/aerie/surveys/tests/test_notification_delivery.py",
+        "server/aerie/surveys/tests/test_phase_schedule.py",
+        "server/aerie/surveys/tests/test_phase_schedule_designer.py",
+        "server/aerie/surveys/tests/test_phase_schedule_report.py"
+      ],
+      "tier": 2,
+      "x": 672.0,
+      "y": 510.0
+    },
+    {
+      "id": "api-medications",
+      "path": "server/aerie/medications",
+      "role": "api",
+      "title": "medications (reminders + RTM)",
+      "summary": "MedicationSchedule, dose generation, missed-dose sweeps, RTM billing summaries, drug search.",
+      "entrypoints": [
+        {
+          "path": "server/aerie/medications/urls.py",
+          "symbol": "urlpatterns"
+        },
+        {
+          "path": "server/aerie/medications/views.py",
+          "symbol": "MedicationScheduleViewSet"
+        },
+        {
+          "path": "server/aerie/medications/tasks.py",
+          "symbol": "sync_med_reminder_messages_continuous"
+        }
+      ],
+      "constraints": [
+        "Medication-reminder rules are admin-authored; seeds must not create them.",
+        "Reminder enrolment resolves the inbox per clinic (Clinic.med_reminder_inbox_id)."
+      ],
+      "evidence": {
+        "path": "server/aerie/medications/apps.py",
+        "symbol": "class MedicationsConfig"
+      },
+      "tests": [
+        "server/aerie/medications/tests/test_billing_summaries.py",
+        "server/aerie/medications/tests/test_both_party_consent.py",
+        "server/aerie/medications/tests/test_cleanup_rtm_daily_summaries.py",
+        "server/aerie/medications/tests/test_clinical_details.py",
+        "server/aerie/medications/tests/test_daily_doses.py",
+        "server/aerie/medications/tests/test_diagnosis_catalog.py",
+        "server/aerie/medications/tests/test_dose_state.py",
+        "server/aerie/medications/tests/test_drug_selection.py",
+        "server/aerie/medications/tests/test_enrollment_consent.py",
+        "server/aerie/medications/tests/test_export_report.py",
+        "server/aerie/medications/tests/test_inbox_routing.py",
+        "server/aerie/medications/tests/test_medication_adherence.py"
+      ],
+      "tier": 1,
+      "x": 336.0,
+      "y": 300.0
+    },
+    {
+      "id": "api-chat",
+      "path": "server/aerie/chat",
+      "role": "api",
+      "title": "chat (WebSocket assistant)",
+      "summary": "Channels consumer that authenticates over the socket and streams OpenAI completions.",
+      "entrypoints": [
+        {
+          "path": "server/aerie/chat/consumers.py",
+          "symbol": "class ChatConsumer"
+        },
+        {
+          "path": "server/aerie/chat/urls.py",
+          "symbol": "get_current_system_prompt"
+        }
+      ],
+      "constraints": [
+        "Auth token arrives in the first socket message, never in the URL."
+      ],
+      "evidence": {
+        "path": "server/aerie/routing.py",
+        "symbol": "websocket_urlpatterns"
+      },
+      "tests": [
+        "server/aerie/chat/tests/test_force_disconnect.py",
+        "server/aerie/chat/tests/test_prompt_templates.py"
+      ],
+      "tier": 1,
+      "x": 1344.0,
+      "y": 300.0
+    },
+    {
+      "id": "ops-tooling",
+      "path": "server/aerie/ops",
+      "role": "service",
+      "title": "ops + seeds (staff tooling)",
+      "summary": "Token-gated /_ops/* SQL, logs, settings and command runner, plus the seed/demo command tree.",
+      "entrypoints": [
+        {
+          "path": "server/aerie/ops/urls.py",
+          "symbol": "urlpatterns"
+        },
+        {
+          "path": "server/aerie/ops/views/sql.py",
+          "symbol": "OpsSqlView"
+        },
+        {
+          "path": "server/aerie/seeds/management/commands/seed_test.py",
+          "symbol": "Command"
+        }
+      ],
+      "constraints": [
+        "aerie.ops is in INSTALLED_APPS on dev/staging only — prod stays clean.",
+        "urls.py gates the ops include on apps.is_installed; importing its views unguarded crashes boot."
+      ],
+      "evidence": {
+        "path": "server/aerie/urls.py",
+        "symbol": "apps.is_installed(\"aerie.ops\")"
+      },
+      "tests": [
+        "server/aerie/ops/tests/test_auth.py",
+        "server/aerie/ops/tests/test_patient_admin_reset_phone.py",
+        "server/aerie/ops/tests/test_phone_reset_service.py",
+        "server/aerie/ops/tests/test_refresh_token_mint.py",
+        "server/aerie/ops/tests/test_refresh_token_model.py",
+        "server/aerie/ops/tests/test_reset_phone.py",
+        "server/aerie/ops/tests/test_run.py",
+        "server/aerie/ops/tests/test_sql.py",
+        "server/aerie/ops/tests/test_studyconsole_reset_demo_notifications.py",
+        "server/aerie/ops/tests/test_token_exchange.py",
+        "server/aerie/seeds/tests/test_assertions.py",
+        "server/aerie/seeds/tests/test_bcc_mm_00001_dashboard_routing.py"
+      ],
+      "tier": 2,
+      "x": 1008.0,
+      "y": 510.0
+    },
+    {
+      "id": "platform",
+      "path": "server/aerie/common",
+      "role": "service",
+      "title": "platform (common, utils, db, settings)",
+      "summary": "AbstractBaseModel, URL/ASGI wiring, settings, storages and the email backends.",
+      "entrypoints": [
+        {
+          "path": "server/aerie/urls.py",
+          "symbol": "urlpatterns"
+        },
+        {
+          "path": "server/aerie/asgi.py",
+          "symbol": "application"
+        },
+        {
+          "path": "server/aerie/common/urls.py",
+          "symbol": "health_check"
+        }
+      ],
+      "constraints": [
+        "IN_PROD is computed at import time — override_settings cannot move it.",
+        "Deployed environments force sslmode=require on the default connection.",
+        "Application-level field encryption is not permitted; encryption is database-native."
+      ],
+      "evidence": {
+        "path": "server/aerie/settings/base.py",
+        "symbol": "INSTALLED_APPS"
+      },
+      "tests": [
+        "server/aerie/common/tests/test_audit.py",
+        "server/aerie/common/tests/test_dst_segments.py",
+        "server/aerie/common/tests/test_health_check.py",
+        "server/aerie/common/tests/test_schema_extension_preload.py",
+        "server/aerie/common/tests/test_serve_docs.py",
+        "server/aerie/common/tests/test_strict_filter_backend.py",
+        "server/aerie/utils/tests/test_correlated_s3_presigning.py",
+        "server/aerie/utils/tests/test_cross_org_s3_detector.py",
+        "server/aerie/utils/tests/test_iam_postgresql_backend.py",
+        "server/aerie/utils/tests/test_org_kms_storage.py",
+        "server/aerie/utils/tests/test_rds_iam.py",
+        "server/aerie/utils/tests/test_ses_backend.py"
+      ],
+      "tier": 2,
+      "x": 1344.0,
+      "y": 510.0
+    },
+    {
+      "id": "task-queue",
+      "path": "server/aerie/common/background_tasks.py",
+      "role": "queue",
+      "title": "background_task queue",
+      "summary": "django4-background-tasks (not Celery). Rows live in Postgres; apps self-schedule repeating tasks from ready().",
+      "entrypoints": [
+        {
+          "path": "server/aerie/common/background_tasks.py",
+          "symbol": "start_once"
+        }
+      ],
+      "constraints": [
+        "Auto-start is env-gated (AUTO_START_SWITCHBIRD_SYNC, AUTO_START_MED_REMINDER_TASKS, ...).",
+        "start_once takes a pg advisory lock so parallel containers cannot double-schedule.",
+        "The background_task table is shared across lanes sharing a dev DB."
+      ],
+      "evidence": {
+        "path": "server/aerie/common/background_tasks.py",
+        "symbol": "pg_advisory_xact_lock"
+      },
+      "tests": [
+        "server/aerie/surveys/tests/test_apps_start_once.py",
+        "server/aerie/surveys/tests/test_sync_background_task.py"
+      ],
+      "tier": 2,
+      "x": 336.0,
+      "y": 510.0
+    },
+    {
+      "id": "postgres",
+      "path": "server/aerie/settings/base.py",
+      "role": "datastore",
+      "title": "PostgreSQL (RDS)",
+      "summary": "Primary store for every model plus the background_task queue. Optional read-only alias for staging debug.",
+      "entrypoints": [
+        {
+          "path": "server/aerie/settings/base.py",
+          "symbol": "DATABASES"
+        }
+      ],
+      "constraints": [
+        "Bounded libpq timeouts: connect_timeout=2, statement_timeout=2000.",
+        "default_readonly alias exists only when DB_READONLY_USER/PASSWORD are set."
+      ],
+      "evidence": {
+        "path": "server/aerie/settings/base.py",
+        "symbol": "DATABASES"
+      },
+      "tests": [],
+      "tier": 3,
+      "x": 636.0,
+      "y": 720.0
+    },
+    {
+      "id": "redis",
+      "path": "server/aerie/settings/base.py",
+      "role": "datastore",
+      "title": "Redis (channel layer)",
+      "summary": "Backs CHANNEL_LAYERS for the chat WebSocket group fan-out.",
+      "entrypoints": [
+        {
+          "path": "server/aerie/settings/base.py",
+          "symbol": "CHANNEL_LAYERS"
+        }
+      ],
+      "constraints": [
+        "RedisChannelLayer only — no cache or queue duties."
+      ],
+      "evidence": {
+        "path": "server/aerie/settings/base.py",
+        "symbol": "channels_redis.core.RedisChannelLayer"
+      },
+      "tests": [],
+      "tier": 3,
+      "x": 1452.0,
+      "y": 720.0
+    },
+    {
+      "id": "ext-switchbird",
+      "path": "server/aerie/surveys/services/switchbird.py",
+      "role": "external",
+      "title": "SwitchBird API",
+      "summary": "SMS surveys and calendar-event scheduling. The busiest integration.",
+      "entrypoints": [
+        {
+          "path": "server/aerie/settings/base.py",
+          "symbol": "SWITCHBIRD_API_BASE_URL"
+        }
+      ],
+      "constraints": [
+        "Vendor truncates long message bodies — abort before rule evaluation.",
+        "Surveys are single-threaded per contact; `stopped` is terminal."
+      ],
+      "evidence": {
+        "path": "server/aerie/settings/base.py",
+        "symbol": "SWITCHBIRD_API_BASE_URL"
+      },
+      "tests": [],
+      "tier": 3,
+      "x": 432.0,
+      "y": 720.0
+    },
+    {
+      "id": "ext-firsthx",
+      "path": "server/aerie/surveys/services/firsthx.py",
+      "role": "external",
+      "title": "FirstHx API",
+      "summary": "Patient intake interviews. Blank intake is created server-side; the report is pulled back.",
+      "entrypoints": [
+        {
+          "path": "server/aerie/settings/base.py",
+          "symbol": "FIRSTHX_API_BASE_URL"
+        }
+      ],
+      "constraints": [
+        "Intake is rendered in an iframe from FIRSTHX_INTAKE_URL; CSP frame-src must allow it."
+      ],
+      "evidence": {
+        "path": "server/aerie/settings/base.py",
+        "symbol": "FIRSTHX_API_BASE_URL"
+      },
+      "tests": [],
+      "tier": 3,
+      "x": 840.0,
+      "y": 720.0
+    },
+    {
+      "id": "ext-dropbox-sign",
+      "path": "server/aerie/surveys/services/dropbox_sign.py",
+      "role": "external",
+      "title": "Dropbox Sign API",
+      "summary": "E-consent signature requests; status changes arrive back on a webhook.",
+      "entrypoints": [
+        {
+          "path": "server/aerie/settings/base.py",
+          "symbol": "DROPBOX_SIGN_API_BASE_URL"
+        }
+      ],
+      "constraints": [
+        "Gated by USE_DROPBOX_SIGN; test mode is on everywhere but prod.",
+        "Callback URL must exactly match the configured Amplify domain."
+      ],
+      "evidence": {
+        "path": "server/aerie/settings/base.py",
+        "symbol": "DROPBOX_SIGN_API_BASE_URL"
+      },
+      "tests": [],
+      "tier": 3,
+      "x": 228.0,
+      "y": 720.0
+    },
+    {
+      "id": "ext-openai",
+      "path": "server/aerie/chat/consumers.py",
+      "role": "external",
+      "title": "OpenAI API",
+      "summary": "Streaming chat completions for the in-app assistant.",
+      "entrypoints": [
+        {
+          "path": "server/aerie/settings/base.py",
+          "symbol": "OPENAI_API_KEY"
+        }
+      ],
+      "constraints": [
+        "Called from async consumer code via AsyncOpenAI."
+      ],
+      "evidence": {
+        "path": "server/aerie/chat/consumers.py",
+        "symbol": "AsyncOpenAI"
+      },
+      "tests": [],
+      "tier": 3,
+      "x": 1656.0,
+      "y": 720.0
+    },
+    {
+      "id": "ext-rxnav",
+      "path": "server/aerie/medications/services/rxnav.py",
+      "role": "external",
+      "title": "NIH RxNav API",
+      "summary": "Drug-name search proxied through the medications app; replaced a bulk RRF sync.",
+      "entrypoints": [
+        {
+          "path": "server/aerie/medications/services/rxnav.py",
+          "symbol": "RXNAV_BASE_URL"
+        }
+      ],
+      "constraints": [
+        "Per-request timeout 5s with an 8s overall fan-out budget; partial results are returned on exhaustion.",
+        "Only SBD/SCD (prescribable) concepts are kept."
+      ],
+      "evidence": {
+        "path": "server/aerie/medications/services/rxnav.py",
+        "symbol": "RXNAV_BASE_URL"
+      },
+      "tests": [],
+      "tier": 3,
+      "x": 24.0,
+      "y": 720.0
+    },
+    {
+      "id": "ext-s3",
+      "path": "server/aerie/utils/storages.py",
+      "role": "external",
+      "title": "AWS S3 (private media)",
+      "summary": "Consent PDFs and uploads behind presigned URLs, optionally per-organization KMS keys.",
+      "entrypoints": [
+        {
+          "path": "server/aerie/utils/storages.py",
+          "symbol": "class PrivateMediaStorage"
+        }
+      ],
+      "constraints": [
+        "SigV4 is explicit — the buckets are SSE-KMS and S3 serves those only over SigV4.",
+        "Presigned URLs expire after one hour."
+      ],
+      "evidence": {
+        "path": "server/aerie/utils/storages.py",
+        "symbol": "S3Boto3Storage"
+      },
+      "tests": [],
+      "tier": 3,
+      "x": 1248.0,
+      "y": 720.0
+    },
+    {
+      "id": "ext-email",
+      "path": "server/aerie/utils/ses_backend.py",
+      "role": "external",
+      "title": "Email (SES / Mailgun)",
+      "summary": "Anymail backends; staging assumes the prod SES role. Bounces and complaints feed a suppression list.",
+      "entrypoints": [
+        {
+          "path": "server/aerie/utils/ses_backend.py",
+          "symbol": "AssumeRoleSESBackend"
+        },
+        {
+          "path": "server/aerie/core/signals.py",
+          "symbol": "handle_ses_tracking_event"
+        }
+      ],
+      "constraints": [
+        "Provider is chosen at import time by ENABLE_EMAILS + EMAIL_PROVIDER.",
+        "Anymail 8.4 does not verify SNS signatures — the webhook relies on HTTP Basic auth."
+      ],
+      "evidence": {
+        "path": "server/aerie/settings/base.py",
+        "symbol": "EMAIL_BACKEND"
+      },
+      "tests": [],
+      "tier": 3,
+      "x": 1044.0,
+      "y": 720.0
+    }
+  ],
+  "edges": [
+    {
+      "from": "client-v1",
+      "to": "api-surveys",
+      "type": "calls",
+      "evidence": {
+        "path": "client/src/services/patient/api.ts",
+        "symbol": "axiosInstance"
+      }
+    },
+    {
+      "from": "client-v1",
+      "to": "api-core",
+      "type": "calls",
+      "evidence": {
+        "path": "client/src/services/user/api.ts",
+        "symbol": "axiosInstance"
+      }
+    },
+    {
+      "from": "client-v1",
+      "to": "api-chat",
+      "type": "calls",
+      "evidence": {
+        "path": "client/src/components/chat-interface.tsx",
+        "symbol": "WebSocket"
+      }
+    },
+    {
+      "from": "client-v2",
+      "to": "api-medications",
+      "type": "calls",
+      "evidence": {
+        "path": "client-v2/src/services/medication-schedule/api.ts",
+        "symbol": "searchDrugsCall"
+      }
+    },
+    {
+      "from": "client-v2",
+      "to": "api-core",
+      "type": "calls",
+      "evidence": {
+        "path": "client-v2/src/services/user/api.ts",
+        "symbol": "axiosInstance"
+      }
+    },
+    {
+      "from": "client-v2",
+      "to": "api-chat",
+      "type": "calls",
+      "evidence": {
+        "path": "client-v2/src/components/chat-interface.tsx",
+        "symbol": "WebSocket"
+      }
+    },
+    {
+      "from": "client-v2",
+      "to": "shared-ts",
+      "type": "imports",
+      "evidence": {
+        "path": "client-v2/package.json",
+        "symbol": "@aerie/shared"
+      }
+    },
+    {
+      "from": "platform",
+      "to": "api-surveys",
+      "type": "imports",
+      "evidence": {
+        "path": "server/aerie/urls.py",
+        "symbol": "aerie.surveys.urls"
+      }
+    },
+    {
+      "from": "platform",
+      "to": "api-medications",
+      "type": "imports",
+      "evidence": {
+        "path": "server/aerie/urls.py",
+        "symbol": "aerie.medications.urls"
+      }
+    },
+    {
+      "from": "platform",
+      "to": "api-core",
+      "type": "imports",
+      "evidence": {
+        "path": "server/aerie/urls.py",
+        "symbol": "aerie.core.urls"
+      }
+    },
+    {
+      "from": "platform",
+      "to": "api-chat",
+      "type": "imports",
+      "evidence": {
+        "path": "server/aerie/routing.py",
+        "symbol": "ChatConsumer"
+      }
+    },
+    {
+      "from": "platform",
+      "to": "ops-tooling",
+      "type": "imports",
+      "evidence": {
+        "path": "server/aerie/urls.py",
+        "symbol": "aerie.ops.urls"
+      }
+    },
+    {
+      "from": "api-surveys",
+      "to": "platform",
+      "type": "imports",
+      "evidence": {
+        "path": "server/aerie/surveys/models.py",
+        "symbol": "AbstractBaseModel"
+      }
+    },
+    {
+      "from": "api-medications",
+      "to": "platform",
+      "type": "imports",
+      "evidence": {
+        "path": "server/aerie/medications/models.py",
+        "symbol": "AbstractBaseModel"
+      }
+    },
+    {
+      "from": "api-surveys",
+      "to": "api-core",
+      "type": "imports",
+      "evidence": {
+        "path": "server/aerie/surveys/admin_displays.py",
+        "symbol": "from aerie.core.models import UserClinicMembership"
+      }
+    },
+    {
+      "from": "api-medications",
+      "to": "api-surveys",
+      "type": "imports",
+      "evidence": {
+        "path": "server/aerie/medications/rtm_summaries.py",
+        "symbol": "from aerie.surveys.models import"
+      }
+    },
+    {
+      "from": "api-chat",
+      "to": "api-core",
+      "type": "imports",
+      "evidence": {
+        "path": "server/aerie/chat/middleware.py",
+        "symbol": "Token"
+      }
+    },
+    {
+      "from": "api-surveys",
+      "to": "surveys-services",
+      "type": "calls",
+      "evidence": {
+        "path": "server/aerie/surveys/helpers.py",
+        "symbol": "get_switchbird_service"
+      }
+    },
+    {
+      "from": "api-medications",
+      "to": "surveys-services",
+      "type": "calls",
+      "evidence": {
+        "path": "server/aerie/medications/tasks.py",
+        "symbol": "get_switchbird_service"
+      }
+    },
+    {
+      "from": "ops-tooling",
+      "to": "surveys-services",
+      "type": "calls",
+      "evidence": {
+        "path": "server/aerie/ops/services/phone_reset.py",
+        "symbol": "get_switchbird_service"
+      }
+    },
+    {
+      "from": "surveys-services",
+      "to": "ext-switchbird",
+      "type": "calls",
+      "evidence": {
+        "path": "server/aerie/surveys/services/switchbird.py",
+        "symbol": "self.api_base_url"
+      }
+    },
+    {
+      "from": "surveys-services",
+      "to": "ext-firsthx",
+      "type": "calls",
+      "evidence": {
+        "path": "server/aerie/surveys/services/firsthx.py",
+        "symbol": "retrieve_report"
+      }
+    },
+    {
+      "from": "surveys-services",
+      "to": "ext-dropbox-sign",
+      "type": "calls",
+      "evidence": {
+        "path": "server/aerie/surveys/services/dropbox_sign.py",
+        "symbol": "class DropboxSignService"
+      }
+    },
+    {
+      "from": "api-chat",
+      "to": "ext-openai",
+      "type": "calls",
+      "evidence": {
+        "path": "server/aerie/chat/consumers.py",
+        "symbol": "handle_streaming_chat"
+      }
+    },
+    {
+      "from": "api-medications",
+      "to": "ext-rxnav",
+      "type": "calls",
+      "evidence": {
+        "path": "server/aerie/medications/services/rxnav.py",
+        "symbol": "search_drugs"
+      }
+    },
+    {
+      "from": "platform",
+      "to": "ext-s3",
+      "type": "writes",
+      "evidence": {
+        "path": "server/aerie/utils/storages.py",
+        "symbol": "class PrivateMediaStorage"
+      }
+    },
+    {
+      "from": "platform",
+      "to": "ext-email",
+      "type": "calls",
+      "evidence": {
+        "path": "server/aerie/utils/ses_backend.py",
+        "symbol": "AssumeRoleSESBackend"
+      }
+    },
+    {
+      "from": "api-core",
+      "to": "ext-email",
+      "type": "subscribes",
+      "evidence": {
+        "path": "server/aerie/core/apps.py",
+        "symbol": "tracking.connect"
+      }
+    },
+    {
+      "from": "ext-dropbox-sign",
+      "to": "api-surveys",
+      "type": "publishes",
+      "evidence": {
+        "path": "server/aerie/surveys/urls.py",
+        "symbol": "dropbox-sign/webhook/"
+      }
+    },
+    {
+      "from": "api-core",
+      "to": "postgres",
+      "type": "writes",
+      "evidence": {
+        "path": "server/aerie/core/models.py",
+        "symbol": "class User"
+      }
+    },
+    {
+      "from": "api-surveys",
+      "to": "postgres",
+      "type": "writes",
+      "evidence": {
+        "path": "server/aerie/surveys/models.py",
+        "symbol": "class Survey"
+      }
+    },
+    {
+      "from": "api-medications",
+      "to": "postgres",
+      "type": "writes",
+      "evidence": {
+        "path": "server/aerie/medications/models.py",
+        "symbol": "class MedicationSchedule"
+      }
+    },
+    {
+      "from": "ops-tooling",
+      "to": "postgres",
+      "type": "reads",
+      "evidence": {
+        "path": "server/aerie/ops/views/sql.py",
+        "symbol": "connections"
+      }
+    },
+    {
+      "from": "task-queue",
+      "to": "postgres",
+      "type": "writes",
+      "evidence": {
+        "path": "server/aerie/common/background_tasks.py",
+        "symbol": "Task.objects.filter"
+      }
+    },
+    {
+      "from": "api-chat",
+      "to": "redis",
+      "type": "publishes",
+      "evidence": {
+        "path": "server/aerie/chat/consumers.py",
+        "symbol": "channel_layer.group_add"
+      }
+    },
+    {
+      "from": "platform",
+      "to": "redis",
+      "type": "reads",
+      "evidence": {
+        "path": "server/aerie/settings/base.py",
+        "symbol": "CHANNEL_LAYERS"
+      }
+    },
+    {
+      "from": "platform",
+      "to": "postgres",
+      "type": "reads",
+      "evidence": {
+        "path": "server/aerie/settings/base.py",
+        "symbol": "dj_database_url.config"
+      }
+    },
+    {
+      "from": "api-surveys",
+      "to": "task-queue",
+      "type": "publishes",
+      "evidence": {
+        "path": "server/aerie/surveys/apps.py",
+        "symbol": "start_once"
+      }
+    },
+    {
+      "from": "api-medications",
+      "to": "task-queue",
+      "type": "publishes",
+      "evidence": {
+        "path": "server/aerie/medications/apps.py",
+        "symbol": "start_once"
+      }
+    },
+    {
+      "from": "task-queue",
+      "to": "api-surveys",
+      "type": "calls",
+      "evidence": {
+        "path": "server/aerie/surveys/tasks.py",
+        "symbol": "@background"
+      }
+    },
+    {
+      "from": "task-queue",
+      "to": "api-medications",
+      "type": "calls",
+      "evidence": {
+        "path": "server/aerie/medications/tasks.py",
+        "symbol": "@background"
+      }
+    },
+    {
+      "from": "ops-tooling",
+      "to": "api-surveys",
+      "type": "imports",
+      "evidence": {
+        "path": "server/aerie/seeds/_common.py",
+        "symbol": "from aerie.surveys.models import"
+      }
+    },
+    {
+      "from": "client-v1",
+      "to": "ext-firsthx",
+      "type": "reads",
+      "evidence": {
+        "path": "client/src/components/firsthx-iframe.tsx",
+        "symbol": "https://intake.firsthx.com"
+      }
+    }
+  ],
+  "flows": [
+    {
+      "id": "flow-switchbird-survey",
+      "name": "SwitchBird SMS assessment round-trip",
+      "trigger": "The self-scheduling background task sync_switchbird_surveys_continuous fires (every 60s when AUTO_START_SWITCHBIRD_SYNC=true).",
+      "steps": [
+        {
+          "node": "task-queue",
+          "detail": "start_once schedules the repeating sync under a pg advisory lock."
+        },
+        {
+          "node": "api-surveys",
+          "detail": "tasks.sync_switchbird_surveys_continuous walks Organizations with a switchbird_inbox_id."
+        },
+        {
+          "node": "surveys-services",
+          "detail": "SwitchBirdSyncService pages the vendor via get_switchbird_service()."
+        },
+        {
+          "node": "ext-switchbird",
+          "detail": "SwitchBird returns survey runs and message bodies for the inbox."
+        },
+        {
+          "node": "surveys-services",
+          "detail": "SurveyIngestionService normalizes the payload into Survey fields."
+        },
+        {
+          "node": "postgres",
+          "detail": "Survey rows are created or updated."
+        },
+        {
+          "node": "api-surveys",
+          "detail": "PatientViewSet dashboard action aggregates the rows per study."
+        },
+        {
+          "node": "client-v1",
+          "detail": "The dashboard page renders the assessment results."
+        }
+      ],
+      "outcome": "Patient SMS assessment responses land as Survey rows and surface on the clinician dashboard."
+    },
+    {
+      "id": "flow-econsent",
+      "name": "E-consent signature",
+      "trigger": "A staff user creates a SignatureRequest, or a survey completion schedules trigger_signature_request.",
+      "steps": [
+        {
+          "node": "client-v1",
+          "detail": "Signature request is created from the study console."
+        },
+        {
+          "node": "api-surveys",
+          "detail": "SignatureRequestViewSet validates and persists the request."
+        },
+        {
+          "node": "surveys-services",
+          "detail": "DropboxSignService sends the signature request to the vendor."
+        },
+        {
+          "node": "ext-dropbox-sign",
+          "detail": "Vendor emails the signer and hosts the signing page."
+        },
+        {
+          "node": "api-surveys",
+          "detail": "dropbox_sign_webhook verifies the event and routes it."
+        },
+        {
+          "node": "postgres",
+          "detail": "SignatureRequest / PendingConsent status is advanced."
+        },
+        {
+          "node": "ext-s3",
+          "detail": "The executed consent PDF is stored under PrivateMediaStorage."
+        }
+      ],
+      "outcome": "A countersigned consent document is on file and the patient's consent status is current."
+    },
+    {
+      "id": "flow-firsthx-intake",
+      "name": "FirstHx intake capture",
+      "trigger": "A patient intake is started for a study configured with a FirstHx intake plan.",
+      "steps": [
+        {
+          "node": "api-surveys",
+          "detail": "Survey/patient views call into the FirstHx door."
+        },
+        {
+          "node": "surveys-services",
+          "detail": "FirstHxService.create_blank_intake provisions the interview."
+        },
+        {
+          "node": "ext-firsthx",
+          "detail": "FirstHx hosts the interview and holds the report."
+        },
+        {
+          "node": "surveys-services",
+          "detail": "retrieve_report / extract_processed_data pull and normalize the result."
+        },
+        {
+          "node": "postgres",
+          "detail": "Survey.processed_data and patient identity fields are written."
+        },
+        {
+          "node": "task-queue",
+          "detail": "complete_patient_creation is queued off the survey signal."
+        }
+      ],
+      "outcome": "An intake interview becomes a Survey row with processed_data plus a fully created Patient."
+    },
+    {
+      "id": "flow-med-reminder",
+      "name": "Medication reminder enrolment and adherence",
+      "trigger": "A clinician creates a MedicationSchedule in client-v2.",
+      "steps": [
+        {
+          "node": "client-v2",
+          "detail": "Medication schedule form posts to the schedules endpoint."
+        },
+        {
+          "node": "api-medications",
+          "detail": "MedicationScheduleViewSet validates drug, dose windows and clinic inbox."
+        },
+        {
+          "node": "ext-rxnav",
+          "detail": "RxNav resolves the drug concept during search."
+        },
+        {
+          "node": "postgres",
+          "detail": "MedicationSchedule plus generated dose rows are written."
+        },
+        {
+          "node": "task-queue",
+          "detail": "sync_med_reminder_messages_continuous and the missed-dose sweep are scheduled."
+        },
+        {
+          "node": "surveys-services",
+          "detail": "get_switchbird_service builds the per-clinic calendar events."
+        },
+        {
+          "node": "ext-switchbird",
+          "detail": "SwitchBird sends the reminder texts and reports replies."
+        },
+        {
+          "node": "api-medications",
+          "detail": "mark_missed_doses records non-responses and RTM summaries are generated."
+        }
+      ],
+      "outcome": "A patient receives scheduled reminder texts and adherence is tracked for RTM billing."
+    },
+    {
+      "id": "flow-chat",
+      "name": "In-app assistant chat",
+      "trigger": "A user opens the chat panel and the browser connects to ws/chat/.",
+      "steps": [
+        {
+          "node": "client-v1",
+          "detail": "chat-interface opens a WebSocket and sends an auth message first."
+        },
+        {
+          "node": "api-chat",
+          "detail": "ChatConsumer authenticates the token and joins the user group."
+        },
+        {
+          "node": "redis",
+          "detail": "The channel layer holds group membership for fan-out and force-disconnect."
+        },
+        {
+          "node": "ext-openai",
+          "detail": "AsyncOpenAI streams completion chunks."
+        },
+        {
+          "node": "api-chat",
+          "detail": "handle_streaming_chat relays chunks back over the socket."
+        }
+      ],
+      "outcome": "The user gets a streamed assistant reply without the auth token ever appearing in a URL."
+    }
+  ]
+}
+</script>
+<script>
+const DATA = JSON.parse(document.getElementById('codemap').textContent);
+const COLORS = {"client": "#5eb0ef", "api": "#7ee2b8", "service": "#c9a0ff", "queue": "#ffc95e", "datastore": "#ff8fa3", "external": "#8c9bb5"};
+const TIER_NAMES = ['clients', 'api apps', 'services & queue', 'data & external'];
+const NW = 178, NH = 52;
+const svg = document.getElementById('svg'), root = document.getElementById('root');
+const panel = document.getElementById('panel');
+const byId = Object.fromEntries(DATA.nodes.map(n => [n.id, n]));
+const hidden = new Set();
+let selected = null, activeFlow = '';
+
+const ns = 'http://www.w3.org/2000/svg';
+const el = (t, a) => { const e = document.createElementNS(ns, t);
+  for (const k in a) e.setAttribute(k, a[k]); return e; };
+
+// tier bands
+DATA.nodes.forEach(n => { n.cx = n.x; n.cy = n.y; });
+TIER_NAMES.forEach((name, t) => {
+  const rows = DATA.nodes.filter(n => n.tier === t);
+  if (!rows.length) return;
+  const y = Math.min(...rows.map(n => n.cy)) - NH / 2 - 22;
+  const x = Math.min(...DATA.nodes.map(n => n.cx)) - NW / 2;
+  const lbl = el('text', { x: x, y: y, class: 'tierlabel' });
+  lbl.textContent = name; root.appendChild(lbl);
+});
+
+const edgeEls = DATA.edges.map((e, i) => {
+  const p = el('path', { class: 'edge' + (e.evidence === 'unknown' ? ' unknown' : '') });
+  p.dataset.i = i; root.appendChild(p); return p;
+});
+
+const nodeEls = DATA.nodes.map(n => {
+  const g = el('g', { class: 'node' });
+  g.dataset.id = n.id;
+  const r = el('rect', { x: -NW / 2, y: -NH / 2, width: NW, height: NH, rx: 9,
+    fill: COLORS[n.role], stroke: COLORS[n.role] });
+  const t1 = el('text', { class: 'label', 'text-anchor': 'middle', y: -4 });
+  t1.textContent = n.title.length > 26 ? n.title.slice(0, 25) + '\u2026' : n.title;
+  const t2 = el('text', { class: 'sub', 'text-anchor': 'middle', y: 13 });
+  t2.textContent = n.id;
+  g.append(r, t1, t2); root.appendChild(g); return g;
+});
+
+function place() {
+  DATA.nodes.forEach((n, i) => {
+    nodeEls[i].setAttribute('transform', `translate(${n.cx},${n.cy})`);
+    nodeEls[i].style.display = hidden.has(n.role) ? 'none' : '';
+  });
+  DATA.edges.forEach((e, i) => {
+    const a = byId[e.from], b = byId[e.to];
+    const mx = (a.cx + b.cx) / 2, my = (a.cy + b.cy) / 2 + (a.cy === b.cy ? -54 : 0);
+    edgeEls[i].setAttribute('d', `M${a.cx},${a.cy} Q${mx},${my} ${b.cx},${b.cy}`);
+    edgeEls[i].style.display =
+      (hidden.has(a.role) || hidden.has(b.role)) ? 'none' : '';
+  });
+}
+
+// A flow hop is an ordering of steps, not necessarily a single code edge. Hops that
+// match a graph edge light that edge; hops that do not get a dashed connector, so the
+// path reads end to end without the map claiming an edge the source does not have.
+function flowEdgeSet(flow) {
+  const s = new Set(), hops = [];
+  for (let i = 0; i < flow.steps.length - 1; i++) {
+    const a = flow.steps[i].node, b = flow.steps[i + 1].node;
+    if (a === b) continue;
+    let found = false;
+    DATA.edges.forEach((e, idx) => {
+      if ((e.from === a && e.to === b) || (e.from === b && e.to === a)) {
+        s.add(idx); found = true;
+      }
+    });
+    if (!found) hops.push([a, b]);
+  }
+  return { edges: s, hops };
+}
+
+const hopLayer = el('g', {});
+root.appendChild(hopLayer);
+
+function drawHops(hops) {
+  hopLayer.textContent = '';
+  hops.forEach(([a, b]) => {
+    const p = byId[a], q = byId[b];
+    const mx = (p.cx + q.cx) / 2, my = (p.cy + q.cy) / 2 + (p.cy === q.cy ? -54 : 0);
+    const path = el('path', { class: 'edge flow hop',
+      d: `M${p.cx},${p.cy} Q${mx},${my} ${q.cx},${q.cy}` });
+    hopLayer.appendChild(path);
+  });
+}
+
+function paint() {
+  const q = document.getElementById('q').value.trim().toLowerCase();
+  const flow = DATA.flows.find(f => f.id === activeFlow);
+  const flowNodes = flow ? new Set(flow.steps.map(s => s.node)) : null;
+  const path = flow ? flowEdgeSet(flow) : null;
+  const flowEdges = path ? path.edges : null;
+  drawHops(path ? path.hops : []);
+  const up = new Set(), down = new Set();
+  if (selected) DATA.edges.forEach((e, i) => {
+    if (e.to === selected) up.add(i);
+    if (e.from === selected) down.add(i);
+  });
+  const related = new Set(selected ? [selected] : []);
+  DATA.edges.forEach((e, i) => { if (up.has(i)) related.add(e.from);
+    if (down.has(i)) related.add(e.to); });
+
+  DATA.nodes.forEach((n, i) => {
+    let dim = false;
+    if (q) {
+      const hay = [n.id, n.title, n.path, n.summary, n.role,
+        ...(n.entrypoints || []).map(x => x.path + ' ' + x.symbol),
+        ...(n.tests || [])].join(' ').toLowerCase();
+      dim = !hay.includes(q);
+    }
+    if (flowNodes && !flowNodes.has(n.id)) dim = true;
+    if (selected && !related.has(n.id)) dim = true;
+    nodeEls[i].classList.toggle('dim', dim);
+    nodeEls[i].classList.toggle('sel', n.id === selected);
+  });
+
+  // A search keeps the edges whose BOTH ends matched, so a hit reads as a subgraph
+  // rather than a scatter of disconnected boxes.
+  const lit = new Set(DATA.nodes.filter((n, i) =>
+    !nodeEls[i].classList.contains('dim')).map(n => n.id));
+  DATA.edges.forEach((e, i) => {
+    const c = edgeEls[i].classList;
+    c.remove('up', 'down', 'flow', 'dim');
+    const joinsLit = lit.has(e.from) && lit.has(e.to);
+    if (flowEdges && flowEdges.has(i)) c.add('flow');
+    else if (up.has(i)) c.add('up');
+    else if (down.has(i)) c.add('down');
+    else if (q && !selected && !flowNodes && joinsLit) c.add('up');
+    else if (selected || flowNodes || q) c.add('dim');
+  });
+}
+
+const esc = s => String(s).replace(/[&<>]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]));
+const ev = e => e.evidence === 'unknown'
+  ? `<span class="unknown">unknown</span>${e.note ? ' &mdash; ' + esc(e.note) : ''}`
+  : `<code>${esc(e.evidence.path)}</code> &middot; <code>${esc(e.evidence.symbol)}</code>`;
+
+function showNode(id) {
+  const n = byId[id];
+  const up = DATA.edges.filter(e => e.to === id);
+  const down = DATA.edges.filter(e => e.from === id);
+  const flows = DATA.flows.filter(f => f.steps.some(s => s.node === id));
+  panel.innerHTML = `
+    <h2>${esc(n.title)}</h2>
+    <p class="path">${esc(n.path)}</p>
+    <p>${esc(n.summary)}</p>
+    <h3>evidence</h3><p><code>${esc(n.evidence.path)}</code> &middot; <code>${esc(n.evidence.symbol)}</code></p>
+    <h3>entrypoints</h3><ul>${n.entrypoints.map(e =>
+      `<li><code>${esc(e.path)}</code> &middot; <code>${esc(e.symbol)}</code></li>`).join('') || '<li>none</li>'}</ul>
+    <h3>upstream callers (${up.length})</h3><ul>${up.map(e =>
+      `<li><b>${esc(e.from)}</b> <i>${esc(e.type)}</i><br>${ev(e)}</li>`).join('') || '<li>none</li>'}</ul>
+    <h3>downstream dependencies (${down.length})</h3><ul>${down.map(e =>
+      `<li><b>${esc(e.to)}</b> <i>${esc(e.type)}</i><br>${ev(e)}</li>`).join('') || '<li>none</li>'}</ul>
+    <h3>tests (${n.tests.length})</h3><ul>${n.tests.map(t =>
+      `<li><code>${esc(t)}</code></li>`).join('') || '<li>none found in scope</li>'}</ul>
+    <h3>flows</h3><ul>${flows.map(f =>
+      `<li>${esc(f.name)}</li>`).join('') || '<li>none</li>'}</ul>
+    <h3>constraints</h3><ul>${n.constraints.map(c => `<li>${esc(c)}</li>`).join('')}</ul>`;
+}
+
+function showFlow(f) {
+  panel.innerHTML = `
+    <h2>${esc(f.name)}</h2>
+    <h3>trigger</h3><p>${esc(f.trigger)}</p>
+    <h3>steps</h3><ol>${f.steps.map(s =>
+      `<li><b>${esc(s.node)}</b><br>${esc(s.detail)}</li>`).join('')}</ol>
+    <h3>outcome</h3><p>${esc(f.outcome)}</p>`;
+}
+
+function showOverview() {
+  const unknown = DATA.edges.filter(e => e.evidence === 'unknown');
+  panel.innerHTML = `
+    <h2>Overview</h2>
+    <p>Click any module to highlight its upstream callers, downstream dependencies,
+       tests and flows. Pick a flow to trace a full path. Drag a module to reposition it;
+       drag the background to pan, scroll to zoom.</p>
+    <h3>scope</h3><ul>${DATA.scope.map(s => `<li><code>${esc(s)}</code></li>`).join('')}</ul>
+    <h3>flows</h3><ol>${DATA.flows.map(f => `<li>${esc(f.name)}</li>`).join('')}</ol>
+    <h3>unmapped relationships (${unknown.length})</h3>
+    <ul>${unknown.map(e =>
+      `<li><b>${esc(e.from)} &rarr; ${esc(e.to)}</b><br>${ev(e)}</li>`).join('') || '<li>none</li>'}</ul>`;
+}
+
+nodeEls.forEach((g, i) => {
+  g.addEventListener('click', ev2 => {
+    ev2.stopPropagation();
+    if (dragMoved) return;
+    const id = DATA.nodes[i].id;
+    selected = selected === id ? null : id;
+    selected ? showNode(selected) : showOverview();
+    paint();
+  });
+});
+
+// pan / zoom / drag
+let view = { x: 0, y: 0, k: 1 }, panning = null, dragging = null, dragMoved = false;
+const apply = () => root.setAttribute('transform',
+  `translate(${view.x},${view.y}) scale(${view.k})`);
+
+svg.addEventListener('pointerdown', e => {
+  const g = e.target.closest('.node');
+  dragMoved = false;
+  if (g) {
+    dragging = { node: byId[g.dataset.id], x: e.clientX, y: e.clientY };
+  } else {
+    panning = { x: e.clientX - view.x, y: e.clientY - view.y };
+    svg.classList.add('grabbing');
+  }
+  // Capture can throw if the pointer was already released elsewhere; the drag
+  // still works without it, so never let it abort the handler.
+  try { svg.setPointerCapture(e.pointerId); } catch { /* no active pointer */ }
+});
+svg.addEventListener('pointermove', e => {
+  if (dragging) {
+    const dx = (e.clientX - dragging.x) / view.k, dy = (e.clientY - dragging.y) / view.k;
+    if (Math.abs(dx) + Math.abs(dy) > 1) dragMoved = true;
+    dragging.node.cx += dx; dragging.node.cy += dy;
+    dragging.x = e.clientX; dragging.y = e.clientY;
+    place();
+  } else if (panning) {
+    view.x = e.clientX - panning.x; view.y = e.clientY - panning.y; apply();
+  }
+});
+svg.addEventListener('pointerup', e => {
+  dragging = null; panning = null; svg.classList.remove('grabbing');
+  try { svg.releasePointerCapture(e.pointerId); } catch { /* already released */ }
+});
+svg.addEventListener('wheel', e => {
+  e.preventDefault();
+  const r = svg.getBoundingClientRect();
+  const mx = e.clientX - r.left, my = e.clientY - r.top;
+  const k = Math.min(3, Math.max(0.25, view.k * (e.deltaY < 0 ? 1.12 : 1 / 1.12)));
+  view.x = mx - (mx - view.x) * (k / view.k);
+  view.y = my - (my - view.y) * (k / view.k);
+  view.k = k; apply();
+}, { passive: false });
+
+function fit() {
+  const r = svg.getBoundingClientRect();
+  const xs = DATA.nodes.map(n => n.cx), ys = DATA.nodes.map(n => n.cy);
+  const x0 = Math.min(...xs) - NW / 2 - 40, y0 = Math.min(...ys) - NH / 2 - 46;
+  const w = Math.max(...xs) + NW / 2 + 40 - x0;
+  const h = Math.max(...ys) + NH / 2 + 24 - y0;
+  view.k = Math.min(r.width / w, r.height / h, 1.4);
+  view.x = (r.width - w * view.k) / 2 - x0 * view.k;
+  view.y = (r.height - h * view.k) / 2 - y0 * view.k;
+  apply();
+}
+
+document.getElementById('zin').onclick = () => { view.k = Math.min(3, view.k * 1.2); apply(); };
+document.getElementById('zout').onclick = () => { view.k = Math.max(0.25, view.k / 1.2); apply(); };
+document.getElementById('reset').onclick = () => {
+  DATA.nodes.forEach(n => { n.cx = n.x; n.cy = n.y; });
+  selected = null; activeFlow = ''; hidden.clear();
+  document.getElementById('q').value = ''; document.getElementById('flow').value = '';
+  document.querySelectorAll('.chip').forEach(c => c.classList.remove('off'));
+  place(); paint(); showOverview(); fit();
+};
+document.getElementById('q').addEventListener('input', paint);
+
+const sel = document.getElementById('flow');
+DATA.flows.forEach(f => {
+  const o = document.createElement('option'); o.value = f.id; o.textContent = f.name;
+  sel.appendChild(o);
+});
+sel.addEventListener('change', () => {
+  activeFlow = sel.value;
+  const f = DATA.flows.find(x => x.id === activeFlow);
+  selected = null;
+  f ? showFlow(f) : showOverview();
+  paint();
+});
+
+document.querySelectorAll('#legend .chip').forEach(chip => {
+  const role = chip.textContent.trim();
+  chip.addEventListener('click', () => {
+    hidden.has(role) ? hidden.delete(role) : hidden.add(role);
+    chip.classList.toggle('off', hidden.has(role));
+    place(); paint();
+  });
+});
+
+svg.addEventListener('click', e => {
+  if (e.target.closest('.node') || dragMoved) return;
+  selected = null; showOverview(); paint();
+});
+
+place(); paint(); showOverview();
+window.addEventListener('resize', fit);
+fit();
+</script>
+</body>
+</html>

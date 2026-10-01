@@ -1,0 +1,18 @@
+@startuml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Context.puml
+HIDE_STEREOTYPE()
+
+title Online Banking System - Context
+
+Person(user, "User", "A customer accessing banking services via web browser")
+System(banking_system, "Banking System", "Core online banking platform")
+System_Ext(payment_processor, "Payment Processor (Visa)", "Handles external payment processing")
+System_Ext(notification_service, "Notification Service (Twilio)", "Sends SMS and email notifications")
+System(fraud_detection, "Fraud Detection System", "Internal system that monitors for fraudulent activity")
+
+Rel(user, banking_system, "Uses", "HTTPS")
+Rel(banking_system, payment_processor, "Processes payments", "API")
+Rel(banking_system, notification_service, "Sends notifications", "API")
+Rel(fraud_detection, banking_system, "Monitors transactions", "API")
+
+@enduml

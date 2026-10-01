@@ -1,0 +1,391 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>scrumlr.io code map</title>
+<style>
+  :root{
+    --bg:#0d1117; --panel:#131a24; --panel-2:#182130; --line:#243044;
+    --fg:#e6edf3; --muted:#8b98a9; --dim:#5d6b7d;
+    --frontend:#7aa2f7; --backend:#9ece6a; --service:#e0af68; --data:#bb9af7; --external:#f7768e;
+    --imports:#6a7f9e; --calls:#7aa2f7; --reads:#9ece6a; --writes:#e0af68;
+    --publishes:#bb9af7; --subscribes:#2ac3de; --unknown:#f7768e;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%;background:var(--bg);color:var(--fg);
+    font:14px/1.55 ui-sans-serif,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
+  a{color:var(--calls)}
+  header{padding:14px 20px;border-bottom:1px solid var(--line);display:flex;
+    gap:18px;align-items:baseline;flex-wrap:wrap;background:var(--panel)}
+  header h1{margin:0;font-size:17px;font-weight:650;letter-spacing:.2px}
+  header .meta{color:var(--muted);font-size:12px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+  #layout{display:flex;height:calc(100% - 57px);min-height:0}
+  #stage{flex:1;position:relative;min-width:0;overflow:hidden}
+  svg{width:100%;height:100%;display:block;cursor:grab}
+  svg.dragging{cursor:grabbing}
+  .nodebox rect{fill:var(--panel-2);stroke:var(--line);stroke-width:1.5;rx:8}
+  .nodebox:hover rect{stroke:var(--fg)}
+  .nodebox.sel rect{stroke:#fff;stroke-width:2.5}
+  .nodebox.dimmed{opacity:.18}
+  .nodebox text{pointer-events:none}
+  .nodebox .t{font-size:12.5px;font-weight:600;fill:var(--fg)}
+  .nodebox .s{font-size:10px;fill:var(--muted);font-family:ui-monospace,Menlo,monospace}
+  .nodebox .bar{stroke:none}
+  .edge{fill:none;stroke-width:1.6;opacity:.55}
+  .edge.hot{opacity:1;stroke-width:3}
+  .edge.dimmed{opacity:.06}
+  .edge.unk{stroke-dasharray:5 4}
+  .grouplabel{fill:var(--dim);font-size:11px;letter-spacing:1.6px;text-transform:uppercase}
+  #side{width:430px;flex:none;border-left:1px solid var(--line);background:var(--panel);
+    overflow:auto;padding:0 0 40px}
+  #tabs{display:flex;border-bottom:1px solid var(--line);position:sticky;top:0;background:var(--panel);z-index:3}
+  #tabs button{flex:1;background:none;border:0;border-bottom:2px solid transparent;color:var(--muted);
+    padding:11px 8px;font:inherit;font-size:12.5px;cursor:pointer}
+  #tabs button.on{color:var(--fg);border-bottom-color:var(--calls)}
+  .pane{padding:16px 18px;display:none}
+  .pane.on{display:block}
+  h2{font-size:15px;margin:0 0 4px}
+  h3{font-size:11px;letter-spacing:1.3px;text-transform:uppercase;color:var(--dim);
+    margin:18px 0 6px;font-weight:600}
+  code,.mono{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11.5px}
+  .path{color:var(--muted)}
+  ul{margin:0;padding-left:18px}
+  li{margin:3px 0}
+  .ev{background:var(--panel-2);border:1px solid var(--line);border-radius:6px;
+    padding:7px 9px;margin:6px 0}
+  .ev .loc{color:var(--calls);font-size:11.5px;font-family:ui-monospace,Menlo,monospace;
+    word-break:break-all}
+  .ev .sym{color:var(--service);font-size:11px;font-family:ui-monospace,Menlo,monospace}
+  .ev pre{margin:5px 0 0;white-space:pre-wrap;word-break:break-word;color:var(--muted);
+    font-family:ui-monospace,Menlo,monospace;font-size:11px}
+  .pill{display:inline-block;padding:1px 7px;border-radius:999px;font-size:10.5px;
+    border:1px solid var(--line);color:var(--muted);margin:0 4px 4px 0}
+  .pill.t-imports{color:var(--imports);border-color:var(--imports)}
+  .pill.t-calls{color:var(--calls);border-color:var(--calls)}
+  .pill.t-reads{color:var(--reads);border-color:var(--reads)}
+  .pill.t-writes{color:var(--writes);border-color:var(--writes)}
+  .pill.t-publishes{color:var(--publishes);border-color:var(--publishes)}
+  .pill.t-subscribes{color:var(--subscribes);border-color:var(--subscribes)}
+  .pill.unk{color:var(--unknown);border-color:var(--unknown)}
+  .row{border-bottom:1px solid var(--line);padding:9px 0;cursor:pointer}
+  .row:hover{background:var(--panel-2)}
+  .row .hd{font-weight:600;font-size:13px}
+  .row .sub{color:var(--muted);font-size:12px}
+  .flowstep{display:flex;gap:9px;padding:6px 0;border-bottom:1px solid var(--line)}
+  .flowstep .n{color:var(--dim);font-family:ui-monospace,Menlo,monospace;font-size:11px;
+    min-width:20px;text-align:right}
+  .flowstep .b b{color:var(--calls);font-family:ui-monospace,Menlo,monospace;font-size:11.5px;font-weight:600}
+  .flowstep .b div{color:var(--muted);font-size:12px}
+  .hint{color:var(--dim);font-size:12px}
+  #legend{position:absolute;left:14px;bottom:14px;background:rgba(19,26,36,.92);
+    border:1px solid var(--line);border-radius:8px;padding:9px 11px;font-size:11px;
+    display:flex;flex-direction:column;gap:3px;pointer-events:none}
+  #legend i{display:inline-block;width:18px;height:2px;vertical-align:middle;margin-right:7px}
+  #ctl{position:absolute;right:14px;top:14px;display:flex;gap:6px}
+  #ctl button{background:var(--panel-2);border:1px solid var(--line);color:var(--fg);
+    border-radius:6px;padding:5px 10px;font:inherit;font-size:12px;cursor:pointer}
+  #ctl button:hover{border-color:var(--fg)}
+  @media (max-width:900px){#layout{flex-direction:column}#side{width:auto;height:48%;
+    border-left:0;border-top:1px solid var(--line)}#stage{height:52%}}
+</style>
+</head>
+<body>
+<header>
+  <h1>scrumlr.io &mdash; code map</h1>
+  <span class="meta" id="hdmeta"></span>
+</header>
+
+<div id="layout">
+  <div id="stage">
+    <svg id="svg"></svg>
+    <div id="ctl">
+      <button id="fit">Fit</button>
+      <button id="clear">Clear selection</button>
+    </div>
+    <div id="legend"></div>
+  </div>
+  <aside id="side">
+    <div id="tabs">
+      <button data-p="detail" class="on">Details</button>
+      <button data-p="nodes">Modules</button>
+      <button data-p="flows">Flows</button>
+      <button data-p="about">About</button>
+    </div>
+    <div class="pane on" id="p-detail"></div>
+    <div class="pane" id="p-nodes"></div>
+    <div class="pane" id="p-flows"></div>
+    <div class="pane" id="p-about"></div>
+  </aside>
+</div>
+
+<script>
+const DATA = {"schema": "scrumlr-codemap/1", "repository": {"name": "scrumlr.io", "commit": "fbf673788a329ae62a1f4f1dfd4b2df73e13dd19", "branch": "main", "commit_time": "2024-06-22T14:01:02Z"}, "generated_at": "2026-09-24T12:58:27Z", "node_cap": 20, "edge_types": ["calls", "imports", "publishes", "reads", "subscribes", "writes"], "summary": "scrumlr.io is a collaborative retrospective board. A React 18 + Redux Toolkit single-page app in src/ talks to a Go (chi) server in server/src/ over REST for writes and over one websocket per board for reads. The server persists to PostgreSQL through bun and fans board events out over NATS (default) or Redis so that multiple server instances stay in step.", "not_mapped": [{"path": "server/src/services/users", "why": "Same shape as svc-notes: DB + realtime broker. Reached via api-http /user and /login."}, {"path": "server/src/services/reactions", "why": "Note-level emoji reactions. Same shape as svc-notes."}, {"path": "server/src/services/board_reactions", "why": "Ephemeral board-wide reactions. Same shape as svc-notes."}, {"path": "server/src/services/health", "why": "Backs GET /health; checks database and broker."}, {"path": "server/src/services/services.go", "why": "The interface contract between api-http and every service. Read this first when tracing a handler."}, {"path": "server/src/common", "why": "Shared DTOs, filters, error helpers and cookie sealing."}, {"path": "server/src/logger", "why": "Zap logger plus chi request-id middleware."}, {"path": "server/src/identifiers", "why": "Context key constants for board/user/column/note ids."}, {"path": "src/utils", "why": "Auth helpers (utils/auth.ts drives sign-in), export, timer, toast, hooks."}, {"path": "src/types", "why": "TypeScript models shared by store, api and components, including the websocket event union."}, {"path": "src/constants", "why": "Colors, hotkeys, storage keys."}, {"path": "cypress", "why": "One end-to-end spec (landingPageToBoard). Not part of the runtime graph."}, {"path": "deployment", "why": "Docker compose, SKE manifests, nginx.conf and the root Dockerfile. Not scanned for this map."}], "nodes": [{"id": "web-entry", "path": "src/index.tsx", "role": "Browser app bootstrap. Mounts React, wires the Redux Provider, i18n, toasts and optional Plausible analytics, then renders the router.", "entrypoints": ["createRoot(document.getElementById(\"root\"))", "Plausible({domain: ANALYTICS_DATA_DOMAIN, apiHost: ANALYTICS_SRC})"], "tests": [], "constraints": ["Runtime config comes from src/config.ts, which reads cookies first, then REACT_APP_* env vars, then falls back to window.location.origin + '/api'.", "Analytics only initialises when both ANALYTICS_DATA_DOMAIN and ANALYTICS_SRC cookies are set."], "evidence": [{"path": "src/index.tsx", "symbol": "root", "line": 49, "snippet": "const root = createRoot(document.getElementById(\"root\") as HTMLDivElement);"}, {"path": "src/index.tsx", "symbol": "import store", "line": 6, "snippet": "import store from \"store\";"}, {"path": "src/config.ts", "symbol": "SERVER_HTTP_URL", "line": 16, "snippet": "export const SERVER_HTTP_URL = serverURL || process.env.REACT_APP_SERVER_HTTP_URL || `${window.location.origin.replace(window.location.protocol, httpProtocol)}/api`;"}], "external": false}, {"id": "web-routes", "path": "src/routes", "role": "React Router route table and route-level guards. Owns the URL surface: homepage, /new, /login, /board/:boardId (+ nested settings, voting, timer, stack).", "entrypoints": ["Router (src/routes/Router.tsx)", "BoardGuard (src/routes/Board/BoardGuard.tsx)", "RequireAuthentication (src/routes/RequireAuthentication.tsx)"], "tests": ["src/routes/__tests__/RequireAuthentication.test.tsx", "src/routes/StackView/__tests__/StackView.test.tsx", "src/routes/NotFound/NotFound.test.tsx"], "constraints": ["BoardGuard is the only place that dispatches joinBoard/leaveBoard; the websocket lifecycle hangs off those actions in the store middleware.", "Every board route is wrapped in RequireAuthentication."], "evidence": [{"path": "src/routes/Router.tsx", "symbol": "Router", "line": 23, "snippet": "const Router = () => ("}, {"path": "src/routes/Router.tsx", "symbol": "board route", "line": 49, "snippet": "path=\"/board/:boardId\""}, {"path": "src/routes/Board/BoardGuard.tsx", "symbol": "joinBoard dispatch", "line": 26, "snippet": "store.dispatch(Actions.joinBoard(boardId!));"}], "external": false}, {"id": "web-components", "path": "src/components", "role": "All React UI. Board canvas, columns, notes, voting, timer, settings dialogs, participant list. Components read state with useSelector and write by dispatching actions.", "entrypoints": ["Board (src/components/Board/Board.tsx)", "NoteInput (src/components/NoteInput/NoteInput.tsx)", "SettingsDialog (src/components/SettingsDialog)"], "tests": ["src/components/Board/__tests__/Board.test.tsx", "src/components/NoteInput/__tests__/NoteInput.test.tsx", "src/components/Column/__tests__/Column.test.tsx", "src/components/Votes/__tests__/Votes.test.tsx", "src/components/SettingsDialog/__tests__/SettingsDialog.test.tsx"], "constraints": ["Most components dispatch actions and let the store middleware do the HTTP call, but a few call src/api directly: Timer.tsx, SettingsDialog/ExportBoard/PrintView/PrintView.tsx and SettingsDialog/Feedback/Feedback.tsx.", "Largest module in the repo by file count - treat it as a directory, not a unit."], "evidence": [{"path": "src/components/NoteInput/NoteInput.tsx", "symbol": "addNote dispatch", "line": 30, "snippet": "dispatch(Actions.addNote(columnId!, content));"}, {"path": "src/components/NoteInput/NoteInput.tsx", "symbol": "import Actions", "line": 4, "snippet": "import {Actions} from \"store/action\";"}], "external": false}, {"id": "web-store", "path": "src/store", "role": "Redux Toolkit store: actions, reducers, and a middleware chain. The middleware layer is the side-effect boundary - it issues REST calls and owns the board websocket.", "entrypoints": ["store (src/store/index.ts)", "passBoardMiddleware (src/store/middleware/board.tsx) - opens/closes the board socket", "passNoteMiddleware (src/store/middleware/note.tsx)"], "tests": [], "constraints": ["One websocket per board, held in a module-level `socket` variable in middleware/board.tsx. Opened on Action.PermittedBoardAccess, closed on Action.LeaveBoard.", "Incoming server events are translated into dispatches inside the socket onmessage handler; reducers never talk to the network.", "parseMiddleware stamps every action with {user, board, voting, serverTimeOffset} context before the per-domain middleware run."], "evidence": [{"path": "src/store/index.ts", "symbol": "parseMiddleware", "line": 30, "snippet": "const parseMiddleware = (stateAPI: MiddlewareAPI<Dispatch, ApplicationState>) => (dispatch: Dispatch) => (action: ReduxAction) => {"}, {"path": "src/store/middleware/board.tsx", "symbol": "socket", "line": 21, "snippet": "socket = new Socket(`${SERVER_WEBSOCKET_URL}/boards/${action.boardId}`, {"}, {"path": "src/store/middleware/board.tsx", "symbol": "INIT handler", "line": 27, "snippet": "if (message.type === \"INIT\") {"}, {"path": "src/store/middleware/note.tsx", "symbol": "API.addNote", "line": 11, "snippet": "API.addNote(action.context.board!, action.columnId, action.text).catch(() => {"}], "external": false}, {"id": "web-api", "path": "src/api", "role": "Thin REST client. One module per resource, all merged into a single `API` object. Every call is window.fetch with credentials: \"include\".", "entrypoints": ["API (src/api/index.ts)", "BoardAPI (src/api/board.ts)", "NoteAPI (src/api/note.ts)", "AuthAPI (src/api/auth.ts)"], "tests": [], "constraints": ["Base URL is SERVER_HTTP_URL from src/config.ts; it already ends in /api in the default case.", "Auth is cookie-based - every fetch sets credentials: \"include\"; there is no Authorization header.", "Each function throws on a non-expected status rather than returning an error value."], "evidence": [{"path": "src/api/index.ts", "symbol": "API", "line": 15, "snippet": "export const API = {"}, {"path": "src/api/board.ts", "symbol": "createBoard", "line": 17, "snippet": "const response = await fetch(`${SERVER_HTTP_URL}/boards`, {"}, {"path": "src/api/note.ts", "symbol": "addNote", "line": 16, "snippet": "const response = await fetch(`${SERVER_HTTP_URL}/boards/${boardId}/notes`, {"}, {"path": "src/api/auth.ts", "symbol": "signInAnonymously", "line": 29, "snippet": "const response = await fetch(`${SERVER_HTTP_URL}/login/anonymous`, {"}], "external": false}, {"id": "server-main", "path": "server/src/main.go", "role": "Go process entrypoint and composition root. Parses CLI flags / env / TOML, runs migrations, picks the message broker, builds every service, and starts the HTTP server.", "entrypoints": ["main()", "run(c *cli.Context)"], "tests": [], "constraints": ["Migrations run before anything else; the process exits if they fail.", "Redis wins over NATS: if --redis-address is set, NATS is not used at all.", "Refuses to start without --key unless --insecure is passed (then a bundled dev keypair signs JWTs).", "OAuth providers are only registered when client id, secret and --auth-callback-host are all set."], "evidence": [{"path": "server/src/main.go", "symbol": "run", "line": 215, "snippet": "func run(c *cli.Context) error {"}, {"path": "server/src/main.go", "symbol": "MigrateDatabase", "line": 216, "snippet": "db, err := migrations.MigrateDatabase(c.String(\"database\"))"}, {"path": "server/src/main.go", "symbol": "broker selection", "line": 226, "snippet": "if c.String(\"redis-address\") != \"\" {"}, {"path": "server/src/main.go", "symbol": "ListenAndServe", "line": 327, "snippet": "return http.ListenAndServe(port, s)"}], "external": false}, {"id": "api-http", "path": "server/src/api", "role": "HTTP + websocket layer (go-chi). Route table, auth middleware, board role guards (participant / moderator / editable), request and response DTO handling, and the two websocket endpoints that stream board state to clients.", "entrypoints": ["New (server/src/api/router.go)", "publicRoutes / protectedRoutes (server/src/api/router.go)", "openBoardSocket (server/src/api/boards_listen_on_board.go)", "listenOnBoardSessionRequest (server/src/api/board_session_requests_listen_on_request.go)"], "tests": ["server/src/api/event_filter_test.go", "server/src/api/notes_test.go", "server/src/api/votes_test.go", "server/src/api/votings_test.go", "server/src/api/json_parse_test.go"], "constraints": ["Public routes: /info, /health, /feedback, /login/*. Everything else sits behind auth.Verifier + jwtauth.Authenticator + auth.AuthContext.", "Board authorisation is middleware, not handler code: BoardParticipantContext, BoardModeratorContext, BoardEditableContext.", "Server holds a map of live board subscriptions keyed by board UUID; it is in-process state, so horizontal scaling relies on the broker fan-out, not shared memory.", "CORS is only installed when origin checking is disabled (--disable-check-origin)."], "evidence": [{"path": "server/src/api/router.go", "symbol": "New", "line": 45, "snippet": "func New("}, {"path": "server/src/api/router.go", "symbol": "publicRoutes", "line": 126, "snippet": "func (s *Server) publicRoutes(r chi.Router) chi.Router {"}, {"path": "server/src/api/router.go", "symbol": "protectedRoutes", "line": 143, "snippet": "func (s *Server) protectedRoutes(r chi.Router) {"}, {"path": "server/src/api/boards_listen_on_board.go", "symbol": "openBoardSocket", "line": 41, "snippet": "func (s *Server) openBoardSocket(w http.ResponseWriter, r *http.Request) {"}, {"path": "server/src/api/context.go", "symbol": "BoardParticipantContext", "line": 43, "snippet": "func (s *Server) BoardParticipantContext(next http.Handler) http.Handler {"}], "external": false}, {"id": "auth", "path": "server/src/auth", "role": "JWT signing/verification and OAuth provider setup (goth). Turns an external identity into a scrumlr user and puts the user id into the request context.", "entrypoints": ["NewAuthConfiguration (server/src/auth/auth.go)", "Auth interface: Sign / Verifier / Exists", "AuthContext middleware (server/src/auth/auth_context.go)"], "tests": [], "constraints": ["Supported providers are Google, GitHub, Microsoft, Azure AD and Apple - all via goth.", "Two JWT keys exist: a real one and an 'unsafe' bundled dev key under auth/devkeys. Never run with the unsafe key outside local development.", "Identity is carried in a cookie, which is why the browser client uses credentials: \"include\"."], "evidence": [{"path": "server/src/auth/auth.go", "symbol": "Auth", "line": 32, "snippet": "type Auth interface {"}, {"path": "server/src/auth/auth.go", "symbol": "NewAuthConfiguration", "line": 54, "snippet": "func NewAuthConfiguration(providers map[string]AuthProviderConfiguration, unsafePrivateKey, privateKey string, database *database.Database) Auth {"}, {"path": "server/src/auth/auth.go", "symbol": "google provider", "line": 69, "snippet": "p := google.New("}], "external": false}, {"id": "svc-boards", "path": "server/src/services/boards", "role": "Board and board-session domain logic: create/update/delete boards and columns, timers, join requests, participant roles, and assembling the FullBoard payload.", "entrypoints": ["NewBoardService", "NewBoardSessionService", "FullBoard"], "tests": [], "constraints": ["Every mutation that other participants must see ends in a realtime broadcast; forgetting the broadcast is the classic bug here.", "Unlike svc-notes and svc-votings, BoardService holds *database.Database directly instead of a package-local DB interface, so there is no mocking seam here."], "evidence": [{"path": "server/src/services/boards/boards.go", "symbol": "BroadcastToBoard", "line": 257, "snippet": "err := s.realtime.BroadcastToBoard(board.ID, realtime.BoardEvent{"}, {"path": "server/src/services/boards/boards.go", "symbol": "package boards", "line": 1, "snippet": "package boards"}, {"path": "server/src/services/services.go", "symbol": "Boards", "line": 27, "snippet": "type Boards interface {"}], "external": false}, {"id": "svc-notes", "path": "server/src/services/notes", "role": "Note domain logic: create, read, update (including stacking/unstacking), delete, and the NOTES_UPDATED / NOTES_SYNC broadcasts that keep every client in step.", "entrypoints": ["NewNoteService", "Create / Update / Delete", "UpdatedNotes"], "tests": ["server/src/services/notes/notes_test.go"], "constraints": ["Per-user note visibility is NOT applied here. The service broadcasts the full set and the API layer filters per socket in server/src/api/event_filter.go (filterNotes).", "DB access goes through the package-local DB interface in notes.go."], "evidence": [{"path": "server/src/services/notes/notes.go", "symbol": "NewNoteService", "line": 35, "snippet": "func NewNoteService(db DB, rt *realtime.Broker) services.Notes {"}, {"path": "server/src/services/notes/notes.go", "symbol": "DB", "line": 26, "snippet": "type DB interface {"}, {"path": "server/src/services/notes/notes.go", "symbol": "CreateNote", "line": 44, "snippet": "note, err := s.database.CreateNote(database.NoteInsert{Author: body.User, Board: body.Board, Column: body.Column, Text: body.Text})"}, {"path": "server/src/services/notes/notes.go", "symbol": "BroadcastToBoard", "line": 138, "snippet": "err := s.realtime.BroadcastToBoard(board, realtime.BoardEvent{"}], "external": false}, {"id": "svc-votings", "path": "server/src/services/votings", "role": "Voting sessions and individual votes: open/close a voting, enforce the vote limit, tally results, and broadcast VOTING_* / VOTES_UPDATED events.", "entrypoints": ["NewVotingService", "Create / Update / AddVote / RemoveVote"], "tests": ["server/src/services/votings/votings_test.go"], "constraints": ["Vote results are re-filtered per socket in server/src/api/event_filter.go: filterVoting keeps only the results for notes that caller can see and recomputes the total from them."], "evidence": [{"path": "server/src/services/votings/votings.go", "symbol": "BroadcastToBoard", "line": 129, "snippet": "err = s.realtime.BroadcastToBoard(board, realtime.BoardEvent{"}, {"path": "server/src/services/services.go", "symbol": "Votings", "line": 84, "snippet": "type Votings interface {"}, {"path": "server/src/api/event_filter.go", "symbol": "filterVotingUpdated", "line": 134, "snippet": "func filterVotingUpdated(voting *VotingUpdated, userID uuid.UUID, boardSettings *dto.Board, columns []*dto.Column) *VotingUpdated {"}], "external": false}, {"id": "svc-feedback", "path": "server/src/services/feedback", "role": "Forwards in-app feedback to an external chat webhook. The only backend module that makes an outbound HTTP call to a third party.", "entrypoints": ["NewFeedbackService(webhookUrl)", "Create / Enabled"], "tests": [], "constraints": ["Disabled when --feedback-webhook-url (SCRUMLR_FEEDBACK_WEBHOOK_URL) is empty. Enabled() is surfaced to the client as feedbackEnabled on GET /info.", "Posts a hard-coded Slack-style block payload with a German title string.", "No retry, no timeout override - it uses http.Post with the default client."], "evidence": [{"path": "server/src/services/feedback/feedback.go", "symbol": "NewFeedbackService", "line": 17, "snippet": "func NewFeedbackService(webhookUrl string) services.Feedback {"}, {"path": "server/src/services/feedback/feedback.go", "symbol": "http.Post", "line": 45, "snippet": "_, err := http.Post(s.webhookUrl, \"application/json\", bytes.NewBuffer(jsonData))"}, {"path": "server/src/services/feedback/feedback.go", "symbol": "Enabled", "line": 49, "snippet": "func (s *FeedbackService) Enabled() bool {"}], "external": false}, {"id": "database", "path": "server/src/database", "role": "Persistence layer over PostgreSQL using bun. One file per aggregate (boards, columns, notes, reactions, sessions, votes, votings, users) plus shared enum types.", "entrypoints": ["New(db *sql.DB, verbose bool)", "Database.Get - loads a whole board in one call", "CreateNote / UpdateNote / DeleteNote"], "tests": ["server/src/database/database_test.go", "server/src/database/boards_test.go", "server/src/database/notes_test.go", "server/src/database/votings_test.go", "server/src/database/votes_test.go", "server/src/database/users_test.go", "server/src/database/columns_test.go", "server/src/database/reactions_test.go", "server/src/database/board_sessions_test.go", "server/src/database/board_session_requests_test.go"], "constraints": ["Connection pool is sized 4 * GOMAXPROCS for both max-open and max-idle.", "Multi-table writes are single SQL statements: CreateBoard composes the board insert, the column inserts and the owner session insert into one CTE query. Read the SQL before changing the service layer.", "DB tests run against a real PostgreSQL instance with fixtures under database/testdata."], "evidence": [{"path": "server/src/database/database.go", "symbol": "New", "line": 19, "snippet": "func New(db *sql.DB, verbose bool) *Database {"}, {"path": "server/src/database/database.go", "symbol": "pool sizing", "line": 24, "snippet": "maxOpenConnections := 4 * runtime.GOMAXPROCS(0)"}, {"path": "server/src/database/database.go", "symbol": "pgdialect", "line": 21, "snippet": "d.db = bun.NewDB(db, pgdialect.New())"}, {"path": "server/src/database/notes.go", "symbol": "CreateNote", "line": 49, "snippet": "func (d *Database) CreateNote(insert NoteInsert) (Note, error) {"}], "external": false}, {"id": "migrations", "path": "server/src/database/migrations", "role": "Embedded SQL schema migrations, applied automatically at process start via golang-migrate.", "entrypoints": ["MigrateDatabase(databaseUrl string)"], "tests": [], "constraints": ["Migration SQL is embedded into the binary with //go:embed sql - adding a file without rebuilding the binary does nothing.", "Runs on every boot, so a bad migration takes the whole service down rather than degrading it."], "evidence": [{"path": "server/src/database/migrations/migrations.go", "symbol": "MigrateDatabase", "line": 16, "snippet": "func MigrateDatabase(databaseUrl string) (*sql.DB, error) {"}, {"path": "server/src/database/migrations/migrations.go", "symbol": "go:embed", "line": 13, "snippet": "//go:embed sql"}, {"path": "server/src/database/migrations/migrations.go", "symbol": "sql.Open", "line": 17, "snippet": "db, err := sql.Open(\"postgres\", databaseUrl)"}], "external": false}, {"id": "realtime", "path": "server/src/realtime", "role": "Pub/sub abstraction for board events. One Client interface with two implementations (NATS and Redis); the Broker adds board-scoped topics and the BoardEvent vocabulary.", "entrypoints": ["NewNats(url) / NewRedis(server)", "Broker.BroadcastToBoard", "Broker.GetBoardChannel"], "tests": ["server/src/realtime/nats_test.go", "server/src/realtime/redis_test.go", "server/src/realtime/boards_test.go", "server/src/realtime/board_sessions_requests_test.go", "server/src/realtime/health_test.go"], "constraints": ["Topic naming is 'board.<uuid>' - see boardsSubject in realtime/boards.go.", "BoardEventType is the full event vocabulary the browser switches on; adding an event means touching this file and src/store/middleware/board.tsx together.", "GetBoardChannel swallows subscribe errors and only logs them (there is a TODO about it), so a broker outage looks like a silent board."], "evidence": [{"path": "server/src/realtime/broker.go", "symbol": "Client", "line": 5, "snippet": "type Client interface {"}, {"path": "server/src/realtime/boards.go", "symbol": "BroadcastToBoard", "line": 42, "snippet": "func (b *Broker) BroadcastToBoard(boardID uuid.UUID, msg BoardEvent) error {"}, {"path": "server/src/realtime/boards.go", "symbol": "boardsSubject", "line": 56, "snippet": "func boardsSubject(boardID uuid.UUID) string {"}, {"path": "server/src/realtime/boards.go", "symbol": "BoardEventType", "line": 11, "snippet": "type BoardEventType string"}], "external": false}, {"id": "ext-postgres", "path": "external://postgresql", "role": "EXTERNAL. PostgreSQL - the system of record for boards, columns, notes, reactions, sessions, votes and users.", "entrypoints": ["postgres://<host>:5432/scrumlr (--database flag / SCRUMLR_SERVER_DATABASE_URL)"], "tests": [], "constraints": ["Only server/src/database and server/src/database/migrations talk to it.", "Local dev instance is started by deployment/docker or server/docker-compose.dev.yml."], "evidence": [{"path": "server/src/database/migrations/migrations.go", "symbol": "postgres driver", "line": 17, "snippet": "db, err := sql.Open(\"postgres\", databaseUrl)"}, {"path": "server/src/database/database.go", "symbol": "pgdialect", "line": 9, "snippet": "\"github.com/uptrace/bun/dialect/pgdialect\""}], "external": true}, {"id": "ext-nats", "path": "external://nats", "role": "EXTERNAL. NATS - the default message broker for fanning board events out across server instances.", "entrypoints": ["nats://localhost:4222 (--nats flag / SCRUMLR_SERVER_NATS_URL)"], "tests": [], "constraints": ["Used only when --redis-address is empty."], "evidence": [{"path": "server/src/realtime/nats.go", "symbol": "NewNats", "line": 39, "snippet": "func NewNats(url string) (*Broker, error) {"}, {"path": "server/src/realtime/nats.go", "symbol": "nats.Connect", "line": 42, "snippet": "nc, err := nats.Connect(url)"}], "external": true}, {"id": "ext-redis", "path": "external://redis", "role": "EXTERNAL. Redis pub/sub - the alternative message broker. Selected by setting --redis-address.", "entrypoints": ["--redis-address / SCRUMLR_SERVER_REDIS_HOST"], "tests": [], "constraints": ["Takes precedence over NATS when set.", "Events are JSON-encoded by hand (encodeEvent/decodeEvent) rather than by the client library."], "evidence": [{"path": "server/src/realtime/redis.go", "symbol": "NewRedis", "line": 12, "snippet": "func NewRedis(server RedisServer) (*Broker, error) {"}, {"path": "server/src/realtime/redis.go", "symbol": "redis.NewClient", "line": 27, "snippet": "rdb := redis.NewClient(&redis.Options{"}], "external": true}, {"id": "ext-oauth", "path": "external://oauth-providers", "role": "EXTERNAL. Google, GitHub, Microsoft, Azure AD and Apple OAuth endpoints, reached through goth.", "entrypoints": ["GET /login/{provider}", "GET /login/{provider}/callback"], "tests": [], "constraints": ["A provider is only wired up when its client id, client secret and --auth-callback-host are all set.", "Redirect URI is derived as <callback-host><base-path>/login/<provider>/callback."], "evidence": [{"path": "server/src/auth/auth.go", "symbol": "goth providers", "line": 18, "snippet": "\"github.com/markbates/goth/providers/google\""}, {"path": "server/src/api/router.go", "symbol": "provider callback route", "line": 137, "snippet": "r.Get(\"/callback\", s.verifyAuthProviderCallback)"}], "external": true}, {"id": "ext-feedback-webhook", "path": "external://feedback-webhook", "role": "EXTERNAL. Slack-compatible incoming webhook that receives user feedback submitted from the app.", "entrypoints": ["--feedback-webhook-url / SCRUMLR_FEEDBACK_WEBHOOK_URL"], "tests": [], "constraints": ["Optional. When unset, the feedback service reports Enabled() == false and the UI hides the form."], "evidence": [{"path": "server/src/services/feedback/feedback.go", "symbol": "http.Post", "line": 45, "snippet": "_, err := http.Post(s.webhookUrl, \"application/json\", bytes.NewBuffer(jsonData))"}, {"path": "server/src/services/feedback/feedback.go", "symbol": "webhookUrl", "line": 14, "snippet": "webhookUrl string"}], "external": true}], "edges": [{"from": "web-entry", "to": "web-store", "type": "imports", "evidence": [{"path": "src/index.tsx", "symbol": "import store", "line": 6, "snippet": "import store from \"store\";"}], "evidence_status": "verified"}, {"from": "web-entry", "to": "web-routes", "type": "imports", "evidence": [{"path": "src/index.tsx", "symbol": "import Router", "line": 7, "snippet": "import Router from \"routes/Router\";"}], "evidence_status": "verified"}, {"from": "web-routes", "to": "web-components", "type": "imports", "evidence": [{"path": "src/routes/Router.tsx", "symbol": "import SettingsDialog", "line": 8, "snippet": "import {SettingsDialog} from \"components/SettingsDialog\";"}], "evidence_status": "verified"}, {"from": "web-routes", "to": "web-store", "type": "calls", "evidence": [{"path": "src/routes/Board/BoardGuard.tsx", "symbol": "joinBoard dispatch", "line": 26, "snippet": "store.dispatch(Actions.joinBoard(boardId!));"}], "evidence_status": "verified"}, {"from": "web-components", "to": "web-store", "type": "calls", "evidence": [{"path": "src/components/NoteInput/NoteInput.tsx", "symbol": "addNote dispatch", "line": 30, "snippet": "dispatch(Actions.addNote(columnId!, content));"}], "evidence_status": "verified"}, {"from": "web-store", "to": "web-api", "type": "calls", "evidence": [{"path": "src/store/middleware/note.tsx", "symbol": "API.addNote", "line": 11, "snippet": "API.addNote(action.context.board!, action.columnId, action.text).catch(() => {"}, {"path": "src/store/middleware/board.tsx", "symbol": "import API", "line": 7, "snippet": "import {API} from \"api\";"}], "evidence_status": "verified"}, {"from": "web-api", "to": "api-http", "type": "calls", "evidence": [{"path": "src/api/board.ts", "symbol": "POST /boards", "line": 17, "snippet": "const response = await fetch(`${SERVER_HTTP_URL}/boards`, {"}, {"path": "server/src/api/router.go", "symbol": "POST /boards route", "line": 148, "snippet": "r.Post(\"/boards\", s.createBoard)"}], "evidence_status": "verified"}, {"from": "web-store", "to": "api-http", "type": "subscribes", "evidence": [{"path": "src/store/middleware/board.tsx", "symbol": "board socket", "line": 21, "snippet": "socket = new Socket(`${SERVER_WEBSOCKET_URL}/boards/${action.boardId}`, {"}, {"path": "server/src/api/boards_listen_on_board.go", "symbol": "openBoardSocket", "line": 41, "snippet": "func (s *Server) openBoardSocket(w http.ResponseWriter, r *http.Request) {"}], "evidence_status": "verified"}, {"from": "server-main", "to": "migrations", "type": "calls", "evidence": [{"path": "server/src/main.go", "symbol": "MigrateDatabase", "line": 216, "snippet": "db, err := migrations.MigrateDatabase(c.String(\"database\"))"}], "evidence_status": "verified"}, {"from": "server-main", "to": "database", "type": "calls", "evidence": [{"path": "server/src/main.go", "symbol": "database.New", "line": 292, "snippet": "dbConnection := database.New(db, c.Bool(\"verbose\"))"}], "evidence_status": "verified"}, {"from": "server-main", "to": "realtime", "type": "calls", "evidence": [{"path": "server/src/main.go", "symbol": "realtime.NewNats", "line": 236, "snippet": "rt, err = realtime.NewNats(c.String(\"nats\"))"}, {"path": "server/src/main.go", "symbol": "realtime.NewRedis", "line": 227, "snippet": "rt, err = realtime.NewRedis(realtime.RedisServer{"}], "evidence_status": "verified"}, {"from": "server-main", "to": "auth", "type": "calls", "evidence": [{"path": "server/src/main.go", "symbol": "NewAuthConfiguration", "line": 296, "snippet": "authConfig := auth.NewAuthConfiguration(providersMap, unsafeKeyWithNewlines, keyWithNewlines, dbConnection)"}], "evidence_status": "verified"}, {"from": "server-main", "to": "svc-boards", "type": "calls", "evidence": [{"path": "server/src/main.go", "symbol": "NewBoardService", "line": 298, "snippet": "boardService := boards.NewBoardService(dbConnection, rt)"}], "evidence_status": "verified"}, {"from": "server-main", "to": "svc-notes", "type": "calls", "evidence": [{"path": "server/src/main.go", "symbol": "NewNoteService", "line": 302, "snippet": "noteService := notes.NewNoteService(dbConnection, rt)"}], "evidence_status": "verified"}, {"from": "server-main", "to": "svc-votings", "type": "calls", "evidence": [{"path": "server/src/main.go", "symbol": "NewVotingService", "line": 300, "snippet": "votingService := votings.NewVotingService(dbConnection, rt)"}], "evidence_status": "verified"}, {"from": "server-main", "to": "svc-feedback", "type": "calls", "evidence": [{"path": "server/src/main.go", "symbol": "NewFeedbackService", "line": 304, "snippet": "feedbackService := feedback.NewFeedbackService(c.String(\"feedback-webhook-url\"))"}], "evidence_status": "verified"}, {"from": "server-main", "to": "api-http", "type": "calls", "evidence": [{"path": "server/src/main.go", "symbol": "api.New", "line": 308, "snippet": "s := api.New("}, {"path": "server/src/main.go", "symbol": "ListenAndServe", "line": 327, "snippet": "return http.ListenAndServe(port, s)"}], "evidence_status": "verified"}, {"from": "api-http", "to": "auth", "type": "calls", "evidence": [{"path": "server/src/api/router.go", "symbol": "auth.Verifier", "line": 145, "snippet": "r.Use(s.auth.Verifier())"}, {"path": "server/src/api/router.go", "symbol": "AuthContext", "line": 147, "snippet": "r.Use(auth.AuthContext)"}], "evidence_status": "verified"}, {"from": "api-http", "to": "svc-boards", "type": "calls", "evidence": [{"path": "server/src/api/boards.go", "symbol": "boards.Create", "line": 34, "snippet": "b, err := s.boards.Create(r.Context(), body)"}, {"path": "server/src/api/boards_listen_on_board.go", "symbol": "boards.FullBoard", "line": 54, "snippet": "board, requests, sessions, columns, notes, reactions, votings, votes, err := s.boards.FullBoard(r.Context(), id)"}], "evidence_status": "verified"}, {"from": "api-http", "to": "svc-notes", "type": "calls", "evidence": [{"path": "server/src/api/notes.go", "symbol": "notes.Create", "line": 28, "snippet": "note, err := s.notes.Create(r.Context(), body)"}, {"path": "server/src/api/notes.go", "symbol": "notes.Delete", "line": 102, "snippet": "if err := s.notes.Delete(r.Context(), body, note); err != nil {"}, {"path": "server/src/api/router.go", "symbol": "initNoteResources", "line": 259, "snippet": "func (s *Server) initNoteResources(r chi.Router) {"}], "evidence_status": "verified"}, {"from": "api-http", "to": "svc-votings", "type": "calls", "evidence": [{"path": "server/src/api/votings.go", "symbol": "votings.Create", "line": 25, "snippet": "voting, err := s.votings.Create(r.Context(), body)"}, {"path": "server/src/api/votings.go", "symbol": "votings.Update", "line": 54, "snippet": "voting, err := s.votings.Update(r.Context(), body)"}, {"path": "server/src/api/router.go", "symbol": "initVotingResources", "line": 190, "snippet": "func (s *Server) initVotingResources(r chi.Router) {"}], "evidence_status": "verified"}, {"from": "api-http", "to": "svc-feedback", "type": "calls", "evidence": [{"path": "server/src/api/feedback.go", "symbol": "feedback.Create", "line": 60, "snippet": "err := s.feedback.Create(r.Context(), string(body.Type), *body.Contact, *body.Text)"}, {"path": "server/src/api/router.go", "symbol": "POST /feedback", "line": 130, "snippet": "r.Post(\"/feedback\", s.createFeedback)"}], "evidence_status": "verified"}, {"from": "api-http", "to": "realtime", "type": "subscribes", "evidence": [{"path": "server/src/api/boards_listen_on_board.go", "symbol": "GetBoardChannel", "line": 127, "snippet": "b.subscription = s.realtime.GetBoardChannel(boardID)"}], "evidence_status": "verified"}, {"from": "svc-notes", "to": "database", "type": "writes", "evidence": [{"path": "server/src/services/notes/notes.go", "symbol": "CreateNote", "line": 44, "snippet": "note, err := s.database.CreateNote(database.NoteInsert{Author: body.User, Board: body.Board, Column: body.Column, Text: body.Text})"}], "evidence_status": "verified"}, {"from": "svc-notes", "to": "database", "type": "reads", "evidence": [{"path": "server/src/services/notes/notes.go", "symbol": "GetNotes", "line": 68, "snippet": "notes, err := s.database.GetNotes(boardID)"}], "evidence_status": "verified"}, {"from": "svc-notes", "to": "realtime", "type": "publishes", "evidence": [{"path": "server/src/services/notes/notes.go", "symbol": "BroadcastToBoard", "line": 138, "snippet": "err := s.realtime.BroadcastToBoard(board, realtime.BoardEvent{"}], "evidence_status": "verified"}, {"from": "svc-boards", "to": "database", "type": "writes", "evidence": [{"path": "server/src/services/boards/boards.go", "symbol": "CreateBoard", "line": 86, "snippet": "b, err := s.database.CreateBoard(body.Owner, board, columns)"}], "evidence_status": "verified"}, {"from": "svc-boards", "to": "realtime", "type": "publishes", "evidence": [{"path": "server/src/services/boards/boards.go", "symbol": "BroadcastToBoard", "line": 257, "snippet": "err := s.realtime.BroadcastToBoard(board.ID, realtime.BoardEvent{"}], "evidence_status": "verified"}, {"from": "svc-votings", "to": "realtime", "type": "publishes", "evidence": [{"path": "server/src/services/votings/votings.go", "symbol": "BroadcastToBoard", "line": 129, "snippet": "err = s.realtime.BroadcastToBoard(board, realtime.BoardEvent{"}], "evidence_status": "verified"}, {"from": "svc-votings", "to": "database", "type": "writes", "evidence": [{"path": "server/src/services/votings/votings.go", "symbol": "CreateVoting", "line": 47, "snippet": "voting, err := s.database.CreateVoting(database.VotingInsert{"}], "evidence_status": "verified"}, {"from": "svc-feedback", "to": "ext-feedback-webhook", "type": "calls", "evidence": [{"path": "server/src/services/feedback/feedback.go", "symbol": "http.Post", "line": 45, "snippet": "_, err := http.Post(s.webhookUrl, \"application/json\", bytes.NewBuffer(jsonData))"}], "evidence_status": "verified"}, {"from": "database", "to": "ext-postgres", "type": "reads", "evidence": [{"path": "server/src/database/boards.go", "symbol": "GetBoard", "line": 183, "snippet": "func (d *Database) GetBoard(id uuid.UUID) (Board, error) {"}, {"path": "server/src/database/database.go", "symbol": "pgdialect", "line": 21, "snippet": "d.db = bun.NewDB(db, pgdialect.New())"}], "evidence_status": "verified"}, {"from": "database", "to": "ext-postgres", "type": "writes", "evidence": [{"path": "server/src/database/notes.go", "symbol": "CreateNote", "line": 49, "snippet": "func (d *Database) CreateNote(insert NoteInsert) (Note, error) {"}], "evidence_status": "verified"}, {"from": "migrations", "to": "ext-postgres", "type": "writes", "evidence": [{"path": "server/src/database/migrations/migrations.go", "symbol": "sql.Open", "line": 17, "snippet": "db, err := sql.Open(\"postgres\", databaseUrl)"}], "evidence_status": "verified"}, {"from": "realtime", "to": "ext-nats", "type": "publishes", "evidence": [{"path": "server/src/realtime/nats.go", "symbol": "natsClient.Publish", "line": 15, "snippet": "return n.con.Publish(subject, event)"}], "evidence_status": "verified"}, {"from": "realtime", "to": "ext-nats", "type": "subscribes", "evidence": [{"path": "server/src/realtime/nats.go", "symbol": "SubscribeToBoardEvents", "line": 29, "snippet": "func (n *natsClient) SubscribeToBoardEvents(subject string) (chan *BoardEvent, error) {"}], "evidence_status": "verified"}, {"from": "realtime", "to": "ext-redis", "type": "publishes", "evidence": [{"path": "server/src/realtime/redis.go", "symbol": "redisClient.Publish", "line": 58, "snippet": "_, err = r.con.Publish(context.Background(), subject, payload).Result()"}], "evidence_status": "verified"}, {"from": "realtime", "to": "ext-redis", "type": "subscribes", "evidence": [{"path": "server/src/realtime/redis.go", "symbol": "SubscribeToBoardEvents", "line": 102, "snippet": "func (r *redisClient) SubscribeToBoardEvents(subject string) (chan *BoardEvent, error) {"}], "evidence_status": "verified"}, {"from": "auth", "to": "ext-oauth", "type": "calls", "evidence": [{"path": "server/src/auth/auth.go", "symbol": "google.New", "line": 69, "snippet": "p := google.New("}, {"path": "server/src/api/router.go", "symbol": "provider begin route", "line": 136, "snippet": "r.Get(\"/\", s.beginAuthProviderVerification)"}], "evidence_status": "verified"}, {"from": "auth", "to": "database", "type": "reads", "evidence": [{"path": "server/src/auth/auth.go", "symbol": "IsUserAvailableForKeyMigration", "line": 167, "snippet": "if ok, err = a.database.IsUserAvailableForKeyMigration(user); ok {"}], "evidence_status": "verified"}, {"from": "web-components", "to": "web-api", "type": "calls", "evidence": [{"path": "src/components/SettingsDialog/Feedback/Feedback.tsx", "symbol": "FeedbackAPI.sendFeedback", "line": 54, "snippet": "FeedbackAPI.sendFeedback(feedbackType.value, feedback.value.trim(), contact.value.trim());"}, {"path": "src/components/Timer/Timer.tsx", "symbol": "import API", "line": 9, "snippet": "import {API} from \"api\";"}], "evidence_status": "verified"}, {"from": "web-routes", "to": "web-api", "type": "calls", "evidence": [{"path": "src/routes/NewBoard/NewBoard.tsx", "symbol": "API.createBoard", "line": 32, "snippet": "const boardId = await API.createBoard("}, {"path": "src/utils/auth.ts", "symbol": "API.signInAnonymously", "line": 17, "snippet": "const user = await API.signInAnonymously(displayName);"}], "evidence_status": "verified"}], "flows": [{"id": "flow-anonymous-login", "name": "Anonymous sign-in", "trigger": "A visitor enters a display name on the landing page and continues without an account.", "steps": [{"node": "web-routes", "detail": "LoginBoard calls Auth.signInAnonymously (src/utils/auth.ts) - no store middleware is involved."}, {"node": "web-api", "detail": "AuthAPI.signInAnonymously POSTs to /login/anonymous with credentials: \"include\"."}, {"node": "api-http", "detail": "The public route /login/anonymous hits Server.signInAnonymously."}, {"node": "database", "detail": "users.LoginAnonymous persists an anonymous user; this happens BEFORE the token is signed."}, {"node": "ext-postgres", "detail": "The user record lands in PostgreSQL."}, {"node": "auth", "detail": "auth.Sign issues a JWT for the new user id; the handler sets it as the HttpOnly 'jwt' cookie."}, {"node": "web-store", "detail": "utils/auth.ts dispatches Actions.signIn with the returned user."}], "outcome": "The browser holds a session cookie and every later request is authenticated by it. Protected routes now pass auth.Verifier and jwtauth.Authenticator.", "evidence": [{"path": "src/routes/LoginBoard/LoginBoard.tsx", "symbol": "Auth.signInAnonymously", "line": 41, "snippet": "await Auth.signInAnonymously(displayName);"}, {"path": "src/utils/auth.ts", "symbol": "API.signInAnonymously", "line": 17, "snippet": "const user = await API.signInAnonymously(displayName);"}, {"path": "src/api/auth.ts", "symbol": "signInAnonymously", "line": 29, "snippet": "const response = await fetch(`${SERVER_HTTP_URL}/login/anonymous`, {"}, {"path": "server/src/api/router.go", "symbol": "anonymous route", "line": 133, "snippet": "r.Post(\"/anonymous\", s.signInAnonymously)"}, {"path": "server/src/api/login.go", "symbol": "users.LoginAnonymous", "line": 35, "snippet": "user, err := s.users.LoginAnonymous(r.Context(), body.Name)"}, {"path": "server/src/api/login.go", "symbol": "auth.Sign", "line": 42, "snippet": "tokenString, err := s.auth.Sign(map[string]interface{}{\"id\": user.ID})"}, {"path": "server/src/api/login.go", "symbol": "jwt cookie", "line": 49, "snippet": "cookie := http.Cookie{Name: \"jwt\", Value: tokenString, Path: \"/\", HttpOnly: true, MaxAge: math.MaxInt32}"}]}, {"id": "flow-join-board", "name": "Open a board and receive the initial state", "trigger": "An authenticated user navigates to /board/:boardId.", "steps": [{"node": "web-routes", "detail": "BoardGuard dispatches joinBoard(boardId)."}, {"node": "web-store", "detail": "On PermittedBoardAccess the board middleware opens a sockette connection to SERVER_WEBSOCKET_URL/boards/<id>."}, {"node": "api-http", "detail": "GET /boards/{id} upgrades to a websocket in openBoardSocket, guarded by BoardParticipantContext."}, {"node": "svc-boards", "detail": "FullBoard assembles board, columns, notes, reactions, votings, votes, sessions and requests."}, {"node": "database", "detail": "Database.Get loads every aggregate for the board."}, {"node": "ext-postgres", "detail": "The rows come out of PostgreSQL."}, {"node": "api-http", "detail": "eventInitFilter strips data the caller may not see, then the INIT event is written to the socket."}, {"node": "web-store", "detail": "The onmessage handler dispatches Actions.initializeBoard with the INIT payload."}, {"node": "web-components", "detail": "Board, columns and notes render from the hydrated store."}], "outcome": "The client has the full board state and a live subscription for every later change.", "evidence": [{"path": "src/routes/Board/BoardGuard.tsx", "symbol": "joinBoard", "line": 26, "snippet": "store.dispatch(Actions.joinBoard(boardId!));"}, {"path": "src/store/middleware/board.tsx", "symbol": "socket open", "line": 21, "snippet": "socket = new Socket(`${SERVER_WEBSOCKET_URL}/boards/${action.boardId}`, {"}, {"path": "server/src/api/boards_listen_on_board.go", "symbol": "FullBoard", "line": 54, "snippet": "board, requests, sessions, columns, notes, reactions, votings, votes, err := s.boards.FullBoard(r.Context(), id)"}, {"path": "server/src/api/boards_listen_on_board.go", "symbol": "eventInitFilter", "line": 77, "snippet": "initEvent = eventInitFilter(initEvent, userID)"}, {"path": "src/store/middleware/board.tsx", "symbol": "INIT dispatch", "line": 29, "snippet": "store.dispatch(Actions.initializeBoard(board, participants, requests || [], columns, notes || [], reactions || [], votes || [], votings || []));"}]}, {"id": "flow-add-note", "name": "Add a note and fan it out to every participant", "trigger": "A participant types into a column and submits a note.", "steps": [{"node": "web-components", "detail": "NoteInput dispatches Actions.addNote(columnId, content)."}, {"node": "web-store", "detail": "passNoteMiddleware calls API.addNote with the board id from the action context."}, {"node": "web-api", "detail": "NoteAPI.addNote POSTs to /boards/{boardId}/notes."}, {"node": "api-http", "detail": "The note routes run BoardParticipantContext, then Server.createNote."}, {"node": "svc-notes", "detail": "NoteService.Create writes the note, then calls UpdatedNotes."}, {"node": "database", "detail": "Database.CreateNote inserts the row."}, {"node": "ext-postgres", "detail": "The note is persisted."}, {"node": "svc-notes", "detail": "UpdatedNotes broadcasts a NOTES_UPDATED BoardEvent."}, {"node": "realtime", "detail": "Broker.BroadcastToBoard publishes on topic board.<uuid>."}, {"node": "ext-nats", "detail": "NATS (or Redis when configured) fans the event out to every server instance."}, {"node": "api-http", "detail": "Each instance's board subscription receives the event and writes it to its websockets."}, {"node": "web-store", "detail": "The onmessage handler dispatches Actions.updatedNotes."}, {"node": "web-components", "detail": "Every participant's board re-renders with the new note."}], "outcome": "The note is durable in PostgreSQL and visible to every connected participant without a refresh.", "evidence": [{"path": "src/components/NoteInput/NoteInput.tsx", "symbol": "addNote", "line": 30, "snippet": "dispatch(Actions.addNote(columnId!, content));"}, {"path": "src/store/middleware/note.tsx", "symbol": "API.addNote", "line": 11, "snippet": "API.addNote(action.context.board!, action.columnId, action.text).catch(() => {"}, {"path": "src/api/note.ts", "symbol": "POST notes", "line": 16, "snippet": "const response = await fetch(`${SERVER_HTTP_URL}/boards/${boardId}/notes`, {"}, {"path": "server/src/api/notes.go", "symbol": "createNote", "line": 15, "snippet": "func (s *Server) createNote(w http.ResponseWriter, r *http.Request) {"}, {"path": "server/src/services/notes/notes.go", "symbol": "CreateNote", "line": 44, "snippet": "note, err := s.database.CreateNote(database.NoteInsert{Author: body.User, Board: body.Board, Column: body.Column, Text: body.Text})"}, {"path": "server/src/services/notes/notes.go", "symbol": "broadcast", "line": 138, "snippet": "err := s.realtime.BroadcastToBoard(board, realtime.BoardEvent{"}, {"path": "server/src/realtime/boards.go", "symbol": "BroadcastToBoard", "line": 42, "snippet": "func (b *Broker) BroadcastToBoard(boardID uuid.UUID, msg BoardEvent) error {"}, {"path": "src/store/middleware/board.tsx", "symbol": "NOTES_UPDATED", "line": 55, "snippet": "if (message.type === \"NOTES_UPDATED\") {"}]}, {"id": "flow-create-board", "name": "Create a new board", "trigger": "A user configures columns and an access policy on /new and submits.", "steps": [{"node": "web-routes", "detail": "The /new route renders NewBoard behind RequireAuthentication."}, {"node": "web-components", "detail": "The template picker and AccessPolicySelection collect name, policy and columns."}, {"node": "web-api", "detail": "NewBoard.tsx calls API.createBoard directly (no store middleware); it POSTs to /boards and returns the new board id."}, {"node": "api-http", "detail": "Server.createBoard runs behind the JWT middleware stack."}, {"node": "svc-boards", "detail": "BoardService.Create persists the board plus its columns and the creator's owner session."}, {"node": "database", "detail": "Database.CreateBoard composes the board, column and owner-session inserts into a single CTE query."}, {"node": "ext-postgres", "detail": "The board is stored."}, {"node": "web-routes", "detail": "The browser navigates to /board/<new id>, which starts the join-board flow."}], "outcome": "A board exists with its columns, the creator is its owner, and the user lands on the live board.", "evidence": [{"path": "src/routes/NewBoard/NewBoard.tsx", "symbol": "API.createBoard", "line": 32, "snippet": "const boardId = await API.createBoard("}, {"path": "src/api/board.ts", "symbol": "createBoard", "line": 15, "snippet": "createBoard: async (name: string | undefined, accessPolicy: {type: string; passphrase?: string}, columns: {name: string; hidden: boolean; color: Color}[]) => {"}, {"path": "server/src/api/router.go", "symbol": "POST /boards", "line": 148, "snippet": "r.Post(\"/boards\", s.createBoard)"}, {"path": "server/src/api/boards.go", "symbol": "createBoard", "line": 34, "snippet": "b, err := s.boards.Create(r.Context(), body)"}, {"path": "server/src/database/boards.go", "symbol": "CreateBoard", "line": 70, "snippet": "func (d *Database) CreateBoard(creator uuid.UUID, board BoardInsert, columns []ColumnInsert) (Board, error) {"}]}, {"id": "flow-voting", "name": "Run a voting session", "trigger": "A moderator opens a voting from the voting dialog.", "steps": [{"node": "web-components", "detail": "VotingDialog dispatches the create-voting action."}, {"node": "web-store", "detail": "passVotingMiddleware calls the votings REST client."}, {"node": "web-api", "detail": "VotingAPI posts to /boards/{id}/votings."}, {"node": "api-http", "detail": "initVotingResources guards create/update with BoardModeratorContext."}, {"node": "svc-votings", "detail": "VotingService creates the voting and broadcasts VOTING_CREATED."}, {"node": "database", "detail": "The voting row is written; votes are later counted in SQL."}, {"node": "ext-postgres", "detail": "Voting and vote rows are persisted."}, {"node": "realtime", "detail": "The voting events are published on the board topic."}, {"node": "api-http", "detail": "eventFilter hides vote counts from participants while the voting is open."}, {"node": "web-store", "detail": "Clients dispatch the voting updates into the votings reducer."}, {"node": "web-components", "detail": "Vote buttons appear; results render once the voting closes."}], "outcome": "Participants cast votes under the configured limit, and totals become visible only after the moderator closes the voting.", "evidence": [{"path": "server/src/api/router.go", "symbol": "initVotingResources", "line": 190, "snippet": "func (s *Server) initVotingResources(r chi.Router) {"}, {"path": "server/src/api/router.go", "symbol": "moderator guard", "line": 193, "snippet": "r.With(s.BoardModeratorContext).Post(\"/\", s.createVoting)"}, {"path": "server/src/services/votings/votings.go", "symbol": "broadcast", "line": 129, "snippet": "err = s.realtime.BroadcastToBoard(board, realtime.BoardEvent{"}, {"path": "server/src/api/event_filter.go", "symbol": "filterVotingUpdated", "line": 134, "snippet": "func filterVotingUpdated(voting *VotingUpdated, userID uuid.UUID, boardSettings *dto.Board, columns []*dto.Column) *VotingUpdated {"}, {"path": "src/store/middleware/board.tsx", "symbol": "VOTING_UPDATED", "line": 93, "snippet": "if (message.type === \"VOTING_UPDATED\") {"}]}, {"id": "flow-feedback", "name": "Submit feedback to the external webhook", "trigger": "A user fills in the feedback form in the settings dialog.", "steps": [{"node": "web-components", "detail": "The Feedback settings panel posts the form."}, {"node": "web-api", "detail": "Feedback.tsx imports FeedbackAPI from api/feedback directly and posts to the public /feedback endpoint. Note api/feedback is NOT merged into the shared API object in api/index.ts."}, {"node": "api-http", "detail": "Server.createFeedback handles it - no authentication required."}, {"node": "svc-feedback", "detail": "FeedbackService.Create builds a Slack block payload and posts it."}, {"node": "ext-feedback-webhook", "detail": "The external webhook receives the message."}], "outcome": "Feedback reaches the team's chat channel. If --feedback-webhook-url is unset the feature is disabled and the form is hidden.", "evidence": [{"path": "src/components/SettingsDialog/Feedback/Feedback.tsx", "symbol": "FeedbackAPI.sendFeedback", "line": 54, "snippet": "FeedbackAPI.sendFeedback(feedbackType.value, feedback.value.trim(), contact.value.trim());"}, {"path": "server/src/api/router.go", "symbol": "POST /feedback", "line": 130, "snippet": "r.Post(\"/feedback\", s.createFeedback)"}, {"path": "server/src/api/feedback.go", "symbol": "feedback.Create", "line": 60, "snippet": "err := s.feedback.Create(r.Context(), string(body.Type), *body.Contact, *body.Text)"}, {"path": "server/src/api/info.go", "symbol": "feedbackEnabled", "line": 38, "snippet": "if s.feedback.Enabled() {"}, {"path": "server/src/services/feedback/feedback.go", "symbol": "http.Post", "line": 45, "snippet": "_, err := http.Post(s.webhookUrl, \"application/json\", bytes.NewBuffer(jsonData))"}, {"path": "src/components/SettingsDialog/Feedback/__tests__/Feedback.test.tsx", "symbol": "describe(Feedback)", "line": 12, "snippet": "describe(\"Feedback\", () => {"}]}]};
+
+/* ---------------------------------------------------------------- layout */
+const GROUPS = [
+  {key:"frontend", label:"Browser",        color:"var(--frontend)", ids:["web-entry","web-routes","web-components","web-store","web-api"]},
+  {key:"edge",     label:"Server edge",    color:"var(--backend)",  ids:["server-main","api-http","auth"]},
+  {key:"service",  label:"Domain services",color:"var(--service)",  ids:["svc-boards","svc-notes","svc-votings","svc-feedback"]},
+  {key:"data",     label:"Infrastructure", color:"var(--data)",     ids:["database","migrations","realtime"]},
+  {key:"external", label:"External",       color:"var(--external)", ids:["ext-postgres","ext-nats","ext-redis","ext-oauth","ext-feedback-webhook"]},
+];
+const NW = 186, NH = 58, COLW = 260, ROWH = 86, TOP = 62, LEFT = 40;
+
+const byId = {};
+DATA.nodes.forEach(n => byId[n.id] = n);
+const pos = {};
+GROUPS.forEach((g, gi) => {
+  const known = g.ids.filter(id => byId[id]);
+  known.forEach((id, i) => {
+    pos[id] = {x: LEFT + gi*COLW, y: TOP + i*ROWH, group:g};
+  });
+});
+// any node not claimed by a group lands in a trailing column
+let extraCol = GROUPS.length, extraRow = 0;
+DATA.nodes.forEach(n => { if(!pos[n.id]){
+  pos[n.id] = {x: LEFT + extraCol*COLW, y: TOP + (extraRow++)*ROWH, group:{label:"Other",color:"var(--muted)"}};
+}});
+
+const W = LEFT + (extraCol+1)*COLW, H = TOP + 6*ROWH + 60;
+
+/* ---------------------------------------------------------------- render */
+const NS = "http://www.w3.org/2000/svg";
+const svg = document.getElementById("svg");
+const el = (t, a={}) => { const e = document.createElementNS(NS,t);
+  for(const k in a) e.setAttribute(k, a[k]); return e; };
+
+const root = el("g");
+svg.appendChild(root);
+const gEdges = el("g"); const gNodes = el("g");
+root.appendChild(gEdges); root.appendChild(gNodes);
+
+// group headings
+GROUPS.forEach((g, gi) => {
+  const t = el("text", {x: LEFT + gi*COLW, y: TOP - 26, class:"grouplabel"});
+  t.textContent = g.label; root.appendChild(t);
+});
+
+function anchor(id, side){
+  const p = pos[id];
+  return {x: p.x + (side === "out" ? NW : 0), y: p.y + NH/2};
+}
+function edgePath(e){
+  const a = anchor(e.from, "out"), b = anchor(e.to, "in");
+  if (pos[e.to].x <= pos[e.from].x){            // backward / same column: loop out
+    const mx = Math.max(a.x, b.x) + 54;
+    return `M${a.x},${a.y} C${mx},${a.y} ${mx},${b.y} ${b.x + NW},${b.y}`
+      .replace(`${b.x + NW},${b.y}`, `${b.x + NW},${b.y}`);
+  }
+  const dx = (b.x - a.x) * 0.5;
+  return `M${a.x},${a.y} C${a.x+dx},${a.y} ${b.x-dx},${b.y} ${b.x},${b.y}`;
+}
+
+const edgeEls = DATA.edges.map(e => {
+  const unk = e.evidence_status === "unknown";
+  const p = el("path", {
+    d: edgePath(e), class: "edge" + (unk ? " unk" : ""),
+    stroke: unk ? "var(--unknown)" : `var(--${e.type})`,
+  });
+  p.addEventListener("click", ev => { ev.stopPropagation(); selectEdge(e); });
+  p.style.cursor = "pointer";
+  gEdges.appendChild(p);
+  return {e, p};
+});
+
+const nodeEls = DATA.nodes.map(n => {
+  const p = pos[n.id];
+  const g = el("g", {class:"nodebox", transform:`translate(${p.x},${p.y})`});
+  g.appendChild(el("rect", {width:NW, height:NH}));
+  const bar = el("rect", {width:4, height:NH, class:"bar", fill:p.group.color, rx:2});
+  g.appendChild(bar);
+  const t1 = el("text", {x:14, y:23, class:"t"}); t1.textContent = n.id; g.appendChild(t1);
+  const t2 = el("text", {x:14, y:41, class:"s"});
+  t2.textContent = n.path.length > 30 ? "…" + n.path.slice(-29) : n.path;
+  g.appendChild(t2);
+  g.addEventListener("click", ev => { ev.stopPropagation(); selectNode(n.id); });
+  gNodes.appendChild(g);
+  return {n, g};
+});
+
+/* ------------------------------------------------------------ pan + zoom */
+let vx = 0, vy = 0, vs = 1;
+function apply(){ root.setAttribute("transform", `translate(${vx},${vy}) scale(${vs})`); }
+function fit(){
+  const r = svg.getBoundingClientRect();
+  vs = Math.min(r.width / (W + 60), r.height / (H + 40), 1.25);
+  vx = 14; vy = 14; apply();
+}
+window.addEventListener("resize", fit);
+svg.addEventListener("wheel", e => {
+  e.preventDefault();
+  const r = svg.getBoundingClientRect();
+  const mx = e.clientX - r.left, my = e.clientY - r.top;
+  const k = Math.exp(-e.deltaY * 0.0016), ns = Math.min(3, Math.max(0.25, vs * k));
+  vx = mx - (mx - vx) * (ns / vs); vy = my - (my - vy) * (ns / vs); vs = ns; apply();
+}, {passive:false});
+let drag = null;
+svg.addEventListener("mousedown", e => { drag = {x:e.clientX, y:e.clientY, vx, vy};
+  svg.classList.add("dragging"); });
+window.addEventListener("mousemove", e => { if(!drag) return;
+  vx = drag.vx + e.clientX - drag.x; vy = drag.vy + e.clientY - drag.y; apply(); });
+window.addEventListener("mouseup", () => { drag = null; svg.classList.remove("dragging"); });
+svg.addEventListener("click", () => clearSel());
+document.getElementById("fit").onclick = fit;
+document.getElementById("clear").onclick = clearSel;
+
+/* -------------------------------------------------------------- side bar */
+const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const pane = k => document.getElementById("p-" + k);
+document.querySelectorAll("#tabs button").forEach(b => b.onclick = () => {
+  document.querySelectorAll("#tabs button").forEach(x => x.classList.toggle("on", x === b));
+  document.querySelectorAll(".pane").forEach(p => p.classList.toggle("on", p.id === "p" + "-" + b.dataset.p));
+});
+function showDetail(html){
+  pane("detail").innerHTML = html;
+  document.querySelectorAll("#tabs button").forEach(x => x.classList.toggle("on", x.dataset.p === "detail"));
+  document.querySelectorAll(".pane").forEach(p => p.classList.toggle("on", p.id === "p-detail"));
+  pane("detail").scrollTop = 0;
+}
+const evHtml = ev => ev.length
+  ? ev.map(e => `<div class="ev"><div class="loc">${esc(e.path)}:${e.line}</div>
+      <div class="sym">${esc(e.symbol)}</div><pre>${esc(e.snippet)}</pre></div>`).join("")
+  : `<p class="hint">No source evidence. This relationship is marked <b>unknown</b>.</p>`;
+
+function nodeDetail(id){
+  const n = byId[id];
+  const out = DATA.edges.filter(e => e.from === id), inc = DATA.edges.filter(e => e.to === id);
+  const line = e => `<li><span class="pill t-${e.type}${e.evidence_status==="unknown"?" unk":""}">${e.type}</span>
+      <code>${esc(e.from === id ? e.to : e.from)}</code>${e.evidence_status==="unknown"?' <span class="hint">(unknown)</span>':""}</li>`;
+  const list = (t, a) => a.length ? `<h3>${t}</h3><ul>${a.join("")}</ul>` : "";
+  return `<h2>${esc(n.id)}</h2>
+    <div class="path mono">${esc(n.path)}</div>
+    <p>${esc(n.role)}</p>
+    ${list("Entrypoints", n.entrypoints.map(x => `<li><code>${esc(x)}</code></li>`))}
+    ${list("Constraints", n.constraints.map(x => `<li>${esc(x)}</li>`))}
+    ${n.tests.length ? list("Tests", n.tests.map(x => `<li><code>${esc(x)}</code></li>`))
+        : `<h3>Tests</h3><p class="hint">No test files found for this module.</p>`}
+    ${list("Outgoing", out.map(line))}
+    ${list("Incoming", inc.map(line))}
+    <h3>Evidence</h3>${evHtml(n.evidence)}`;
+}
+function edgeDetail(e){
+  return `<h2><code>${esc(e.from)}</code> &rarr; <code>${esc(e.to)}</code></h2>
+    <p><span class="pill t-${e.type}${e.evidence_status==="unknown"?" unk":""}">${e.type}</span>
+       <span class="pill${e.evidence_status==="unknown"?" unk":""}">${e.evidence_status}</span></p>
+    ${e.note ? `<p>${esc(e.note)}</p>` : ""}
+    <h3>Evidence</h3>${evHtml(e.evidence)}`;
+}
+
+let sel = null;
+function paint(){
+  const hot = new Set(); const hotEdges = new Set();
+  if (sel && sel.k === "node"){
+    hot.add(sel.id);
+    DATA.edges.forEach((e,i) => { if(e.from===sel.id||e.to===sel.id){
+      hotEdges.add(i); hot.add(e.from); hot.add(e.to);} });
+  } else if (sel && sel.k === "edge"){
+    hotEdges.add(sel.i); hot.add(DATA.edges[sel.i].from); hot.add(DATA.edges[sel.i].to);
+  } else if (sel && sel.k === "flow"){
+    sel.nodes.forEach(id => hot.add(id));
+    DATA.edges.forEach((e,i)=>{ if(hot.has(e.from)&&hot.has(e.to)) hotEdges.add(i); });
+  }
+  const on = !!sel;
+  nodeEls.forEach(({n,g}) => {
+    g.classList.toggle("dimmed", on && !hot.has(n.id));
+    g.classList.toggle("sel", !!sel && sel.k === "node" && sel.id === n.id);
+  });
+  edgeEls.forEach(({p}, i) => {
+    p.classList.toggle("hot", hotEdges.has(i));
+    p.classList.toggle("dimmed", on && !hotEdges.has(i));
+  });
+}
+function selectNode(id){ sel = {k:"node", id}; paint(); showDetail(nodeDetail(id)); }
+function selectEdge(e){ sel = {k:"edge", i: DATA.edges.indexOf(e)}; paint(); showDetail(edgeDetail(e)); }
+function selectFlow(f){
+  sel = {k:"flow", nodes: f.steps.map(s => s.node)}; paint();
+  showDetail(`<h2>${esc(f.name)}</h2>
+    <h3>Trigger</h3><p>${esc(f.trigger)}</p>
+    <h3>Steps</h3>${f.steps.map((s,i)=>`<div class="flowstep"><div class="n">${i+1}</div>
+      <div class="b"><b data-go="${esc(s.node)}">${esc(s.node)}</b><div>${esc(s.detail)}</div></div></div>`).join("")}
+    <h3>Outcome</h3><p>${esc(f.outcome)}</p>
+    <h3>Evidence</h3>${evHtml(f.evidence)}`);
+  pane("detail").querySelectorAll("[data-go]").forEach(b => {
+    b.style.cursor = "pointer";
+    b.onclick = () => selectNode(b.dataset.go);
+  });
+}
+function clearSel(){ sel = null; paint(); showDetail(overview()); }
+
+function overview(){
+  const unk = DATA.edges.filter(e => e.evidence_status === "unknown");
+  return `<h2>Overview</h2><p>${esc(DATA.summary)}</p>
+    <h3>How to read this</h3>
+    <ul><li>Click a box for a module: role, entrypoints, tests, constraints, source evidence.</li>
+    <li>Click a line for one relationship and the source lines that prove it.</li>
+    <li>The <b>Flows</b> tab traces end-to-end paths and highlights them on the diagram.</li>
+    <li>Dashed red lines are relationships with <b>no</b> source evidence &mdash; treated as unknown, not asserted.</li>
+    <li>Scroll to zoom, drag to pan, <b>Fit</b> to reset.</li></ul>
+    <h3>Counts</h3>
+    <ul><li>${DATA.nodes.length} modules (cap ${DATA.node_cap})</li>
+    <li>${DATA.edges.length} relationships, ${unk.length} unknown</li>
+    <li>${DATA.flows.length} traced flows</li></ul>
+    ${!unk.length ? `<p class="hint">Every relationship drawn here resolves to a source line. Nothing is marked unknown in this build.</p>` : ""}
+    ${unk.length ? `<h3>Unknown relationships</h3><ul>${unk.map(e =>
+      `<li><code>${esc(e.from)} &rarr; ${esc(e.to)}</code> (${e.type})<br><span class="hint">${esc(e.note||"")}</span></li>`).join("")}</ul>` : ""}`;
+}
+
+/* ------------------------------------------------------------- tab panes */
+pane("nodes").innerHTML = GROUPS.map(g => {
+  const list = g.ids.filter(id => byId[id]).map(id => {
+    const n = byId[id];
+    return `<div class="row" data-go="${esc(id)}"><div class="hd">${esc(id)}</div>
+      <div class="sub mono">${esc(n.path)}</div>
+      <div class="sub">${esc(n.role.slice(0,120))}${n.role.length>120?"…":""}</div></div>`;
+  }).join("");
+  return list ? `<h3>${esc(g.label)}</h3>${list}` : "";
+}).join("");
+
+pane("flows").innerHTML = DATA.flows.map((f,i) =>
+  `<div class="row" data-flow="${i}"><div class="hd">${esc(f.name)}</div>
+   <div class="sub">${esc(f.trigger)}</div>
+   <div class="sub mono">${f.steps.length} steps</div></div>`).join("");
+
+pane("about").innerHTML = `<h2>About this map</h2>
+  <h3>Provenance</h3>
+  <ul><li>Commit <code>${esc(DATA.repository.commit)}</code></li>
+  <li>Branch <code>${esc(DATA.repository.branch)}</code></li>
+  <li>Generated <code>${esc(DATA.generated_at)}</code></li></ul>
+  <h3>Rules this map follows</h3>
+  <ul>
+    <li>At most ${DATA.node_cap} primary modules.</li>
+    <li>Every module carries id, path, role, entrypoints, tests, constraints, evidence.</li>
+    <li>Relationship types are limited to <code>${DATA.edge_types.join(" | ")}</code>.</li>
+    <li>Every relationship without a matching source line is marked <b>unknown</b> rather than guessed.</li>
+    <li>Every flow step names a module that exists in this map.</li>
+  </ul>
+  <h3>Not on this map</h3>
+  <p class="hint">Real modules left out to stay within the ${DATA.node_cap}-module cap. They exist; this map just does not draw them.</p>
+  <ul>${(DATA.not_mapped||[]).map(m=>`<li><code>${esc(m.path)}</code><br><span class="hint">${esc(m.why)}</span></li>`).join("")}</ul>
+  <h3>Companion files</h3>
+  <ul><li><code>codemap.json</code> &mdash; the same nodes, edges and flows as data, with evidence.</li>
+  <li><code>codemap.lock</code> &mdash; commit, dirty flag, scope, exclusions, and a per-module fingerprint.</li></ul>`;
+
+document.getElementById("legend").innerHTML =
+  DATA.edge_types.map(t => `<div><i style="background:var(--${t})"></i>${t}</div>`).join("") +
+  `<div><i style="background:var(--unknown)"></i>unknown (dashed)</div>`;
+
+document.getElementById("hdmeta").textContent =
+  `${DATA.repository.commit.slice(0,12)} · ${DATA.nodes.length} modules · ` +
+  `${DATA.edges.length} edges · ${DATA.flows.length} flows · generated ${DATA.generated_at}`;
+
+document.querySelectorAll("[data-go]").forEach(r => r.onclick = () => selectNode(r.dataset.go));
+document.querySelectorAll("[data-flow]").forEach(r => r.onclick = () => selectFlow(DATA.flows[+r.dataset.flow]));
+
+svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+svg.removeAttribute("viewBox");
+fit();
+showDetail(overview());
+</script>
+</body>
+</html>

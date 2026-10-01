@@ -1,0 +1,22 @@
+@startuml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Context.puml
+HIDE_STEREOTYPE()
+
+title Ride-Sharing Platform - Context Diagram
+
+Person(rider, "Rider", "Requests rides via the platform")
+Person(driver, "Driver", "Accepts ride requests and provides transport")
+System(ride_sharing, "Ride-Sharing Platform", "Connects riders with drivers and manages trips")
+System_Ext(maps_service, "Google Maps", "Provides routing and navigation services")
+System_Ext(payment_service, "Stripe", "Processes payment transactions")
+System_Ext(notification_service, "Firebase", "Sends push notifications to users")
+System(support_system, "Support Agent System", "Handles customer disputes and support requests")
+
+Rel(rider, ride_sharing, "Requests rides", "HTTPS")
+Rel(driver, ride_sharing, "Accepts rides, updates location", "HTTPS")
+Rel(ride_sharing, maps_service, "Gets routing and distance", "API/HTTPS")
+Rel(ride_sharing, payment_service, "Processes payments", "API/HTTPS")
+Rel(ride_sharing, notification_service, "Sends push notifications", "API/HTTPS")
+Rel(ride_sharing, support_system, "Escalates disputes", "Internal API")
+
+@enduml

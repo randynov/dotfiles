@@ -1,0 +1,35 @@
+@startuml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Sequence.puml
+HIDE_STEREOTYPE()
+
+title Place Order Flow - Sequence Diagram
+
+Person(customer, "Customer", "Places orders via the web application")
+Container(web_app, "Web Application", "React", "Frontend web application")
+Container(api_server, "API Server", "Node.js", "Backend API server")
+Container(inventory_service, "Inventory Service", "Python", "Checks product stock levels")
+ContainerDb(inventory_db, "Inventory Database", "PostgreSQL", "Stores inventory data")
+Container(payment_service, "Payment Service", "Node.js", "Processes card payments")
+ContainerQueue(order_queue, "Order Queue", "RabbitMQ", "Message queue for order events")
+Container(fulfillment_service, "Fulfillment Service", "Java", "Processes orders for fulfillment")
+
+== Order Submission ==
+Rel(customer, web_app, "Submits order", "HTTPS")
+Rel(web_app, api_server, "POST /orders", "REST/JSON")
+
+== Inventory Check ==
+Rel(api_server, inventory_service, "Checks stock availability", "REST/JSON")
+Rel(inventory_service, inventory_db, "Queries inventory", "SQL")
+Rel(inventory_db, inventory_service, "Returns stock levels", "SQL")
+Rel(inventory_service, api_server, "Returns availability", "REST/JSON")
+
+== Payment Processing ==
+Rel(api_server, payment_service, "Charges card", "REST/JSON")
+Rel(payment_service, api_server, "Returns payment confirmation", "REST/JSON")
+
+== Order Fulfillment ==
+Rel(api_server, order_queue, "Publishes order event", "AMQP")
+Rel(order_queue, fulfillment_service, "Delivers order event", "AMQP")
+Rel(fulfillment_service, api_server, "Updates order status", "REST/JSON")
+
+@enduml

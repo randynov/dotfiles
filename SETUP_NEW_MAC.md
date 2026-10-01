@@ -66,7 +66,7 @@ chezmoi diff
 If `~/.zshrc` was already copied from the old Mac, it is newer than the repo copy and contains local secrets. Apply everything except it:
 
 ```bash
-chezmoi apply $(chezmoi managed --include=files --path-style=absolute | grep -v '/\.zshrc$')
+chezmoi apply $(chezmoi managed --path-style=absolute | grep -v '/\.zshrc$')
 ```
 
 Otherwise, apply everything:

@@ -1,0 +1,148 @@
+# Apps from Loma. Delete lines you do not want, then: brew bundle --file=~/Brewfile.apps
+# Cloud sync apps are commented out; handled separately.
+
+# Homebrew casks
+cask "1password"
+cask "acorn"
+cask "adapter"
+cask "adobe-acrobat-reader"
+cask "airflow"
+cask "airtable"
+cask "anytype"
+cask "bambu-studio"
+cask "bartender"
+cask "betterdisplay"
+cask "block-buzz"
+# cask "box-drive"
+cask "brave-browser"
+cask "cap"
+cask "cardhop"
+cask "chatgpt"
+cask "chatgpt-classic"
+cask "chrome-remote-desktop-host"
+cask "claude"
+cask "claude-devtools"
+cask "cmux"
+cask "comet"
+cask "conductor"
+cask "crossover"
+cask "cursor"
+cask "daisydisk"
+cask "devin-desktop"
+cask "discord"
+cask "disk-drill"
+cask "displaylink"
+cask "docker-desktop"
+# cask "dropbox"
+cask "elgato-camera-hub"
+cask "epic-games"
+cask "fathom"
+cask "figma"
+cask "firefox"
+cask "fluidvoice"
+cask "flutterflow"
+cask "github"
+cask "google-chrome"
+# cask "google-drive"
+cask "gpt4all"
+cask "handbrake-app"
+cask "heynote"
+cask "istat-menus"
+cask "iterm2"
+cask "itermai"
+cask "itermbrowserplugin"
+cask "jan"
+cask "jupyterlab-app"
+cask "kiro"
+cask "krita"
+cask "langgraph-studio"
+cask "linear"
+cask "lm-studio"
+cask "logi-options+"
+cask "loom"
+cask "lulu"
+# cask "megasync"
+cask "meteorologist"
+cask "microsoft-edge"
+cask "microsoft-excel"
+cask "microsoft-onenote"
+cask "microsoft-outlook"
+cask "microsoft-powerpoint"
+cask "microsoft-teams"
+cask "microsoft-word"
+cask "miro"
+cask "multipass"
+cask "notion"
+cask "nvidia-geforce-now"
+cask "ollama-app"
+# cask "onedrive"
+cask "onyx"
+cask "orka-desktop"
+cask "oversight"
+cask "perplexity"
+cask "private-internet-access"
+cask "raycast"
+cask "rivet"
+cask "shottr"
+cask "signal"
+cask "sizeup"
+cask "skim"
+cask "steam"
+cask "sublime-text"
+cask "superhuman"
+cask "tailscale-app"
+cask "telegram"
+cask "termius"
+cask "thunderbird"
+cask "tor-browser"
+cask "transmission"
+cask "transnomino"
+cask "vibetunnel"
+cask "vlc"
+cask "vorssaint"
+cask "whatcable"
+cask "zed"
+cask "zoom"
+
+# Mac App Store (requires App Store sign-in on hreysi)
+mas "Apollo", id: 6448019325
+mas "Blackmagic Disk Speed Test", id: 425264550
+mas "BloonsTD6+", id: 1584423325
+mas "BrightIntosh", id: 6452471855
+mas "Canary Mail", id: 1236045954
+mas "CardPointers", id: 1472875808
+mas "Cinebench", id: 1438772273
+mas "Color Picker", id: 1545870783
+mas "Contextly", id: 6762497168
+mas "Control Center", id: 1515453657
+mas "CopyLess 2", id: 993841014
+mas "Croissant", id: 6670288979
+mas "Developer", id: 640199958
+mas "DrawBook", id: 6698859618
+mas "Dynamic wallpaper", id: 1582358382
+mas "Fantastical", id: 975937182
+mas "Keynote", id: 409183694
+mas "MWeb", id: 1183407767
+mas "Numbers", id: 409203825
+mas "Pages", id: 409201541
+mas "Paprika Recipe Manager 3", id: 1303222628
+mas "Pocket", id: 568494494
+mas "Poolsuite FM", id: 1514817810
+mas "Reeder", id: 6475002485
+mas "Screens 5", id: 1663047912
+mas "Seashore", id: 1448648921
+mas "Slack", id: 803453959
+mas "Speedtest", id: 1153157709
+mas "Spokenly", id: 6740315592
+mas "Super Easy Slides", id: 6738591861
+mas "The Unarchiver", id: 425424353
+mas "Todoist", id: 585829637
+mas "Transcriptionist", id: 6447059405
+mas "UpNote", id: 1398373917
+mas "WhatsApp", id: 310633997
+mas "Whisper Transcription", id: 1668083311
+mas "WireGuard", id: 1451685025
+mas "Xcode", id: 497799835
+
+# No cask found; install by hand if needed:
+# 1Code, Cheating Daddy, Chops, Claude Code Tool Manager, Claude MQOL, Claude Starfysh, Clay, Fireflies, Glass, Google Docs, Google Sheets, Google Slides, Grizzly, Gumroad, HyperCoder, Ledger, MP4tools, MarkPane, MarkPaneQLHost, NFC Tools, Oh My Marktext, PeekX, PromptBoard, Qwen, Reor, Rumble, ShortcutDetective, Supercut, Task Manager TMOG, VMware Fusion, Xirp, google-drive-ql-preview, pickle

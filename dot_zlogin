@@ -19,7 +19,6 @@ if [[ -o interactive && -t 0 && -t 1 && $SHLVL -eq 1 && -z "$VSCODE_INJECTION" &
 #    weather_padding=$(( (term_width - ${#weather_text}) / 2 ))
 #    printf "%*s%s\n" $weather_padding "" "$weather_text" | lolcat
     echo "--------------------------------------------------------------------------------"
-    fortune | boxes -d "$(boxes -l | tail -n +4 | awk '/^[a-zA-Z0-9-]+$/{print $1}' | gshuf -n 1)" | lolcat -t
+    fortune | col -b | boxes -d "$(boxes -l | tail -n +4 | awk '/^[a-zA-Z0-9-]+$/{print $1}' | gshuf -n 1)" | lolcat -t
     echo "--------------------------------------------------------------------------------"
 fi
-

@@ -7,32 +7,55 @@
 // custom settings, run the `open default settings` command
 // from the command palette or from `Zed` application menu.
 {
+  "cli_default_open_behavior": "existing_window",
+  "project_panel": {
+    "dock": "left"
+  },
+  "outline_panel": {
+    "dock": "left"
+  },
+  "collaboration_panel": {
+    "dock": "left"
+  },
+  "git_panel": {
+    "dock": "left"
+  },
   "icon_theme": "Material Icon Theme",
   "edit_predictions": {
+    "provider": "zed",
     "mode": "eager",
     "copilot": {
       "proxy": null,
-      "proxy_no_verify": null
+      "proxy_no_verify": null,
     },
-    "enabled_in_text_threads": false
+    "enabled_in_text_threads": false,
   },
   "languages": {
     "Markdown": {
-      "format_on_save": "on"
-    }
+      "format_on_save": "on",
+    },
+  },
+  "lsp": {
+    "markdownlint": {
+      "settings": {
+        "config": {
+          "MD013": false,
+        },
+      },
+    },
   },
   "features": {
-    "edit_prediction_provider": "zed",
     "show_completions_on_input": false,
     "show_inline_completions": false,
     "show_autocomplete": false,
-    "show_edit_predictions": false
+    "show_edit_predictions": false,
   },
   "agent": {
+    "dock": "right",
     "default_model": {
       "provider": "ollama",
-      "model": "codellama:13b-code-q5_K_M"
-    }
+      "model": "codellama:13b-code-q5_K_M",
+    },
   },
   "theme": "Ayu Dark",
   "vim_mode": false,
@@ -40,5 +63,5 @@
   "ui_font_family": "FiraCode Nerd Font Mono",
   "soft_wrap": "editor_width",
   "hard_tabs": false,
-  "buffer_font_size": 16
+  "buffer_font_size": 16,
 }

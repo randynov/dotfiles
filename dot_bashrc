@@ -9,3 +9,9 @@ export CREW_MAX_RPM=300
 export PATH="$PATH:/Users/randallnoval/.lmstudio/bin"
 
 [[ "$TERM_PROGRAM" == "kiro" ]] && . "$(kiro --locate-shell-integration-path bash)"
+
+alias gam="/Users/randallnoval/bin/gam7/gam"
+
+alias claude-mem='bun "/Users/randallnoval/.claude/plugins/marketplaces/thedotmack/plugin/scripts/worker-service.cjs"'
+
+source /Users/randallnoval/.config/broot/launcher/bash/br

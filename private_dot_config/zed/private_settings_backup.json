@@ -16,6 +16,11 @@
     },
     "enabled_in_text_threads": false
   },
+  "languages": {
+    "Markdown": {
+      "format_on_save": "on"
+    }
+  },
   "features": {
     "edit_prediction_provider": "zed",
     "show_completions_on_input": false,
@@ -27,12 +32,12 @@
     "default_model": {
       "provider": "ollama",
       "model": "codellama:13b-code-q5_K_M"
-    },
-    "version": "2"
+    }
   },
   "theme": "Ayu Dark",
   "vim_mode": false,
   "ui_font_size": 16,
+  "ui_font_family": "FiraCode Nerd Font Mono",
   "soft_wrap": "editor_width",
   "hard_tabs": false,
   "buffer_font_size": 16

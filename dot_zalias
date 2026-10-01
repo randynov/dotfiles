@@ -31,6 +31,7 @@ alias rd="rmdir"
 alias cat='bat'
 alias find='fd'
 alias grep='rg'
+alias rgf='rg --files | rg'
 
 # Directory navigation shortcuts
 alias ..='cd ..'
@@ -46,6 +47,9 @@ alias mv='mv -i'
 alias ping='ping -c 5'
 alias ports='lsof -i'
 
+# Passphrase Generation with Bitwarden
+alias bwgen='bw generate --passphrase -c --includeNumber --words 3 2>/dev/null | pbcopy'
+
 # System information
 alias myip='curl -s ipinfo.io/ip'
 
@@ -56,6 +60,7 @@ alias pcp='rsync -r --info=progress2'
 alias gst='git status'
 alias gco='git checkout'
 alias gcb='git checkout -b'
+alias gdd='git diff | diffnav'
 alias gp='git push'
 alias gpl='git pull'
 alias ga='git add'
@@ -73,6 +78,7 @@ alias gfa='git fetch --all'
 alias grb='git rebase'
 alias gstash='git stash'
 alias gstp='git stash pop'
+alias gcmp='git checkout main && git pull'
 
 # Git utilities
 alias gcamm='git commit -am "$(curl -sk https://whatthecommit.com/index.txt)" && git push'
@@ -96,10 +102,15 @@ alias serve='python -m http.server 8000'
 alias jsonpp='python -m json.tool'
 alias docker-compose='docker compose'
 
+# AWS SSO login (opens in Brave) and prod shortcut
+alias awsl="BROWSER='open -a \"Brave Browser.app\" %s' aws sso login"
+alias aws-p="aws --profile prod"
+
 # Personal shortcuts
 alias cds="cd $HOME/Downloads/starfysh/code/curiocity"
 alias star="ssh 'starfysh@pdx1-shared-a2-13.dreamhost.com'"
 alias g="glow -w 80 -p"
+alias rich="rich -n -g -y -w 100 --theme one-dark"
 alias czup="chezmoi re-add && chezmoi git add . && chezmoi git -- commit -m 'Auto-sync dotfiles' && chezmoi git push && chezmoi update"
 alias cz="chezmoi"
 
@@ -110,6 +121,8 @@ alias python='python3'
 alias cc-log='uvx claude-code-log@latest --open-browser'
 alias cc-usage='bunx ccusage'
 alias cc-monitor='claude-monitor'
+alias hcc='happy claude --model opusplan'
+alias cco='claude --model opusplan'
 
 # ================================================
 # FUNCTIONS
@@ -120,18 +133,18 @@ pull_ollama() {
     echo "📋 Listing installed ollama models..."
     ollama list
     echo ""
-    
+
     echo "🔄 Updating all models..."
     local models=$(ollama list | tail -n +2 | awk '{print $1}' | grep -v '^$')
-    
+
     if [ -z "$models" ]; then
         echo "❌ No models found to update"
         return 1
     fi
-    
+
     local count=0
     local total=$(echo "$models" | wc -l | tr -d ' ')
-    
+
     echo "$models" | while read -r model; do
         if [ -n "$model" ]; then
             count=$((count + 1))
@@ -141,7 +154,7 @@ pull_ollama() {
             echo "✅ Completed: $model"
         fi
     done
-    
+
     echo ""
     echo "🎉 All ollama models updated successfully!"
 }
@@ -150,3 +163,250 @@ pull_ollama() {
 # alias cd='cd \\!*;sp'  # Custom cd with sp command
 # alias l.='/bin/ls -dG .*'  # Show hidden files only
 # alias syssleep="osascript -e='tell application='System Events' to sleep'"  # System sleep
+
+# PKM (Personal Knowledge Management) utilities
+alias pkm-capture="python3 ~/.claude/skills/pkm/capture.py"
+alias pkm-sort="python3 ~/.claude/skills/pkm/sorter.py"
+alias pkm-nudge="python3 ~/.claude/skills/pkm/nudge.py"
+alias pkm-review="python3 ~/.claude/skills/pkm/review.py"
+alias pkm-template="python3 ~/.claude/skills/pkm/templates.py"
+
+# Create worktree from GitHub issue (accepts URL or issue number)
+giw() {
+  # Cleanup function
+  [[ "$1" =~ ^-c ]] && {
+    local issue=$2
+    [ -z "$issue" ] && { echo "Usage: giw -c <issue-number>"; return 1 }
+
+    local dir="../mqol-$issue"
+
+    if [ ! -d "$dir" ]; then
+      echo "❌ Worktree folder not found: $dir"
+
+      # Check for any branches with this issue number
+      echo "🔍 Checking for branches with issue #$issue..."
+      git branch --list | grep -i "$issue" | while read branch; do
+        branch=$(echo "$branch" | sed 's/^\*\? //')  # Clean branch name
+        echo "   Found branch: $branch"
+        echo "   Delete with: git branch -D $branch"
+      done
+
+      return 1
+    fi
+
+    echo "🧹 Cleaning up issue #$issue..."
+
+    # Check if we're inside the worktree
+    if [[ "$(realpath "$(pwd)" 2>/dev/null)" == "$(realpath "$dir" 2>/dev/null)" ]]; then
+      echo "❌ You're inside the worktree: $dir"
+      echo "   Navigate out first: cd .."
+      echo "   Then run: giw -c $issue"
+      return 1
+    fi
+
+    # Get branch name from worktree
+    local branch=""
+    if [ -d "$dir/.git" ]; then
+      branch=$(cd "$dir" && git branch --show-current 2>/dev/null)
+    fi
+
+    echo "📁 Removing: $dir"
+    echo "🌿 Branch: ${branch:-unknown}"
+
+    # Remove worktree
+    if git worktree remove "$dir" 2>/dev/null; then
+      echo "✅ Worktree removed"
+    else
+      echo "⚠️  Normal remove failed, trying force..."
+      git worktree remove "$dir" --force 2>/dev/null || {
+        echo "❌ Force remove also failed"
+        echo "   Try manual removal: rm -rf $dir"
+        return 1
+      }
+    fi
+
+    # Delete branch if it exists
+    if [ -n "$branch" ] && git show-ref --verify --quiet "refs/heads/$branch" 2>/dev/null; then
+      echo "🗑️  Deleting branch: $branch"
+      git branch -D "$branch" 2>/dev/null && echo "✅ Branch deleted" || echo "⚠️  Could not delete branch"
+    fi
+
+    echo "✅ Cleanup complete"
+    return 0
+  }
+
+  # Help
+  [[ "$1" =~ ^-h ]] && {
+    echo "giw <issue>          # Create worktree for issue"
+    echo "giw -c <issue>       # Cleanup worktree for issue"
+    return
+  }
+
+  # Main logic - CREATE worktree
+  local issue=$1
+  [ -z "$issue" ] && { echo "Usage: giw <issue-number>"; return 1 }
+
+  # ---- STEP 1: FAST FAIL - Check if worktree folder exists ----
+  local dir="../mqol-$issue"
+
+  if [ -d "$dir" ]; then
+    echo "❌ FAST FAIL: Worktree folder already exists: $dir"
+    echo ""
+
+    # Provide diagnostic info
+    if [ -d "$dir/.git" ]; then
+      local existing_branch=$(cd "$dir" && git branch --show-current 2>/dev/null)
+      echo "📊 Diagnostic info:"
+      echo "   Current branch: ${existing_branch:-unknown}"
+      echo "   Full path: $(realpath "$dir" 2>/dev/null)"
+
+      # Check if we're inside it
+      if [[ "$(realpath "$(pwd)" 2>/dev/null)" == "$(realpath "$dir" 2>/dev/null)" ]]; then
+        echo "   ⚠️  YOU ARE CURRENTLY INSIDE THIS WORKTREE"
+      fi
+    else
+      echo "⚠️  Folder exists but is not a git worktree"
+    fi
+
+    echo ""
+    echo "🔧 To fix:"
+    echo "   Clean it up: giw -c $issue"
+    echo "   Or navigate to it: cd $dir"
+    return 1
+  fi
+
+  # ---- STEP 2: Get repo info ----
+  local repo=$(gh repo view --json nameWithOwner -q '.nameWithOwner' 2>/dev/null)
+  [ -z "$repo" ] && { echo "❌ Not in a git repository"; return 1 }
+
+  echo "🎯 Creating worktree for issue #$issue in $repo"
+
+  # ---- STEP 3: Get issue content ----
+  local content=$(gh issue view $issue --repo $repo 2>/dev/null)
+  if [ -z "$content" ]; then
+    echo "❌ Could not fetch issue #$issue"
+    echo "   Check: https://github.com/$repo/issues/$issue"
+    echo "   Or authenticate: gh auth login"
+    return 1
+  fi
+
+  # ---- STEP 4: Get branch name from Gemini ----
+  echo "🤖 Getting branch name from Gemini..."
+  local gemini_output=$(echo "$content" | gemini \
+    --prompt "Return ONLY a git branch name in format type/kebab-case for this issue.
+    Example: feat/add-new-feature or fix/login-bug")
+
+  # Extract branch name
+  local branch
+  if [[ "$gemini_output" =~ ([a-z]+/[a-z0-9-]+) ]]; then
+    branch="${match[1]}"
+  else
+    branch="feat/issue-$issue"
+  fi
+
+  echo "✅ Gemini suggests: $branch"
+
+  # ---- STEP 5: Check if branch already exists ----
+  if git show-ref --verify --quiet "refs/heads/$branch" 2>/dev/null; then
+    echo ""
+    echo "❌ BRANCH CONFLICT: '$branch' already exists!"
+
+    # Check if branch is used by any worktree
+    local worktree_info=$(git worktree list | grep "\[$branch\]")
+    if [ -n "$worktree_info" ]; then
+      echo "   ⚠️  This branch is being used by a worktree:"
+      echo "   $worktree_info"
+    else
+      echo "   ℹ️  Branch exists but is not currently used by any worktree"
+    fi
+
+    # Check if this might be from a previous attempt at this issue
+    if [[ "$branch" == "feat/issue-$issue" ]] || [[ "$branch" =~ $issue ]]; then
+      echo ""
+      echo "🔧 This looks like a leftover branch from issue #$issue"
+      echo "   You can safely delete it: git branch -D $branch"
+      echo "   Then run: giw $issue"
+    else
+      echo ""
+      echo "🔧 Options:"
+      echo "   1. Delete this branch: git branch -D $branch"
+      echo "   2. Use a different branch name manually"
+      echo "   3. Check why this branch exists first"
+    fi
+
+    return 1
+  fi
+
+  # ---- STEP 6: Create worktree ----
+  echo ""
+  echo "📁 Creating worktree..."
+  git worktree add -b "$branch" "$dir" main || {
+    echo "❌ Failed to create worktree"
+    echo "   Check if 'main' exists: git branch -a | grep main"
+    return 1
+  }
+
+  cd "$dir"
+  echo "✅ Created in: $(pwd)"
+
+  # Setup mise
+  [ -f "mise.toml" ] && { mise trust 2>/dev/null; echo "🔧 mise trusted" }
+
+  echo ""
+  echo "🚀 READY TO WORK ON ISSUE #$issue"
+  echo "🌿 Branch: $(git branch --show-current)"
+  echo "📁 Location: $(pwd)"
+  echo "🔗 Issue: https://github.com/$repo/issues/$issue"
+
+  # Show issue title
+  local issue_title=$(echo "$content" | head -1)
+  echo "📝 Issue: $issue_title"
+}
+
+# ============================================================================
+# ZELLIJ PROFILES & ALIASES
+# ============================================================================
+
+# Default invisible session (no UI)
+alias z='zellij --session main attach --create'
+
+# Themed sessions with different profiles
+alias z-dracula='zellij options --theme dracula --session dracula attach --create'
+alias z-nord='zellij options --theme nord --session nord attach --create'
+alias z-catppuccin='zellij options --theme catppuccin-mocha --session catppuccin attach --create'
+alias z-tokyo='zellij options --theme tokyo-night --session tokyo attach --create'
+alias z-light='zellij options --theme solarized-light --session light attach --create'
+
+# Session management
+alias zls='zellij list-sessions'
+alias za='zellij attach'
+alias zkill='zellij kill-all-sessions'
+alias zk='zellij delete-session'
+
+# ============================================================================
+# LOWFI FLOATING PLAYER (WORKS IN ANY SESSION)
+# ============================================================================
+
+# Default lowfi floating player
+alias lowfi='zellij run --floating --close-on-exit --width 23% --height 15% --x 70% --y 10% -- lowfi -amb'
+
+# Lowfi variants
+alias lowfi-mini='zellij run --floating --close-on-exit --width 35% --height 20% --x 65% --y 5% -- lowfi -m'
+alias lowfi-compact='zellij run --floating --close-on-exit --width 30% --height 20% --x 2% --y 2% -- lowfi'
+
+# Start Zellij with theme AND lowfi in one command
+alias zlowfi-dracula='zellij options --theme dracula --session lofi attach --create && zellij run --floating --close-on-exit --width 40% --height 30% --x 70% --y 10% -- lowfi'
+alias zlowfi-nord='zellij options --theme nord --session lofi attach --create && zellij run --floating --close-on-exit --width 40% --height 30% --x 70% --y 10% -- lowfi'
+alias zlowfi-catppuccin='zellij options --theme catppuccin-mocha --session lofi attach --create && zellij run --floating --close-on-exit --width 40% --height 30% --x 70% --y 10% -- lowfi'
+
+# ============================================================================
+# Yazi shortcut
+# https://yazi-rs.github.io/docs/configuration/overview
+# ============================================================================
+function y() {
+	local tmp="$(mktemp -t "yazi-cwd.XXXXXX")" cwd
+	command yazi "$@" --cwd-file="$tmp"
+	IFS= read -r -d '' cwd < "$tmp"
+	[ "$cwd" != "$PWD" ] && [ -d "$cwd" ] && builtin cd -- "$cwd"
+	command rm -f -- "$tmp"
+}

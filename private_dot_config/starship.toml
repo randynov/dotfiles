@@ -11,6 +11,7 @@
 
 # ---------- GLOBAL LAYOUT ----------
 add_newline = true
+scan_timeout = 50
 format = """
 [╭](fg:green)\
 $os\
@@ -154,6 +155,9 @@ disabled = false
 [nodejs]
 format = '[─](fg:current_line)[](fg:bluegreen)[$symbol](fg:primary bg:bluegreen)[](fg:bluegreen bg:dkgrey)[ $version](fg:foreground bg:dkgrey)[](fg:dkgrey)'
 symbol = '󰎙'
+detect_extensions = []
+detect_files = ['.node-version', 'package.json']
+detect_folders = ['node_modules']
 
 [dotnet]
 format = '[─](fg:current_line)[](fg:purple)[$symbol](fg:primary bg:purple)[](fg:purple bg:box)[ $tfm](fg:foreground bg:box)[](fg:box)'
@@ -162,6 +166,9 @@ symbol = ' .NET'
 [python]
 format = '[─](fg:current_line)[](fg:cyan)[$symbol](fg:primary bg:cyan)[](fg:cyan bg:dkgrey)[ $version](fg:foreground bg:dkgrey)[](fg:dkgrey)'
 symbol = ''
+detect_extensions = []
+detect_files = ['.python-version', 'pyproject.toml', 'requirements.txt', 'Pipfile']
+detect_folders = ['.venv', '__pycache__']
 
 [java]
 format = '[─](fg:current_line)[](fg:salmon)[$symbol](fg:primary bg:salmon)[](fg:salmon bg:box)[ $version](fg:foreground bg:box)[](fg:box)'

@@ -5,10 +5,9 @@
 	required = true
 [user]
 	name = Randall
-	email = randall@starfysh.net
+	email = 976199+randynov@users.noreply.github.com
 [core]
 	excludesfile = /Users/randallnoval/.gitignore_global
-	pager = delta
 [interactive]
     diffFilter = delta --color-only
 [delta]
@@ -51,3 +50,7 @@
 [credential "https://gist.github.com"]
 	helper = 
 	helper = !/opt/homebrew/bin/gh auth git-credential
+[coderabbit]
+	machineId = cli/1fdea90e97ac435c9c94e98a8b02a527
+[pager]
+	diff = diffnav

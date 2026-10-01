@@ -11,7 +11,7 @@ defaults write com.apple.dock magnification -bool true
 defaults write com.apple.dock orientation -string left
 defaults write com.apple.dock show-recents -bool true
 defaults write com.apple.dock mru-spaces -bool false
-# Hot corners: TL Quick Note, TR Desktop, BL Notification Center, BR Application Windows
+# Hot corners: TL Quick Note, TR Desktop, BL Put Display to Sleep, BR Application Windows
 defaults write com.apple.dock wvous-tl-corner -int 14
 defaults write com.apple.dock wvous-tr-corner -int 4
 defaults write com.apple.dock wvous-bl-corner -int 10

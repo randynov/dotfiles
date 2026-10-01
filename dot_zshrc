@@ -43,7 +43,11 @@ export PATH
 # ================================================
 
 # Add custom completions directory to fpath
-fpath=($HOME/.zsh $fpath)
+fpath=(
+  $HOME/.zsh
+  /Users/randallnoval/.docker/completions
+  $fpath
+)
 
 # Enhanced completion system
 autoload -Uz compinit
@@ -86,9 +90,9 @@ zstyle ':completion:*:*:cd:*:directory-stack' menu yes select
 zstyle ':completion:*:-tilde-:*' group-order 'named-directories' 'path-directories' 'users' 'expand'
 zstyle ':completion:*' squeeze-slashes true
 
-# FZF-tab completion styling
-zstyle ':fzf-tab:complete:cd:*' fzf-preview 'ls --color $realpath'
-zstyle ':fzf-tab:complete:__zoxide_z:*' fzf-preview 'ls --color $realpath'
+# FZF-tab completion styling (preview disabled - causes cursor position bugs with Unicode prompts)
+# zstyle ':fzf-tab:complete:cd:*' fzf-preview 'ls --color $realpath'
+# zstyle ':fzf-tab:complete:__zoxide_z:*' fzf-preview 'ls --color $realpath'
 
 # Enable approximate matching
 zstyle ':completion:*' completer _complete _match _approximate
@@ -371,20 +375,17 @@ zinit light-mode for \
 
 ### End of Zinit's installer chunk
 
+# Load fzf-tab synchronously (must load after compinit, before other plugins)
+zinit light Aloxaf/fzf-tab
+
 # Load plugins with turbo mode for faster startup
 zinit wait lucid for \
         zdharma-continuum/fast-syntax-highlighting \
-        zsh-users/zsh-autosuggestions \
-        Aloxaf/fzf-tab
+        zsh-users/zsh-autosuggestions
 
 alias claude="/Users/randallnoval/.claude/local/claude"
 
 [[ "$TERM_PROGRAM" == "kiro" ]] && . "$(kiro --locate-shell-integration-path zsh)"
-# The following lines have been added by Dbrew info postgresql@17ocker Desktop to enable Docker CLI completions.
-fpath=(/Users/randallnoval/.docker/completions $fpath)
-autoload -Uz compinit
-compinit
-# End of Docker CLI completions
 
 # Added by Antigravity
 export PATH="/Users/randallnoval/.antigravity/antigravity/bin:$PATH"

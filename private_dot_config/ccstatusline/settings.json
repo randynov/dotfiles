@@ -1,0 +1,48 @@
+{
+  "version": 3,
+  "lines": [
+    [
+      {
+        "id": "1",
+        "type": "model",
+        "color": "green",
+        "rawValue": true
+      },
+      {
+        "id": "3",
+        "type": "context-percentage-usable",
+        "color": "yellow",
+        "rawValue": true
+      },
+      {
+        "id": "5",
+        "type": "git-branch",
+        "color": "brightBlack",
+        "rawValue": true
+      },
+      {
+        "id": "7",
+        "type": "git-changes",
+        "color": "yellow"
+      },
+      {
+        "id": "block",
+        "type": "block-timer",
+        "color": "magenta",
+        "rawValue": true,
+        "metadata": {
+          "display": "progress"
+        }
+      }
+    ]
+  ],
+  "flexMode": "full-minus-40",
+  "compactThreshold": 60,
+  "colorLevel": 3,
+  "defaultPadding": " ",
+  "inheritSeparatorColors": false,
+  "globalBold": false,
+  "powerline": {
+    "enabled": false
+  }
+}
